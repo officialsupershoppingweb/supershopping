@@ -1,0 +1,262 @@
+/* --- GLOBAL RESET & THEME VARIABLES --- */
+:root {
+  --primary-blue: #1a237e;      /* Deep Royal Flipkart Navy Blue */
+  --primary-accent: #2874f0;    /* Interactive Accent Blue */
+  --amber-gold: #ffc200;        /* Reward Coins & Badges */
+  --bg-slate: #f1f3f6;          /* Clean Canvas Background */
+  --text-dark: #1e293b;         /* Modern High-Contrast Charcoal */
+  --text-muted: #64748b;        /* Secondary Subtitle Grey */
+  --border-color: #e2e8f0;      /* Card & Input Border */
+  --success-green: #10b981;     /* Verified & Green Coin Status */
+  --danger-red: #ef4444;        /* Error & Cancelled Status */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-slate);
+  color: var(--text-dark);
+  padding-bottom: 75px; /* Bottom Nav Space */
+}
+
+/* --- HEADER & FLIPKART STYLE SEARCH PILL --- */
+header {
+  background: var(--primary-blue);
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.brand-logo {
+  color: #ffffff;
+  font-size: 19px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-logo span {
+  color: var(--amber-gold);
+}
+
+.header-wallet-pill {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 6px 12px;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.search-pill-box {
+  width: 100%;
+  background: #ffffff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 8px 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+.search-pill-box i {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-right: 10px;
+}
+
+.search-pill-box input {
+  width: 100%;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--text-dark);
+}
+
+/* --- CATEGORY CIRCLE SLIDER --- */
+.category-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 14px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--border-color);
+  scrollbar-width: none;
+}
+.category-carousel::-webkit-scrollbar { display: none; }
+
+.category-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 60px;
+  cursor: pointer;
+}
+
+.category-icon-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--primary-accent);
+}
+
+.category-item.active .category-icon-circle {
+  background: var(--primary-blue);
+  color: #ffffff;
+  border-color: var(--primary-blue);
+}
+
+.category-item span {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.category-item.active span {
+  color: var(--primary-blue);
+}
+
+/* --- 3-COLUMN DEALS GRID (FLIPKART STYLE) --- */
+.section-title {
+  padding: 16px 16px 8px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.deals-grid-3col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 0 10px;
+}
+
+.deal-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+  position: relative;
+}
+
+.deal-card img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.deal-rating-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0,0,0,0.65);
+  color: #fff;
+  font-size: 10px;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.deal-title {
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.deal-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+
+.deal-final-price {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.deal-mrp {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.deal-custom-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--success-green);
+  margin-top: 4px;
+  background: #ecfdf5;
+  padding: 2px 4px;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* --- FIXED 5-BUTTON BOTTOM NAVIGATION --- */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  z-index: 1000;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-decoration: none;
+  cursor: pointer;
+  gap: 3px;
+}
+
+.nav-item.active {
+  color: var(--primary-accent);
+  font-weight: 700;
+}
+
+.nav-item i {
+  font-size: 18px;
+}
