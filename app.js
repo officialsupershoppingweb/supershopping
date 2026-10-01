@@ -1,542 +1,657 @@
-/* ========================================================
-   SUPER SHOPPING - CORE FRONTEND ENGINE (CUSTOMER PORTAL)
-   ======================================================== */
+/* ==========================================================================
+   SUPER SHOPPING - CORE APP LOGIC & ENGINE
+   ========================================================================== */
 
-// --- 1. LOCAL STATE & CONFIGURATION ---
-const APP_CONFIG = {
-  SCRIPT_URL: "https://script.google.com/macros/s/AKfycbw.../exec", // Backend Apps Script URL
-  MIN_SHARPNESS_THRESHOLD: 12.0 // Canvas blur limit check
+// --- 1. STATE & LOCAL DATA STORES ---
+const AppState = {
+  currentTab: 'home',
+  currentUser: {
+    isLoggedIn: false,
+    name: 'Guest User',
+    id: 'SS-GUEST-1092',
+    phone: '',
+    address: '',
+    referralCode: 'SS-REF-8821',
+    referralsCount: 2, // Out of 5
+    coinsBalance: 24,
+    pendingCash: 120
+  },
+  activeCameraTarget: null, // 'invoice', 'product', 'delivery'
+  capturedProofs: {
+    invoice: null,
+    product: null,
+    delivery: null
+  },
+  selectedRewardMethod: 'cashback', // 'cashback' or 'coins'
+  mediaStream: null
 };
 
-let currentUser = JSON.parse(localStorage.getItem("ss_user_session")) || null;
-let currentProducts = [];
-let currentEbooks = [];
-
-// Sample Mock Data (Testing & Instant Display)
-const MOCK_PRODUCTS = [
+// Mock Verified Deals Database (Dynamic Store Engine)
+const DealsCatalog = [
   {
-    id: "PROD-101",
-    title: "AUSK Maroon Cotton Blend Formal Shirt",
+    id: 'D01',
+    title: 'Men Casual Solid Slim Fit Cotton Shirt',
+    store: 'flipkart',
+    price: 449,
     mrp: 1499,
-    price: 484,
-    category: "Fashion",
-    rating: "4.2",
-    rewardTag: "Earn ₹25 Cashback",
-    affiliateLink: "https://amazon.in",
-    images: [
-      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500",
-      "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500"
-    ],
-    specs: { "Fabric": "Cotton Blend", "Pattern": "Solid", "Fit": "Slim Fit", "Wash": "Machine Wash" }
+    discount: '70% OFF',
+    category: 'fashion',
+    imageUrl: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=400&q=80',
+    affiliateUrl: 'https://earnkaro.com/' // Profit Link destination
   },
   {
-    id: "PROD-102",
-    title: "IQOO Z11x 5G Smartphone (Titanium Grey)",
-    mrp: 29399,
-    price: 27649,
-    category: "Mobiles",
-    rating: "4.5",
-    rewardTag: "Earn 2.5%-5% Cashback",
-    affiliateLink: "https://amazon.in",
-    images: [
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500"
-    ],
-    specs: { "RAM": "8 GB", "Storage": "128 GB", "Battery": "6000 mAh", "Camera": "50MP AI" }
+    id: 'D02',
+    title: 'Wireless Bluetooth Headphone with Deep Bass',
+    store: 'amazon',
+    price: 999,
+    mrp: 2999,
+    discount: '66% OFF',
+    category: 'electronics',
+    imageUrl: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=400&q=80',
+    affiliateUrl: 'https://amazon.in/' // Direct Amazon Associates link
   },
   {
-    id: "PROD-103",
-    title: "Wireless Bluetooth Smart Earbuds with ANC",
-    mrp: 3999,
+    id: 'D03',
+    title: 'Stainless Steel Insulated Water Bottle (1 Litre)',
+    store: 'amazon',
+    price: 499,
+    mrp: 999,
+    discount: '50% OFF',
+    category: 'home',
+    imageUrl: 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&w=400&q=80',
+    affiliateUrl: 'https://amazon.in/'
+  },
+  {
+    id: 'D04',
+    title: 'Smart Fitness Tracker Band with Heart Rate Monitor',
+    store: 'flipkart',
     price: 1299,
-    category: "Electronics",
-    rating: "4.3",
-    rewardTag: "Earn 40 Coins",
-    affiliateLink: "https://amazon.in",
-    images: [
-      "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500"
-    ],
-    specs: { "Playtime": "40 Hours", "ANC": "Active Noise Cancelling", "Bluetooth": "v5.3" }
+    mrp: 3499,
+    discount: '62% OFF',
+    category: 'electronics',
+    imageUrl: 'https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?auto=format&fit=crop&w=400&q=80',
+    affiliateUrl: 'https://earnkaro.com/'
   }
 ];
 
-const MOCK_EBOOKS = [
+// Mock E-Books & Study Notes Database
+const EbooksCatalog = [
   {
-    id: "EB-01",
-    title: "Complete Digital Marketing Masterguide",
-    coinPrice: 30,
-    cashPrice: 149,
-    pdfUrl: "https://example.com/sample.pdf",
-    cover: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500"
+    id: 'EB01',
+    title: 'Class 12 Accounts & Partnership Master Notes',
+    author: 'Commerce Hub Expert',
+    category: 'commerce',
+    coinCost: 25,
+    previewPages: 'Chapter 1: Goodwill Valuation & Distribution Rules.\nCapital adjustments and profit sharing ratio changes summarized in simple step-by-step points...',
+    pdfUrl: '#'
   },
   {
-    id: "EB-02",
-    title: "Accounting & Tally Prime Shortcut Handbook",
-    coinPrice: 20,
-    cashPrice: 99,
-    pdfUrl: "https://example.com/sample.pdf",
-    cover: "https://images.unsplash.com/photo-1554415707-9e4466bfe039?w=500"
+    id: 'EB02',
+    title: 'Zero to Hero: Affiliate Marketing Growth Playbook',
+    author: 'Digital Growth Lab',
+    category: 'business',
+    coinCost: 35,
+    previewPages: 'Module 1: High converting deals discovery.\nHow performance marketing engines generate steady daily transactions using organic networks...',
+    pdfUrl: '#'
+  },
+  {
+    id: 'EB03',
+    title: 'Class 11 English Core Complete Notes & Analysis',
+    author: 'Faculty of Humanities',
+    category: 'notes1112',
+    coinCost: 15,
+    previewPages: 'Chapter Overview: The Portrait of a Lady.\nCharacter sketch, central themes, grandmother-grandson relationship stages and exam questions...',
+    pdfUrl: '#'
   }
 ];
 
-// --- 2. INITIALIZATION & SESSION PERSISTENCE ---
-document.addEventListener("DOMContentLoaded", () => {
-  currentProducts = MOCK_PRODUCTS;
-  currentEbooks = MOCK_EBOOKS;
-  
-  renderProducts(currentProducts);
-  renderEbooks(currentEbooks);
-  checkAuthPersistence();
+// Mock 100-Day Active Pipeline Orders
+const UserOrdersPipeline = [
+  {
+    orderId: 'OD-40918-2026',
+    productName: 'Cotton Casual Shirt',
+    store: 'Flipkart',
+    claimType: 'Cashback Reward',
+    amount: '₹80',
+    currentDay: 28,
+    returnSafe: true, // Return window elapsed
+    settlementDate: 'Day 101'
+  }
+];
+
+// --- 2. INITIALIZATION ---
+document.addEventListener('DOMContentLoaded', () => {
+  renderDeals(DealsCatalog);
+  renderEbooks(EbooksCatalog);
+  renderOrdersPipeline();
+  renderReferralBadges();
+  setupEventListeners();
+  updateUserUI();
 });
 
-function checkAuthPersistence() {
-  if (currentUser) {
-    updateUserInterface();
+// --- 3. TAB NAVIGATION & HEADER SEARCH VISIBILITY ---
+function switchTab(targetTab) {
+  AppState.currentTab = targetTab;
+
+  // Tab Panes Active Toggle
+  document.querySelectorAll('.tab-pane').forEach(pane => {
+    pane.classList.remove('active');
+  });
+  const activePane = document.getElementById(`pane-${targetTab}`);
+  if (activePane) activePane.classList.add('active');
+
+  // Bottom Nav Bar Icons Active Toggle
+  document.querySelectorAll('.nav-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.tab === targetTab);
+  });
+
+  // FROZEN RULE: Search Bar visibility logic
+  const searchContainer = document.getElementById('headerSearchContainer');
+  const titleBar = document.getElementById('headerTitleBar');
+  const titleText = document.getElementById('titleBarText');
+  const searchInput = document.getElementById('globalSearchInput');
+
+  if (targetTab === 'home') {
+    searchContainer.style.display = 'flex';
+    titleBar.style.display = 'none';
+    searchInput.placeholder = 'Search products, deals, discounts...';
+  } else if (targetTab === 'ebooks') {
+    searchContainer.style.display = 'flex';
+    titleBar.style.display = 'none';
+    searchInput.placeholder = 'Search study notes, e-books, guides...';
   } else {
-    // Guest or trigger login modal if needed
-    document.getElementById("profileNameDisplay").innerText = "Guest User";
-    document.getElementById("profileEmailDisplay").innerText = "Please login to track rewards";
-    document.getElementById("profileUserIdDisplay").innerText = "ID: Not Logged In";
-  }
-}
+    // Hide search bar on Earn, Wallet, Account tabs
+    searchContainer.style.display = 'none';
+    titleBar.style.display = 'block';
 
-function updateUserInterface() {
-  document.getElementById("headerCoinCount").innerText = `${currentUser.coins || 0} Coins`;
-  document.getElementById("walletCoinBalance").innerText = currentUser.coins || 0;
-  document.getElementById("walletCashPipeline").innerText = `₹${currentUser.cashPipeline || 0}`;
-  
-  // Profile Screen
-  document.getElementById("profileNameDisplay").innerText = currentUser.name;
-  document.getElementById("profileEmailDisplay").innerText = currentUser.email;
-  document.getElementById("profileUserIdDisplay").innerText = `ID: ${currentUser.id}`;
-  document.getElementById("profileAvatar").innerText = currentUser.name.charAt(0).toUpperCase();
-  
-  // Referral
-  const refCode = `REF-${currentUser.id.slice(-4)}`;
-  document.getElementById("userReferralCode").innerText = refCode;
-  document.getElementById("refUsageText").innerText = `Referrals Used: ${currentUser.referralsUsed || 0}/5`;
-
-  renderCashMilestones(currentUser.orders || []);
-}
-
-// --- 3. BOTTOM NAVIGATION TAB SWITCHER ---
-function switchTab(tabName) {
-  document.querySelectorAll(".tab-content").forEach(el => el.style.display = "none");
-  document.querySelectorAll(".nav-item").forEach(el => el.classList.remove("active"));
-  
-  const targetTab = document.getElementById(`tab-${tabName}`);
-  if (targetTab) targetTab.style.display = "block";
-  
-  const navIndices = { home: 0, earn: 1, ebooks: 2, wallet: 3, account: 4 };
-  const navItems = document.querySelectorAll(".nav-item");
-  if (navItems[navIndices[tabName]]) {
-    navItems[navIndices[tabName]].classList.add("active");
-  }
-  window.scrollTo(0, 0);
-}
-
-// --- 4. FLIPKART STYLE PRODUCT RENDER & SMART DEMAND INTERCEPTOR ---
-function renderProducts(items) {
-  const grid = document.getElementById("productsGrid");
-  grid.innerHTML = "";
-
-  if (items.length === 0) {
-    grid.innerHTML = `<p style="grid-column: span 3; text-align: center; color: var(--text-muted); padding: 30px;">Koi product nahi mila.</p>`;
-    return;
+    if (targetTab === 'earn') titleText.textContent = '🎁 Claim Purchase Reward';
+    if (targetTab === 'wallet') titleText.textContent = '💳 Rewards & Payout Wallet';
+    if (targetTab === 'account') titleText.textContent = '👤 Account & Settings';
   }
 
-  items.forEach(prod => {
-    const card = document.createElement("div");
-    card.className = "deal-card";
-    card.onclick = () => openProductModal(prod);
-    card.innerHTML = `
-      <span class="deal-rating-badge">${prod.rating} ★</span>
-      <img src="${prod.images[0]}" alt="${prod.title}" loading="lazy">
-      <div class="deal-title">${prod.title}</div>
-      <div class="deal-price-row">
-        <span class="deal-final-price">₹${prod.price}</span>
-        <span class="deal-mrp">₹${prod.mrp}</span>
+  // Scroll to top of container smoothly
+  const main = document.getElementById('appMain');
+  if (main) main.scrollTop = 0;
+}
+
+// --- 4. RENDER DEALS & DYNAMIC STORE BUTTONS (FLIPKART / AMAZON) ---
+function renderDeals(deals) {
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
+
+  grid.innerHTML = deals.map(deal => {
+    const isAmazon = deal.store.toLowerCase() === 'amazon';
+    const storeBadgeClass = isAmazon ? 'badge-store-amazon' : 'badge-store-flipkart';
+    const storeBadgeText = isAmazon ? 'Amazon Deal' : 'Flipkart Deal';
+    const btnClass = isAmazon ? 'btn-store-amazon' : 'btn-store-flipkart';
+    const btnText = isAmazon ? '⚡ Shop on Amazon' : '⚡ Shop on Flipkart';
+
+    return `
+      <div class="product-card">
+        <div class="product-thumb-wrap">
+          <img src="${deal.imageUrl}" alt="${deal.title}" loading="lazy" />
+          <span class="product-store-badge ${storeBadgeClass}">${storeBadgeText}</span>
+        </div>
+        <div class="product-details">
+          <h4 class="product-title" title="${deal.title}">${deal.title}</h4>
+          <div class="price-row">
+            <span class="deal-price">₹${deal.price}</span>
+            <span class="mrp-price">₹${deal.mrp}</span>
+            <span class="discount-tag">${deal.discount}</span>
+          </div>
+          <a href="${deal.affiliateUrl}" target="_blank" rel="noopener noreferrer" class="btn-store-action ${btnClass}">
+            ${btnText}
+          </a>
+        </div>
       </div>
-      <div class="deal-custom-badge">${prod.rewardTag}</div>
     `;
-    grid.appendChild(card);
-  });
+  }).join('');
 }
 
-function handleSearch(query) {
-  const q = query.trim().toLowerCase();
-  if (!q) {
-    renderProducts(currentProducts);
+// --- 5. RENDER E-BOOKS (PORTRAIT SHELF VIEW) ---
+function renderEbooks(books) {
+  const grid = document.getElementById('ebooksStoreGrid');
+  if (!grid) return;
+
+  grid.innerHTML = books.map(book => {
+    return `
+      <div class="ebook-card">
+        <div class="ebook-cover-wrap">
+          <span class="ebook-preview-tag">👁️ Sample Inside</span>
+          <span style="font-weight:700; font-size:12px; z-index:2;">${book.title}</span>
+        </div>
+        <div class="ebook-details">
+          <h5 class="ebook-title">${book.title}</h5>
+          <span class="ebook-author">${book.author}</span>
+          <span class="ebook-price-pill">🪙 ${book.coinCost} Green Coins</span>
+          <div class="ebook-actions-stack">
+            <button type="button" class="btn-preview" onclick="openBookPreview('${book.id}')">Read Preview</button>
+            <button type="button" class="btn-unlock-coin" onclick="unlockBookWithCoins('${book.id}', ${book.coinCost})">⚡ Unlock Book</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// --- 6. WALLET 100-DAY TRACKER PIPELINE ---
+function renderOrdersPipeline() {
+  const container = document.getElementById('walletPipelineList');
+  if (!container) return;
+
+  if (UserOrdersPipeline.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <p style="color:#64748b; font-size:12.5px; text-align:center;">Abhi koi active order cashback pipeline me nahi hai.</p>
+      </div>
+    `;
     return;
   }
-  const filtered = currentProducts.filter(p => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+
+  container.innerHTML = UserOrdersPipeline.map(item => {
+    return `
+      <div class="order-pipeline-card">
+        <div class="order-pipeline-header">
+          <span class="order-platform-tag">${item.store} • ${item.orderId}</span>
+          <span class="order-day-tag">Day ${item.currentDay} of 100</span>
+        </div>
+        <p style="font-size:13px; font-weight:700; margin-bottom:4px;">${item.productName}</p>
+        <span style="font-size:11.5px; color:#475569;">Expected Reward: <strong>${item.amount} via UPI</strong></span>
+
+        <!-- 4-Stage Progress Road -->
+        <div class="progress-road">
+          <div class="road-step completed">✓</div>
+          <div class="road-step completed">✓</div>
+          <div class="road-step current">●</div>
+          <div class="road-step">○</div>
+        </div>
+        <div class="road-labels">
+          <span>Claimed</span>
+          <span>Verified</span>
+          <span>Merchant</span>
+          <span>101st Day UPI</span>
+        </div>
+
+        ${item.returnSafe ? `
+          <div class="order-safe-badge">
+            🛡️ Return Period Safe: Commission Approved
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// --- 7. ACCOUNT 5 REFERRAL SLOTS ---
+function renderReferralBadges() {
+  const container = document.getElementById('referralSlotsContainer');
+  if (!container) return;
+
+  const totalSlots = 5;
+  const claimed = AppState.currentUser.referralsCount;
+  let html = '';
+
+  for (let i = 1; i <= totalSlots; i++) {
+    const isClaimed = i <= claimed;
+    html += `
+      <div class="ref-slot-badge ${isClaimed ? 'claimed' : ''}">
+        <div class="slot-circle">${isClaimed ? '✓' : i}</div>
+        <span class="slot-label">${isClaimed ? 'Won 10🪙' : 'Empty'}</span>
+      </div>
+    `;
+  }
+  container.innerHTML = html;
+}
+
+// --- 8. REWARD METHOD SELECTION & CONDITIONAL UPI ---
+function selectRewardMethod(type) {
+  AppState.selectedRewardMethod = type;
+  const cardCash = document.getElementById('cardCashback');
+  const cardCoins = document.getElementById('cardCoins');
+  const upiContainer = document.getElementById('upiFieldContainer');
+
+  if (type === 'cashback') {
+    cardCash.classList.add('selected');
+    cardCoins.classList.remove('selected');
+    upiContainer.style.display = 'block';
+  } else {
+    cardCoins.classList.add('selected');
+    cardCash.classList.remove('selected');
+    upiContainer.style.display = 'none';
+  }
+}
+
+// --- 9. IN-APP LIVE CAMERA ENGINE (DIRECT VIEWPORT CAPTURE) ---
+async function openLiveCamera(targetType) {
+  AppState.activeCameraTarget = targetType;
+  const modal = document.getElementById('cameraModal');
+  const video = document.getElementById('liveVideoFeed');
+  const title = document.getElementById('cameraTargetTitle');
+
+  if (targetType === 'invoice') title.textContent = 'Capture Live Invoice / Bill';
+  if (targetType === 'product') title.textContent = 'Capture Live Unboxed Product';
+  if (targetType === 'delivery') title.textContent = 'Capture Delivery App Screenshot Proof';
+
+  modal.style.display = 'flex';
+
+  try {
+    // Request environment/rear camera on mobile devices
+    AppState.mediaStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment' },
+      audio: false
+    });
+    video.srcObject = AppState.mediaStream;
+  } catch (err) {
+    alert('Camera permission denied ya camera available nahi hai. Device setting check karein.');
+    closeLiveCamera();
+  }
+}
+
+function snapPhoto() {
+  const video = document.getElementById('liveVideoFeed');
+  const canvas = document.getElementById('liveCaptureCanvas');
+  const context = canvas.getContext('2d');
+
+  canvas.width = video.videoWidth || 640;
+  canvas.height = video.videoHeight || 480;
+  context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const photoBase64 = canvas.toDataURL('image/jpeg', 0.85);
+  const target = AppState.activeCameraTarget;
+
+  AppState.capturedProofs[target] = photoBase64;
+
+  // Update Proof box status in form
+  const statusBadge = document.getElementById(`status${target.charAt(0).toUpperCase() + target.slice(1)}`);
+  const thumbBox = document.getElementById(`thumb${target.charAt(0).toUpperCase() + target.slice(1)}`);
+
+  if (statusBadge) {
+    statusBadge.textContent = 'Captured ✓';
+    statusBadge.classList.add('captured');
+  }
+
+  if (thumbBox) {
+    thumbBox.style.display = 'block';
+    thumbBox.innerHTML = `<img src="${photoBase64}" alt="Captured ${target}" />`;
+  }
+
+  closeLiveCamera();
+}
+
+function closeLiveCamera() {
+  const modal = document.getElementById('cameraModal');
+  const video = document.getElementById('liveVideoFeed');
+
+  if (AppState.mediaStream) {
+    AppState.mediaStream.getTracks().forEach(track => track.stop());
+    AppState.mediaStream = null;
+  }
+  if (video) video.srcObject = null;
+  modal.style.display = 'none';
+}
+
+// --- 10. SMART FAQ ACCORDION HANDLER ---
+function toggleFaq(btnElement) {
+  const parentItem = btnElement.closest('.faq-item');
+  const isActive = parentItem.classList.contains('active');
+
+  // Close all open FAQs
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.classList.remove('active');
+  });
+
+  // Toggle current FAQ
+  if (!isActive) {
+    parentItem.classList.add('active');
+  }
+}
+
+// --- 11. E-BOOK PREVIEW & UNLOCK ---
+function openBookPreview(bookId) {
+  const book = EbooksCatalog.find(b => b.id === bookId);
+  if (!book) return;
+
+  const modal = document.getElementById('previewModal');
+  const title = document.getElementById('previewModalTitle');
+  const content = document.getElementById('previewContentBox');
+  const unlockBtn = document.getElementById('btnUnlockFromPreview');
+
+  title.textContent = book.title;
+  content.innerHTML = `
+    <div style="background:#f8fafc; padding:12px; border-radius:8px; border:1px solid #e2e8f0; font-size:12.5px; line-height:1.6; white-space:pre-line;">
+      ${book.previewPages}
+    </div>
+    <p style="font-size:11px; color:#64748b; margin-top:10px;">⚡ Full notes padhne ke liye apne Green Coins se unlock karein.</p>
+  `;
+
+  unlockBtn.onclick = () => {
+    closePreviewModal();
+    unlockBookWithCoins(book.id, book.coinCost);
+  };
+
+  modal.style.display = 'flex';
+}
+
+function closePreviewModal() {
+  document.getElementById('previewModal').style.display = 'none';
+}
+
+function unlockBookWithCoins(bookId, coinCost) {
+  if (AppState.currentUser.coinsBalance < coinCost) {
+    const deficit = coinCost - AppState.currentUser.coinsBalance;
+    alert(`Coins Shortage: Aapke paas ${AppState.currentUser.coinsBalance} Coins hain. Is book ke liye ${deficit} Coins aur chahiye!\n\nAmazon ya Flipkart se deals purchase karein aur coins kamayein.`);
+    switchTab('home');
+    return;
+  }
+
+  AppState.currentUser.coinsBalance -= coinCost;
+  updateUserUI();
+  alert(`Badhai ho! Book unlock ho chuki hai aur aapki "My Library" me add kar di gayi hai.`);
+}
+
+function switchEbookSegment(segment) {
+  const btnExp = document.getElementById('segExplore');
+  const btnLib = document.getElementById('segLibrary');
+  const storeView = document.getElementById('ebooksStoreGrid');
+  const libView = document.getElementById('ebooksLibraryView');
+  const catPills = document.getElementById('ebookCategoryPills');
+
+  if (segment === 'explore') {
+    btnExp.classList.add('active');
+    btnLib.classList.remove('active');
+    storeView.style.display = 'grid';
+    catPills.style.display = 'flex';
+    libView.style.display = 'none';
+  } else {
+    btnLib.classList.add('active');
+    btnExp.classList.remove('active');
+    storeView.style.display = 'none';
+    catPills.style.display = 'none';
+    libView.style.display = 'block';
+  }
+}
+
+// --- 12. CLAIM FORM SUBMIT (AUDIT VALIDATION) ---
+document.getElementById('rewardClaimForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const orderId = document.getElementById('orderIdInput').value.trim();
+  const prodName = document.getElementById('productNameInput').value.trim();
+  const upiId = document.getElementById('upiInput').value.trim();
+
+  if (!orderId || !prodName) {
+    alert('Kripya Order ID aur Product Name bharein.');
+    return;
+  }
+
+  // Live Proof Mandatory Check
+  if (!AppState.capturedProofs.invoice || !AppState.capturedProofs.product || !AppState.capturedProofs.delivery) {
+    alert('Sabhi 3 proofs ki Live camera photo click karna anivarya hai (Invoice, Product & Delivery Status).');
+    return;
+  }
+
+  if (AppState.selectedRewardMethod === 'cashback' && !upiId) {
+    alert('Cashback Reward ke liye valid UPI ID darj karein.');
+    return;
+  }
+
+  // Successful Simulation
+  alert('Claim Successfully Submitted!\nAapka claim Verification Desk par bhej diya gaya hai. Approval status aapke Wallet tab par live dikhega.');
   
-  if (filtered.length === 0) {
-    openDemandModal(query);
-  } else {
-    renderProducts(filtered);
-  }
-}
-
-function filterCategory(catName, el) {
-  document.querySelectorAll(".category-item").forEach(c => c.classList.remove("active"));
-  el.classList.add("active");
-  if (catName === "All") {
-    renderProducts(currentProducts);
-  } else {
-    const filtered = currentProducts.filter(p => p.category.toLowerCase() === catName.toLowerCase());
-    renderProducts(filtered);
-  }
-}
-
-// Demand Interceptor Modals
-function openDemandModal(searchWord) {
-  document.getElementById("demandProductInput").value = searchWord;
-  document.getElementById("demandModal").style.display = "flex";
-}
-function closeDemandModal() {
-  document.getElementById("demandModal").style.display = "none";
-}
-function submitProductDemand() {
-  const prod = document.getElementById("demandProductInput").value.trim();
-  const price = document.getElementById("demandTargetPrice").value.trim();
-  if (!prod) return alert("Kripya product ka naam ya link daalein.");
-
-  alert("Shukriya! Aapki request accept ho gayi hai. Hamari team 24 se 48 ghante me ise live kar degi.");
-  closeDemandModal();
-  document.getElementById("mainSearchInput").value = "";
-  renderProducts(currentProducts);
-}
-
-// --- 5. PRODUCT DETAIL SLIDER & STICKY BUY BAR ---
-let activeModalProduct = null;
-function openProductModal(prod) {
-  activeModalProduct = prod;
-  document.getElementById("detailTitle").innerText = prod.title;
-  document.getElementById("detailFinalPrice").innerText = `₹${prod.price}`;
-  document.getElementById("detailMrp").innerText = `₹${prod.mrp}`;
-  document.getElementById("detailRewardTag").innerText = prod.rewardTag;
-  document.getElementById("stickyBarPrice").innerText = `₹${prod.price}`;
-  document.getElementById("stickyBuyBtn").href = prod.affiliateLink;
-
-  // Swiper Photos
-  const mainImg = document.getElementById("detailMainImg");
-  const thumbStrip = document.getElementById("detailThumbnails");
-  mainImg.src = prod.images[0];
-  thumbStrip.innerHTML = "";
-
-  prod.images.forEach((imgUrl, idx) => {
-    const thumb = document.createElement("img");
-    thumb.src = imgUrl;
-    thumb.className = idx === 0 ? "active-thumb" : "";
-    thumb.onclick = () => {
-      mainImg.src = imgUrl;
-      thumbStrip.querySelectorAll("img").forEach(t => t.classList.remove("active-thumb"));
-      thumb.classList.add("active-thumb");
-    };
-    thumbStrip.appendChild(thumb);
+  // Reset Form
+  e.target.reset();
+  AppState.capturedProofs = { invoice: null, product: null, delivery: null };
+  document.querySelectorAll('.preview-thumbnail').forEach(el => el.style.display = 'none');
+  document.querySelectorAll('.proof-status-tag').forEach(el => {
+    el.textContent = 'Pending Capture';
+    el.classList.remove('captured');
   });
 
-  // Specs
-  const specsDiv = document.getElementById("detailSpecsContent");
-  specsDiv.innerHTML = "";
-  for (const [k, v] of Object.entries(prod.specs || {})) {
-    specsDiv.innerHTML += `<div style="display:flex; justify-content:space-between; padding:4px 0; border-bottom:1px solid #eee; font-size:12px;"><strong>${k}</strong><span>${v}</span></div>`;
+  switchTab('wallet');
+});
+
+// --- 13. AUTH & ONBOARDING MODAL ---
+function openAuthModal() {
+  document.getElementById('authModal').style.display = 'flex';
+}
+
+function closeAuthModal() {
+  document.getElementById('authModal').style.display = 'none';
+}
+
+function switchAuthMode(mode) {
+  const isSignup = mode === 'signup';
+  document.getElementById('btnAuthLogin').classList.toggle('active', !isSignup);
+  document.getElementById('btnAuthSignup').classList.toggle('active', isSignup);
+
+  document.getElementById('grpFullName').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('grpReferral').style.display = isSignup ? 'block' : 'none';
+  document.getElementById('grpTermsCheckbox').style.display = isSignup ? 'flex' : 'none';
+  document.getElementById('authSubmitBtn').textContent = isSignup ? 'Agree & Create Account' : 'Sign In';
+}
+
+document.getElementById('authForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const isSignup = document.getElementById('btnAuthSignup').classList.contains('active');
+
+  if (isSignup) {
+    const agreed = document.getElementById('authTermsAgree').checked;
+    if (!agreed) {
+      alert('Terms of Service aur Cashback Policy ko agree karna zaroori hai.');
+      return;
+    }
+    const name = document.getElementById('authFullName').value.trim() || 'Valued Member';
+    AppState.currentUser.isLoggedIn = true;
+    AppState.currentUser.name = name;
+  } else {
+    AppState.currentUser.isLoggedIn = true;
+    AppState.currentUser.name = 'Verified Member';
   }
 
-  // Similar Products Slider
-  const simRow = document.getElementById("detailSimilarRow");
-  simRow.innerHTML = "";
-  currentProducts.filter(p => p.id !== prod.id).forEach(sp => {
-    const card = document.createElement("div");
-    card.style = "min-width: 110px; background:#fff; border:1px solid #e2e8f0; border-radius:6px; padding:6px; font-size:11px; cursor:pointer;";
-    card.onclick = () => openProductModal(sp);
-    card.innerHTML = `<img src="${sp.images[0]}" style="width:100%; height:90px; object-fit:cover; border-radius:4px;"><p style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${sp.title}</p><strong>₹${sp.price}</strong>`;
-    simRow.appendChild(card);
-  });
+  updateUserUI();
+  closeAuthModal();
+  alert('Welcome to Super Shopping!');
+});
 
-  document.getElementById("productDetailModal").style.display = "block";
+function handleAuthAction() {
+  if (AppState.currentUser.isLoggedIn) {
+    AppState.currentUser.isLoggedIn = false;
+    AppState.currentUser.name = 'Guest User';
+    updateUserUI();
+    alert('Logged out successfully.');
+  } else {
+    openAuthModal();
+  }
 }
 
-function closeProductModal() {
-  document.getElementById("productDetailModal").style.display = "none";
+// Update Top Pill & Account Displays
+function updateUserUI() {
+  const guestPill = document.getElementById('guestPill');
+  const nameDisplay = document.getElementById('accountNameDisplay');
+  const coinBal = document.getElementById('walletCoinBalance');
+  const cashBal = document.getElementById('walletPendingCash');
+
+  if (guestPill) guestPill.textContent = AppState.currentUser.isLoggedIn ? AppState.currentUser.name : 'Guest Mode';
+  if (nameDisplay) nameDisplay.textContent = AppState.currentUser.name;
+  if (coinBal) coinBal.textContent = AppState.currentUser.coinsBalance;
+  if (cashBal) cashBal.textContent = `₹${AppState.currentUser.pendingCash}`;
 }
 
-// --- 6. CLIENT-SIDE LIVE CAMERA BLUR & QUALITY AUDIT ---
-function processCapture(fileInput, previewId) {
-  const file = fileInput.files[0];
+// --- 14. PROFILE DP UPLOAD ---
+document.getElementById('dpFileInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.src = e.target.result;
-    img.onload = function() {
-      // Run Canvas Laplacian / Edge Contrast check
-      const isClear = evaluateSharpness(img);
-      if (!isClear) {
-        alert("⚠️ Please take a clear photo! Image bohot dhundhli ya andhere me hai. Kripya roshni me saaf photo lein.");
-        fileInput.value = ""; // Reset
-        document.getElementById(previewId).innerHTML = "";
-        return;
-      }
-      // Clean Preview
-      document.getElementById(previewId).innerHTML = `
-        <div style="position:relative; margin-top:8px;">
-          <img src="${img.src}" style="width:100px; height:100px; object-fit:cover; border-radius:6px; border:2px solid var(--success-green);">
-          <small style="display:block; color:var(--success-green); font-weight:600;"><i class="fa-solid fa-check"></i> Photo Verified Clear</small>
-        </div>
-      `;
-    };
+  reader.onload = function(evt) {
+    const avatarImg = document.getElementById('avatarImage');
+    const avatarInitials = document.getElementById('avatarInitials');
+    avatarImg.src = evt.target.result;
+    avatarImg.style.display = 'block';
+    avatarInitials.style.display = 'none';
   };
   reader.readAsDataURL(file);
-}
+});
 
-function evaluateSharpness(img) {
-  const canvas = document.getElementById("qualityAuditCanvas");
-  const ctx = canvas.getContext("2d");
-  canvas.width = 100;
-  canvas.height = 100;
-  ctx.drawImage(img, 0, 0, 100, 100);
-  
-  const imgData = ctx.getImageData(0, 0, 100, 100);
-  const data = imgData.data;
-  let totalContrast = 0;
-
-  for (let i = 0; i < data.length - 4; i += 4) {
-    const diff = Math.abs(data[i] - data[i + 4]);
-    totalContrast += diff;
+// Profile Form Save
+document.getElementById('profileEditForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const newName = document.getElementById('profFullName').value.trim();
+  if (newName) {
+    AppState.currentUser.name = newName;
+    updateUserUI();
   }
-  const avgContrast = totalContrast / (data.length / 4);
-  return avgContrast > APP_CONFIG.MIN_SHARPNESS_THRESHOLD;
-}
+  alert('Profile details updated successfully!');
+});
 
-// --- 7. REWARD SUBMISSION & SELECTION ---
-function selectRewardChoice(type) {
-  document.getElementById("rewardCardCash").classList.toggle("selected", type === "cash");
-  document.getElementById("rewardCardCoins").classList.toggle("selected", type === "coins");
-  document.getElementById("upiFieldBlock").style.display = type === "cash" ? "block" : "none";
-}
-
-function submitRewardClaim() {
-  if (!currentUser) {
-    openAuthModal();
-    return;
-  }
-  const orderId = document.getElementById("claimOrderId").value.trim();
-  const prodName = document.getElementById("claimProductName").value.trim();
-  const invoicePhoto = document.getElementById("cameraInvoice").files[0];
-  const productPhoto = document.getElementById("cameraProduct").files[0];
-  const deliveryScreenshot = document.getElementById("galleryDelivery").files[0];
-  const rewardType = document.querySelector('input[name="rewardMethod"]:checked').value;
-  const upiId = document.getElementById("claimUpiId").value.trim();
-
-  if (!orderId || !prodName || !invoicePhoto || !productPhoto || !deliveryScreenshot) {
-    return alert("Kripya saare mandatory fields aur dono Live Photos attach karein!");
-  }
-  if (rewardType === "CASH" && !upiId) {
-    return alert("Kripya 101st day payout ke liye UPI ID enter karein.");
-  }
-
-  // Create local milestone entry for immediate reflection
-  const newOrder = {
-    orderId: orderId,
-    prodName: prodName,
-    rewardType: rewardType,
-    upiId: upiId,
-    dayCount: 1, // Day 1
-    status: "Stage 1",
-    estimatedCash: "2.5% - 5%"
-  };
-
-  currentUser.orders = currentUser.orders || [];
-  currentUser.orders.unshift(newOrder);
-  localStorage.setItem("ss_user_session", JSON.stringify(currentUser));
-  
-  alert("🎉 Purchase claim successfully submit ho gaya! Desk review ke baad wallet me timeline update ho jayegi.");
-  switchTab("wallet");
-  updateUserInterface();
-}
-
-// --- 8. WALLET 100-DAY MILESTONE TRACKER ---
-function renderCashMilestones(orders) {
-  const container = document.getElementById("cashPayoutsList");
-  container.innerHTML = "";
-
-  if (orders.length === 0) {
-    container.innerHTML = `<p style="text-align:center; color:var(--text-muted); padding:20px;">Koi active payout nahi hai.</p>`;
-    return;
-  }
-
-  orders.forEach(ord => {
-    let milestoneText = "";
-    let amountBadge = "";
-
-    if (ord.dayCount <= 25) {
-      milestoneText = "🟡 Stage 1: Order & Return Window Verification";
-      amountBadge = `<span style="color:#d97706; font-size:12px; font-weight:700;">Estimated: 2.5% to 5%</span>`;
-    } else if (ord.dayCount <= 50) {
-      milestoneText = "🔵 Stage 2: Withdrawal Request Accepted & Queued";
-      amountBadge = `<span style="color:#2563eb; font-size:12px; font-weight:700;">Processing</span>`;
-    } else if (ord.dayCount <= 75) {
-      milestoneText = "🟣 Stage 3: Merchant Commission Generating";
-      amountBadge = `<span style="color:#7c3aed; font-size:12px; font-weight:700;">Generating</span>`;
-    } else if (ord.dayCount <= 100) {
-      milestoneText = "🟠 Stage 4: Final Calculation Locked";
-      amountBadge = `<span style="color:var(--success-green); font-size:13px; font-weight:800;">Final Amount: ₹${ord.finalAmount || 50} Locked</span>`;
-    } else {
-      milestoneText = "🟢 Completed Successfully (Settled via UPI)";
-      amountBadge = `<span style="color:var(--success-green); font-weight:700;">Paid (Ref: UTR-${Math.floor(100000 + Math.random()*900000)})</span>`;
-    }
-
-    const card = document.createElement("div");
-    card.className = "payout-order-card";
-    card.innerHTML = `
-      <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-        <strong>Order: ${ord.orderId}</strong>
-        ${amountBadge}
-      </div>
-      <p style="font-size:12px; color:var(--text-muted);">${ord.prodName}</p>
-      <div style="font-size:12px; font-weight:600; margin:6px 0;">${milestoneText}</div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" style="width: ${Math.min(ord.dayCount, 100)}%;"></div>
-      </div>
-      <div style="display:flex; justify-content:space-between; font-size:11px; color:var(--text-muted); margin-top:4px;">
-        <span>Day ${ord.dayCount} of 100</span>
-        <span>UPI: ${ord.upiId || 'N/A'}</span>
-      </div>
-    `;
-    container.appendChild(card);
-  });
-}
-
-// --- 9. E-BOOKS DIGITAL UNLOCK & DYNAMIC UPI ---
-function renderEbooks(books) {
-  const grid = document.getElementById("ebooksGrid");
-  grid.innerHTML = "";
-
-  books.forEach(b => {
-    const card = document.createElement("div");
-    card.className = "deal-card";
-    card.innerHTML = `
-      <img src="${b.cover}" alt="${b.title}">
-      <div class="deal-title">${b.title}</div>
-      <div style="font-size:12px; color:var(--success-green); font-weight:700; margin-bottom:6px;">
-        🪙 ${b.coinPrice} Coins <small style="color:var(--text-muted);">or ₹${b.cashPrice}</small>
-      </div>
-      <button class="btn-primary" style="font-size:11px; padding:6px 0;" onclick="unlockEbook('${b.id}')">
-        Unlock Now
-      </button>
-    `;
-    grid.appendChild(card);
-  });
-}
-
-function unlockEbook(bookId) {
-  if (!currentUser) return openAuthModal();
-  const book = currentEbooks.find(b => b.id === bookId);
-  if (!book) return;
-
-  if (currentUser.coins >= book.coinPrice) {
-    if (confirm(`${book.coinPrice} Green Coins deduct karke E-Book download karein?`)) {
-      currentUser.coins -= book.coinPrice;
-      localStorage.setItem("ss_user_session", JSON.stringify(currentUser));
-      updateUserInterface();
-      alert(`🎉 E-Book Unlock Ho Gayi! PDF Download Link: ${book.pdfUrl}`);
-      window.open(book.pdfUrl, "_blank");
-    }
-  } else {
-    // Dynamic Amount UPI Trigger
-    const upiDeepLink = `upi://pay?pa=official@upi&pn=SuperShopping&am=${book.cashPrice}&cu=INR`;
-    if (confirm(`Aapke paas paryapt coins nahi hain. Kya aap ₹${book.cashPrice} direct UPI se pay karke download karna chahte hain?`)) {
-      window.location.href = upiDeepLink;
-    }
-  }
-}
-
-// --- 10. AUTHENTICATION & REFERRAL LOGIC ---
-function openAuthModal() { document.getElementById("authModal").style.display = "flex"; }
-function closeAuthModal() { document.getElementById("authModal").style.display = "none"; }
-function toggleAuthView(view) {
-  document.getElementById("loginView").style.display = view === "login" ? "block" : "none";
-  document.getElementById("signupView").style.display = view === "signup" ? "block" : "none";
-}
-
-function sendSignupOtp() {
-  const email = document.getElementById("regEmail").value.trim();
-  if (!email || !email.includes("@")) return alert("Kripya valid Email ID enter karein.");
-  document.getElementById("regOtpBlock").style.display = "block";
-  alert("6-Digit OTP aapke email par bhej diya gaya hai (Free Google Engine).");
-}
-
-function executeSignup() {
-  const name = document.getElementById("regName").value.trim();
-  const email = document.getElementById("regEmail").value.trim();
-  const phone = document.getElementById("regPhone").value.trim();
-  const pwd = document.getElementById("regPassword").value.trim();
-  const refCode = document.getElementById("regReferralInput").value.trim();
-
-  if (!name || !email || !phone || !pwd) return alert("Kripya sabhi mandatory fields bharein.");
-
-  const newId = `SS-${Math.floor(100000 + Math.random() * 900000)}`;
-  currentUser = {
-    id: newId,
-    name: name,
-    email: email,
-    phone: phone,
-    coins: refCode ? 6 : 0, // 6 coins for referee
-    cashPipeline: 0,
-    referralsUsed: 0,
-    orders: []
-  };
-
-  localStorage.setItem("ss_user_session", JSON.stringify(currentUser));
-  closeAuthModal();
-  updateUserInterface();
-  alert(`🎉 Account successfully create ho gaya! Welcome, ${name}`);
-}
-
-function executeLogin() {
-  const ident = document.getElementById("loginIdentifier").value.trim();
-  const pwd = document.getElementById("loginPassword").value.trim();
-  if (!ident || !pwd) return alert("Email/User ID aur Password enter karein.");
-
-  // Fast Mock Login
-  currentUser = {
-    id: ident.startsWith("SS-") ? ident : "SS-489210",
-    name: "User XYZ",
-    email: ident.includes("@") ? ident : "user@supershopping.com",
-    coins: 20,
-    cashPipeline: 80,
-    referralsUsed: 1,
-    orders: [
-      { orderId: "OD1928374", prodName: "Cotton Shirt", dayCount: 14, estimatedCash: "2.5% - 5%", upiId: "xyz@upi" }
-    ]
-  };
-
-  localStorage.setItem("ss_user_session", JSON.stringify(currentUser));
-  closeAuthModal();
-  updateUserInterface();
-}
-
-function handleLogout() {
-  if (confirm("Kya aap sach me logout karna chahte hain?")){
-    localStorage.removeItem("ss_user_session");
-    currentUser = null;
-    location.reload();}
-}
-
+// --- 15. REFERRAL COPY & SHARE ---
 function copyReferralCode() {
-  const code = document.getElementById("userReferralCode").innerText;
-  navigator.clipboard.writeText(code);
-  alert(`Referral Code ${code} copied!`);
+  const code = document.getElementById('userReferralCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    alert(`Referral Code ${code} copied to clipboard!`);
+  });
 }
 
-function shareWebsiteLink() {
-  const shareText = `Check out Super Shopping for exclusive deals and cashback rewards: ${window.location.origin}`;
-  if (navigator.share) {
-    navigator.share({ title: "Super Shopping", text: shareText, url: window.location.origin });
-  } else {
-    navigator.clipboard.writeText(shareText);
-    alert("Website link copied!");
-  }
+function sharePlatform() {
+  const shareText = encodeURIComponent(`Shop on Amazon & Flipkart via Super Shopping and get extra Cashback Rewards + Green Coins! Use my invite code: ${AppState.currentUser.referralCode}`);
+  window.open(`https://api.whatsapp.com/send?text=${shareText}`, '_blank');
+}
+
+// --- 16. LEGAL POLICY MODAL ---
+function openPolicyModal() {
+  document.getElementById('policyModal').style.display = 'flex';
+}
+
+function closePolicyModal() {
+  document.getElementById('policyModal').style.display = 'none';
+}
+
+// --- 17. SEARCH FILTER ENGINE (HOME & E-BOOKS) ---
+function setupEventListeners() {
+  const searchInput = document.getElementById('globalSearchInput');
+  const clearBtn = document.getElementById('clearSearchBtn');
+
+  searchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase().trim();
+    clearBtn.style.display = term ? 'block' : 'none';
+
+    if (AppState.currentTab === 'home') {
+      const filtered = DealsCatalog.filter(d => 
+        d.title.toLowerCase().includes(term) || d.store.toLowerCase().includes(term)
+      );
+      renderDeals(filtered);
+    } else if (AppState.currentTab === 'ebooks') {
+      const filtered = EbooksCatalog.filter(b => 
+        b.title.toLowerCase().includes(term) || b.author.toLowerCase().includes(term)
+      );
+      renderEbooks(filtered);
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    searchInput.value = '';
+    clearBtn.style.display = 'none';
+    if (AppState.currentTab === 'home') renderDeals(DealsCatalog);
+    if (AppState.currentTab === 'ebooks') renderEbooks(EbooksCatalog);
+  });
 }
