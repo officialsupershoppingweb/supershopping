@@ -12,11 +12,11 @@ const AppState = {
     phone: '',
     address: '',
     referralCode: 'SS-REF-2026',
-    referralsCount: 0, // Clean zero-state
-    coinsBalance: 0,   // Real 0 Coins
-    pendingCash: 0     // Real ₹0 Cash
+    referralsCount: 0,
+    coinsBalance: 0,
+    pendingCash: 0
   },
-  activeCameraTarget: null, // 'invoice', 'product', 'delivery'
+  activeCameraTarget: null,
   capturedProofs: {
     invoice: null,
     product: null,
@@ -28,7 +28,7 @@ const AppState = {
 
 let currentActiveProduct = null;
 
-// --- 2. VERIFIED DEALS DATA STORE (WITH DYNAMIC MEASUREMENT & VARIANTS) ---
+// --- 2. VERIFIED DEALS DATA STORE ---
 const LiveCatalogDeals = [
   {
     id: 'DEAL-101',
@@ -100,7 +100,7 @@ const LiveCatalogDeals = [
   }
 ];
 
-// --- 3. DIGITAL ASSETS & E-BOOKS (EMPTY/CLEAN BASELINE) ---
+// --- 3. DIGITAL ASSETS & E-BOOKS ---
 const DigitalBooksCatalog = [
   {
     id: 'EBK-01',
@@ -120,12 +120,10 @@ const DigitalBooksCatalog = [
   }
 ];
 
-// Active Orders Pipeline (Default Clean State: Empty)
 const UserOrdersPipeline = [];
 
 // --- 4. LIFECYCLE INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-  setupNavigationTabs();
   renderDealsGrid(LiveCatalogDeals);
   renderEbooksGrid(DigitalBooksCatalog);
   renderPipelineList();
@@ -133,35 +131,24 @@ document.addEventListener('DOMContentLoaded', () => {
   setupGlobalSearch();
   setupCategoryFilters();
   syncUserStateUI();
+  setupEventListenersSafe();
 });
 
-// Setup bottom tabs properly
-function setupNavigationTabs() {
-  document.querySelectorAll('.bottom-tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const tabKey = btn.dataset.tab;
-      if (tabKey) switchTab(tabKey);
-    });
-  });
-}
-
-// --- 5. TAB SWITCHER & HEADER SEARCH ENGINE ---
+// --- 5. TAB SWITCHER (ORIGINAL CSS TAB-PANE SYSTEM) ---
 function switchTab(tabKey) {
   AppState.currentTab = tabKey;
 
-  // Make sure PDP is closed when navigating between tabs
+  // Detail view ko band karo agar khula hai
   const pdpView = document.getElementById('productDetailView');
   if (pdpView) pdpView.style.display = 'none';
 
-  // Toggle Tab Panes
+  // Toggle Tab Panes (Puraane CSS rules ke hisaab se)
   document.querySelectorAll('.tab-pane').forEach(pane => {
     pane.classList.remove('active');
-    pane.style.display = 'none';
   });
   const activePane = document.getElementById(`pane-${tabKey}`);
   if (activePane) {
     activePane.classList.add('active');
-    activePane.style.display = 'block';
   }
 
   // Toggle Bottom Bar Tabs
@@ -169,7 +156,7 @@ function switchTab(tabKey) {
     btn.classList.toggle('active', btn.dataset.tab === tabKey);
   });
 
-  // Search Bar Visibility Logic
+  // Search Bar vs Title Bar
   const searchBar = document.getElementById('navSearchBar');
   const titleBar = document.getElementById('navTitleBar');
   const sectionTitle = document.getElementById('navSectionTitle');
@@ -184,7 +171,6 @@ function switchTab(tabKey) {
     if (titleBar) titleBar.style.display = 'none';
     if (searchInput) searchInput.placeholder = 'Search study notes, digital guides...';
   } else {
-    // Hide search bar on Earn, Wallet, Account
     if (searchBar) searchBar.style.display = 'none';
     if (titleBar) titleBar.style.display = 'block';
 
@@ -198,7 +184,7 @@ function switchTab(tabKey) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// --- 6. RENDER DEALS (CLICKABLE TO OPEN PDP) ---
+// --- 6. RENDER DEALS ---
 function renderDealsGrid(deals) {
   const container = document.getElementById('productsFluidGrid');
   if (!container) return;
@@ -208,7 +194,7 @@ function renderDealsGrid(deals) {
       <div class="empty-panel" style="grid-column: 1 / -1;">
         <span class="empty-glyph">🔍</span>
         <h4>No matching deals found</h4>
-        <p>Try searching for a different keyword or paste a product link below.</p>
+        <p>Try searching for a different keyword or browse other categories.</p>
         <button type="button" class="btn-action-primary mt-3" onclick="openSearchMissModal()">
           Request Product Reward Eligibility
         </button>
@@ -271,7 +257,7 @@ function renderEbooksGrid(books) {
   }).join('');
 }
 
-// --- 8. WALLET PIPELINE (CLEAN ZERO-STATE) ---
+// --- 8. WALLET PIPELINE ---
 function renderPipelineList() {
   const container = document.getElementById('pipelineOrdersList');
   if (!container) return;
@@ -289,7 +275,7 @@ function renderPipelineList() {
   }
 }
 
-// --- 9. ACCOUNT 5 REFERRAL SLOTS ---
+// --- 9. ACCOUNT REFERRAL SLOTS ---
 function renderReferralSlots() {
   const container = document.getElementById('slotsVisualGrid');
   if (!container) return;
@@ -328,7 +314,7 @@ function selectRewardPlan(planType) {
   }
 }
 
-// --- 11. IN-APP LIVE CAMERA DESK ---
+// --- 11. LIVE CAMERA DESK ---
 async function openLiveCamera(targetType) {
   AppState.activeCameraTarget = targetType;
   const modal = document.getElementById('inAppCameraModal');
@@ -399,43 +385,70 @@ function closeLiveCamera() {
   if (modal) modal.style.display = 'none';
 }
 
-// --- 12. CLAIM FORM AUDIT SUBMISSION ---
-const rewardForm = document.getElementById('rewardClaimForm');
-if (rewardForm) {
-  rewardForm.addEventListener('submit', (e) => {
-    e.preventDefault();
+// --- 12. EVENT LISTENERS SETUP ---
+function setupEventListenersSafe() {
+  const rewardForm = document.getElementById('rewardClaimForm');
+  if (rewardForm) {
+    rewardForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const orderId = document.getElementById('orderIdInput').value.trim();
+      const prodName = document.getElementById('productNameInput').value.trim();
+      const upiId = document.getElementById('upiAddressInput') ? document.getElementById('upiAddressInput').value.trim() : '';
 
-    const orderId = document.getElementById('orderIdInput').value.trim();
-    const prodName = document.getElementById('productNameInput').value.trim();
-    const upiId = document.getElementById('upiAddressInput') ? document.getElementById('upiAddressInput').value.trim() : '';
+      if (!orderId || !prodName) {
+        alert('Please enter your Store Order ID and Product Name.');
+        return;
+      }
 
-    if (!orderId || !prodName) {
-      alert('Please enter your Store Order ID and Product Name.');
-      return;
-    }
+      if (!AppState.capturedProofs.invoice || !AppState.capturedProofs.product || !AppState.capturedProofs.delivery) {
+        alert('All 3 Live Verification Proofs (Invoice, Product, and Delivery Status) are mandatory.');
+        return;
+      }
 
-    if (!AppState.capturedProofs.invoice || !AppState.capturedProofs.product || !AppState.capturedProofs.delivery) {
-      alert('All 3 Live Verification Proofs (Invoice, Product, and Delivery Status) are mandatory.');
-      return;
-    }
+      if (AppState.selectedRewardPlan === 'cashback' && !upiId) {
+        alert('Please provide a valid UPI ID for 101st Day settlement.');
+        return;
+      }
 
-    if (AppState.selectedRewardPlan === 'cashback' && !upiId) {
-      alert('Please provide a valid UPI ID for 101st Day settlement.');
-      return;
-    }
+      alert('Claim Submitted Successfully!\nYour proofs have been routed to the Verification Desk. Track updates under the Wallet tab.');
 
-    alert('Claim Submitted Successfully!\nYour proofs have been routed to the Verification Desk. Track updates under the Wallet tab.');
+      e.target.reset();
+      AppState.capturedProofs = { invoice: null, product: null, delivery: null };
+      document.querySelectorAll('.proof-thumb').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.proof-badge').forEach(el => {
+        el.textContent = 'Pending';
+        el.classList.remove('captured');
+      });
 
-    e.target.reset();
-    AppState.capturedProofs = { invoice: null, product: null, delivery: null };
-    document.querySelectorAll('.proof-thumb').forEach(el => el.style.display = 'none');
-    document.querySelectorAll('.proof-badge').forEach(el => {
-      el.textContent = 'Pending';
-      el.classList.remove('captured');
+      switchTab('wallet');
     });
+  }
 
-    switchTab('wallet');
-  });
+  const authForm = document.getElementById('authCoreForm');
+  if (authForm) {
+    authForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const btnSignup = document.getElementById('btnToggleSignup');
+      const isSignup = btnSignup ? btnSignup.classList.contains('active') : false;
+
+      if (isSignup) {
+        const agreed = document.getElementById('authAgreementBox').checked;
+        if (!agreed) {
+          alert('You must accept the Terms of Service & Cashback Policy to continue.');
+          return;
+        }
+        const name = document.getElementById('authNameInput').value.trim() || 'Verified Member';
+        AppState.currentUser.name = name;
+      } else {
+        AppState.currentUser.name = 'Verified Member';
+      }
+
+      AppState.currentUser.isLoggedIn = true;
+      syncUserStateUI();
+      closeAuthModal();
+      alert(`Welcome, ${AppState.currentUser.name}!`);
+    });
+  }
 }
 
 // --- 13. SMART FAQ ACCORDION ---
@@ -488,32 +501,6 @@ function setAuthMode(mode) {
   if (grpRef) grpRef.style.display = isSignup ? 'block' : 'none';
   if (grpAgr) grpAgr.style.display = isSignup ? 'flex' : 'none';
   if (btnAction) btnAction.textContent = isSignup ? 'Create Account & Agree' : 'Sign In to Account';
-}
-
-const authForm = document.getElementById('authCoreForm');
-if (authForm) {
-  authForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const btnSignup = document.getElementById('btnToggleSignup');
-    const isSignup = btnSignup ? btnSignup.classList.contains('active') : false;
-
-    if (isSignup) {
-      const agreed = document.getElementById('authAgreementBox').checked;
-      if (!agreed) {
-        alert('You must accept the Terms of Service & Cashback Policy to continue.');
-        return;
-      }
-      const name = document.getElementById('authNameInput').value.trim() || 'Verified Member';
-      AppState.currentUser.name = name;
-    } else {
-      AppState.currentUser.name = 'Verified Member';
-    }
-
-    AppState.currentUser.isLoggedIn = true;
-    syncUserStateUI();
-    closeAuthModal();
-    alert(`Welcome, ${AppState.currentUser.name}!`);
-  });
 }
 
 function performLogout() {
@@ -672,18 +659,16 @@ function closePolicyModal() {
   if (m) m.style.display = 'none';
 }
 
-// ==========================================================================
 // --- 19. PRODUCT DETAIL VIEW (PDP) ENGINE ---
-// ==========================================================================
 function openProductDetail(productId) {
   const product = LiveCatalogDeals.find(d => d.id === productId);
   if (!product) return;
 
   currentActiveProduct = product;
 
-  // Home pane hide, PDP show
-  const homePane = document.getElementById('pane-home');
-  if (homePane) homePane.style.display = 'none';
+  // Home tab chhipao aur Detail screen dikhao
+  const activeHome = document.getElementById('pane-home');
+  if (activeHome) activeHome.classList.remove('active');
 
   const pdpView = document.getElementById('productDetailView');
   if (pdpView) pdpView.style.display = 'block';
@@ -710,14 +695,14 @@ function openProductDetail(productId) {
   const mrpEl = document.getElementById('pdpBottomMrp');
   if (mrpEl) mrpEl.textContent = `₹${product.mrp}`;
 
-  // Buy Button
+  // Buy Button Link Set
   const buyBtn = document.getElementById('pdpBuyButton');
   if (buyBtn) {
     buyBtn.href = product.affiliateUrl;
     buyBtn.textContent = `Buy at ₹${product.price} ⚡`;
   }
 
-  // Dynamic Measurement / Variant Configuration
+  // Variant Chips Auto Setup
   const sizeSection = document.getElementById('pdpSizeSection');
   const sizeChips = document.getElementById('pdpSizeChips');
 
@@ -735,7 +720,7 @@ function openProductDetail(productId) {
     }
   }
 
-  // Dynamic Color Dots
+  // Color Dots Auto Setup
   const colorSection = document.getElementById('pdpColorSection');
   const colorChips = document.getElementById('pdpColorChips');
 
@@ -750,7 +735,7 @@ function openProductDetail(productId) {
     }
   }
 
-  // Related Deals Shelf
+  // Related Recommendations Shelf
   const relatedGrid = document.getElementById('pdpRelatedGrid');
   if (relatedGrid) {
     const relatedDeals = LiveCatalogDeals.filter(d => d.id !== product.id).slice(0, 3);
@@ -771,7 +756,7 @@ function closeProductDetail() {
   if (pdpView) pdpView.style.display = 'none';
 
   const homePane = document.getElementById('pane-home');
-  if (homePane) homePane.style.display = 'block';
+  if (homePane) homePane.classList.add('active');
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
