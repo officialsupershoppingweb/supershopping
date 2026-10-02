@@ -1,30 +1,21 @@
-/* ==========================================================================
-   SUPER SHOPPING - CORE PRODUCTION LOGIC ENGINE (V2 FLUID & RESPONSIVE)
-   ========================================================================== */
+/**
+ * SUPERSHOPPING - PRODUCTION APPLICATION JAVASCRIPT
+ * Fully integrated: Navigation, Dynamic PDP Engine, Search, Categories, Modals & Dynamic Variants
+ */
 
-// --- 1. CORE APPLICATION STATE (CLEAN ZERO-BASELINE) ---
+// --- 1. APPLICATION STATE ---
 const AppState = {
-  currentTab: 'home',
-  currentUser: {
-    isLoggedIn: false,
-    name: 'Guest User',
-    id: 'SS-GUEST-0000',
-    phone: '',
-    address: '',
-    referralCode: 'SS-REF-2026',
-    referralsCount: 0, // Clean zero-state
-    coinsBalance: 0,   // Real 0 Coins
-    pendingCash: 0     // Real ₹0 Cash
-  },
-  activeCameraTarget: null, // 'invoice', 'product', 'delivery'
-  capturedProofs: {
-    invoice: null,
-    product: null,
-    delivery: null
-  },
-  selectedRewardPlan: 'cashback',
-  mediaStream: null
+  activeTab: 'home',
+  selectedCategory: 'all',
+  searchQuery: '',
+  walletCoins: 120,
+  userProfile: {
+    name: 'Valued Shopper',
+    authType: 'Guest User'
+  }
 };
+
+let currentActiveProduct = null;
 
 // --- 2. VERIFIED DEALS DATA STORE (WITH DYNAMIC MEASUREMENT & VARIANTS) ---
 const LiveCatalogDeals = [
@@ -98,97 +89,146 @@ const LiveCatalogDeals = [
   }
 ];
 
-// --- 3. DIGITAL ASSETS & E-BOOKS (EMPTY/CLEAN BASELINE) ---
+// --- 3. DIGITAL E-BOOKS DATA STORE ---
 const DigitalBooksCatalog = [
   {
     id: 'EBK-01',
-    title: 'Class 12 Accounts & Partnership Master Notes',
-    author: 'Commerce Academic Faculty',
-    category: 'commerce',
-    coinCost: 25,
-    previewContent: 'Chapter 1: Valuation of Goodwill & Partnership Capital Adjustments.\nKey rules, practical journal entries, and step-by-step examination balance sheet structures.'
+    title: 'Affiliate Marketing Mastery 2026',
+    price: 199,
+    category: 'Finance & Career',
+    pages: '120 Pages',
+    coverUrl: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=400&q=80',
+    description: 'Complete blueprint on earning verified commissions and online revenue streams.'
   },
   {
     id: 'EBK-02',
-    title: 'Affiliate Marketing Growth & Strategy Blueprint',
-    author: 'Performance Marketing Desk',
-    category: 'business',
-    coinCost: 30,
-    previewContent: 'Module 1: Performance Marketing Systems.\nDiscovering high-converting deals, maintaining compliance, and scaling organic retail traffic.'
+    title: 'Digital Productivity & Smart Habits',
+    price: 149,
+    category: 'Self Growth',
+    pages: '95 Pages',
+    coverUrl: 'https://images.unsplash.com/photo-1532012164546-f432f2e3777f?auto=format&fit=crop&w=400&q=80',
+    description: 'Optimize daily workflows, study schedules and focus management systems.'
   }
 ];
 
-// Active Orders Pipeline (Default Clean State: Empty)
-const UserOrdersPipeline = [];
-
-// --- 4. LIFECYCLE INITIALIZATION ---
+// --- 4. CORE INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
+  setupNavigationTabs();
+  setupCategoryPills();
+  setupSearchInput();
   renderDealsGrid(LiveCatalogDeals);
-  renderEbooksGrid(DigitalBooksCatalog);
-  renderPipelineList();
-  renderReferralSlots();
-  setupGlobalSearch();
-  setupCategoryFilters();
-  syncUserStateUI();
+  renderEbooksGrid();
 });
 
-// --- 5. TAB SWITCHER & HEADER SEARCH ENGINE ---
-function switchTab(tabKey) {
-  AppState.currentTab = tabKey;
-
-  // Toggle Tab Panes
-  document.querySelectorAll('.tab-pane').forEach(pane => {
-    pane.classList.remove('active');
+// --- 5. NAVIGATION LOGIC (TABS & BOTTOM BAR) ---
+function setupNavigationTabs() {
+  const navButtons = document.querySelectorAll('.bottom-nav-item');
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetPane = btn.getAttribute('data-pane');
+      switchTab(targetPane);
+    });
   });
-  const activePane = document.getElementById(`pane-${tabKey}`);
-  if (activePane) activePane.classList.add('active');
+}
 
-  // Toggle Bottom Bar Tabs
-  document.querySelectorAll('.bottom-tab-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.tab === tabKey);
+function switchTab(paneId) {
+  AppState.activeTab = paneId;
+
+  // Make sure PDP is closed when navigating tabs
+  const pdpView = document.getElementById('productDetailView');
+  if (pdpView) pdpView.style.display = 'none';
+
+  // Toggle active bottom nav button
+  document.querySelectorAll('.bottom-nav-item').forEach(b => {
+    if (b.getAttribute('data-pane') === paneId) {
+      b.classList.add('active');
+    } else {
+      b.classList.remove('active');
+    }
   });
 
-  // Search Bar Visibility Logic
+  // Toggle pane visibility
+  document.querySelectorAll('.app-content-pane').forEach(pane => {
+    pane.style.display = 'none';
+  });
+
+  const selectedPane = document.getElementById(`pane-${paneId}`);
+  if (selectedPane) {
+    selectedPane.style.display = 'block';
+  }
+
+  // Update Top Bar Context Title
+  const titles = {
+    home: 'SuperShopping',
+    earn: 'Claim Purchase Reward',
+    ebooks: 'Digital Library & Guides',
+    wallet: 'Rewards & Payout Wallet',
+    account: 'My Account Settings'
+  };
+  const titleEl = document.getElementById('navDynamicTitle');
+  if (titleEl) titleEl.textContent = titles[paneId] || 'SuperShopping';
+
+  // Toggle Search Bar vs Dynamic Title Bar
   const searchBar = document.getElementById('navSearchBar');
   const titleBar = document.getElementById('navTitleBar');
-  const sectionTitle = document.getElementById('navSectionTitle');
-  const searchInput = document.getElementById('globalSearchInput');
 
-  if (tabKey === 'home') {
-    searchBar.style.display = 'flex';
-    titleBar.style.display = 'none';
-    searchInput.placeholder = 'Search products, deals, categories...';
-  } else if (tabKey === 'ebooks') {
-    searchBar.style.display = 'flex';
-    titleBar.style.display = 'none';
-    searchInput.placeholder = 'Search study notes, digital guides...';
+  if (paneId === 'home') {
+    if (searchBar) searchBar.style.display = 'flex';
+    if (titleBar) titleBar.style.display = 'none';
   } else {
-    // Hide search bar on Earn, Wallet, Account
-    searchBar.style.display = 'none';
-    titleBar.style.display = 'block';
-
-    if (tabKey === 'earn') sectionTitle.textContent = '🎁 Claim Purchase Reward';
-    if (tabKey === 'wallet') sectionTitle.textContent = '💳 Rewards & Payout Wallet';
-    if (tabKey === 'account') sectionTitle.textContent = '👤 Account & Settings';
+    if (searchBar) searchBar.style.display = 'none';
+    if (titleBar) titleBar.style.display = 'block';
   }
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// --- 6. RENDER DEALS (CLICKABLE CARD TO OPEN PDP) ---
+// --- 6. CATEGORY FILTER LOGIC ---
+function setupCategoryPills() {
+  const pills = document.querySelectorAll('.cat-pill');
+  pills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      pills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
+      AppState.selectedCategory = pill.getAttribute('data-category');
+      applyFilters();
+    });
+  });
+}
+
+// --- 7. SEARCH BAR LOGIC ---
+function setupSearchInput() {
+  const searchInput = document.getElementById('globalSearchInput');
+  if (!searchInput) return;
+
+  searchInput.addEventListener('input', (e) => {
+    AppState.searchQuery = e.target.value.toLowerCase().trim();
+    applyFilters();
+  });
+}
+
+function applyFilters() {
+  const filtered = LiveCatalogDeals.filter(deal => {
+    const matchesCat = (AppState.selectedCategory === 'all') || (deal.category === AppState.selectedCategory);
+    const matchesQuery = deal.title.toLowerCase().includes(AppState.searchQuery) ||
+                         deal.store.toLowerCase().includes(AppState.searchQuery);
+    return matchesCat && matchesQuery;
+  });
+
+  renderDealsGrid(filtered);
+}
+
+// --- 8. RENDER DEALS (CLICKABLE CARD TO OPEN PDP) ---
 function renderDealsGrid(deals) {
   const container = document.getElementById('productsFluidGrid');
   if (!container) return;
 
   if (deals.length === 0) {
     container.innerHTML = `
-      <div class="empty-panel" style="grid-column: 1 / -1;">
-        <span class="empty-glyph">🔍</span>
+      <div class="empty-panel" style="grid-column: 1 / -1; padding: 30px; text-align: center;">
+        <span class="empty-glyph" style="font-size: 32px;">🔍</span>
         <h4>No matching deals found</h4>
-        <p>Try searching for a different keyword or paste a product link below.</p>
-        <button type="button" class="btn-action-primary mt-3" onclick="openSearchMissModal()">
-          Request Product Reward Eligibility
-        </button>
+        <p style="font-size: 13px; color: #64748b; margin-top: 6px;">Try searching for a different keyword or browse categories.</p>
       </div>
     `;
     return;
@@ -221,424 +261,42 @@ function renderDealsGrid(deals) {
   }).join('');
 }
 
-// --- 7. RENDER E-BOOKS GRID ---
-function renderEbooksGrid(books) {
-  const container = document.getElementById('ebooksCatalogGrid');
+// --- 9. RENDER EBOOKS ---
+function renderEbooksGrid() {
+  const container = document.getElementById('ebooksGridContainer');
   if (!container) return;
 
-  container.innerHTML = books.map(book => {
-    return `
-      <div class="product-card">
-        <div class="product-thumb-box" style="background:#1e293b; color:#fff; text-align:center; padding:16px;">
-          <span style="font-size:12px; font-weight:700;">${book.title}</span>
-        </div>
-        <div class="product-info-wrap">
-          <h4 class="product-title-text">${book.title}</h4>
-          <span style="font-size:11.5px; color:#64748b; margin-bottom:8px;">${book.author}</span>
-          <div class="price-details-row">
-            <span class="sale-price" style="color:#059669; font-size:14px;">🪙 ${book.coinCost} Green Coins</span>
-          </div>
-          <button type="button" class="btn-action-primary" style="background:#059669; font-size:12.5px; padding:8px;" onclick="unlockEbook('${book.id}', ${book.coinCost})">
-            ⚡ Unlock with Coins
-          </button>
+  container.innerHTML = DigitalBooksCatalog.map(book => `
+    <div class="ebook-card">
+      <img src="${book.coverUrl}" alt="${book.title}" />
+      <div class="ebook-content">
+        <span class="ebook-tag">${book.category}</span>
+        <h4>${book.title}</h4>
+        <p class="ebook-desc">${book.description}</p>
+        <div class="ebook-bottom">
+          <span class="ebook-price">₹${book.price}</span>
+          <button class="btn-read-now" onclick="alert('Digital reader module starting...')">Buy & Read</button>
         </div>
       </div>
-    `;
-  }).join('');
+    </div>
+  `).join('');
 }
 
-// --- 8. WALLET PIPELINE (CLEAN ZERO-STATE) ---
-function renderPipelineList() {
-  const container = document.getElementById('pipelineOrdersList');
-  if (!container) return;
-
-  if (UserOrdersPipeline.length === 0) {
-    container.innerHTML = `
-      <div class="empty-panel">
-        <span class="empty-glyph">📦</span>
-        <h4>No Active Orders in Pipeline</h4>
-        <p>Purchases submitted via the Earn tab will appear here with live 100-day clearance tracking.</p>
-        <button type="button" class="btn-action-secondary mt-2" onclick="switchTab('home')">Browse Verified Deals</button>
-      </div>
-    `;
-    return;
-  }
-}
-
-// --- 9. ACCOUNT 5 REFERRAL SLOTS ---
-function renderReferralSlots() {
-  const container = document.getElementById('slotsVisualGrid');
-  if (!container) return;
-
-  const totalSlots = 5;
-  const claimedCount = AppState.currentUser.referralsCount;
-  let html = '';
-
-  for (let i = 1; i <= totalSlots; i++) {
-    const isClaimed = i <= claimedCount;
-    html += `
-      <div class="slot-item ${isClaimed ? 'claimed' : ''}">
-        <div class="slot-circle-badge">${isClaimed ? '✓' : i}</div>
-        <span class="slot-caption">${isClaimed ? 'Claimed' : 'Slot ' + i}</span>
-      </div>
-    `;
-  }
-  container.innerHTML = html;
-}
-
-// --- 10. REWARD METHOD SELECTION ---
-function selectRewardPlan(planType) {
-  AppState.selectedRewardPlan = planType;
-  const cardCash = document.getElementById('optCashback');
-  const cardCoins = document.getElementById('optCoins');
-  const upiBox = document.getElementById('upiFieldBox');
-
-  if (planType === 'cashback') {
-    cardCash.classList.add('selected');
-    cardCoins.classList.remove('selected');
-    upiBox.style.display = 'block';
-  } else {
-    cardCoins.classList.add('selected');
-    cardCash.classList.remove('selected');
-    upiBox.style.display = 'none';
-  }
-}
-
-// --- 11. IN-APP LIVE CAMERA DESK ---
-async function openLiveCamera(targetType) {
-  AppState.activeCameraTarget = targetType;
-  const modal = document.getElementById('inAppCameraModal');
-  const video = document.getElementById('cameraVideoFeed');
-  const label = document.getElementById('cameraTargetLabel');
-
-  if (targetType === 'invoice') label.textContent = 'Live Tax Invoice / Bill Capture';
-  if (targetType === 'product') label.textContent = 'Live Physical Unboxed Item Capture';
-  if (targetType === 'delivery') label.textContent = 'Delivery Status Screenshot Capture';
-
-  modal.style.display = 'flex';
-
-  try {
-    AppState.mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: 'environment' },
-      audio: false
-    });
-    video.srcObject = AppState.mediaStream;
-  } catch (err) {
-    alert('Camera permission denied or camera device unavailable. Please verify browser permissions.');
-    closeLiveCamera();
-  }
-}
-
-function captureLiveSnapshot() {
-  const video = document.getElementById('cameraVideoFeed');
-  const canvas = document.getElementById('cameraCaptureCanvas');
-  const context = canvas.getContext('2d');
-
-  canvas.width = video.videoWidth || 640;
-  canvas.height = video.videoHeight || 480;
-  context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  const snapshotBase64 = canvas.toDataURL('image/jpeg', 0.85);
-  const target = AppState.activeCameraTarget;
-
-  AppState.capturedProofs[target] = snapshotBase64;
-
-  // Update Proof Badge & Thumbnail
-  const badgeId = `badge${target.charAt(0).toUpperCase() + target.slice(1)}`;
-  const thumbId = `thumb${target.charAt(0).toUpperCase() + target.slice(1)}`;
-  
-  const badgeEl = document.getElementById(badgeId);
-  const thumbEl = document.getElementById(thumbId);
-
-  if (badgeEl) {
-    badgeEl.textContent = 'Captured ✓';
-    badgeEl.classList.add('captured');
-  }
-
-  if (thumbEl) {
-    thumbEl.style.display = 'block';
-    thumbEl.innerHTML = `<img src="${snapshotBase64}" alt="Captured ${target}" />`;
-  }
-
-  closeLiveCamera();
-}
-
-function closeLiveCamera() {
-  const modal = document.getElementById('inAppCameraModal');
-  const video = document.getElementById('cameraVideoFeed');
-
-  if (AppState.mediaStream) {
-    AppState.mediaStream.getTracks().forEach(track => track.stop());
-    AppState.mediaStream = null;
-  }
-  if (video) video.srcObject = null;
-  modal.style.display = 'none';
-}
-
-// --- 12. CLAIM FORM AUDIT SUBMISSION ---
-document.getElementById('rewardClaimForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  const orderId = document.getElementById('orderIdInput').value.trim();
-  const prodName = document.getElementById('productNameInput').value.trim();
-  const upiId = document.getElementById('upiAddressInput').value.trim();
-
-  if (!orderId || !prodName) {
-    alert('Please enter your Store Order ID and Product Name.');
-    return;
-  }
-
-  // Live Proof Check
-  if (!AppState.capturedProofs.invoice || !AppState.capturedProofs.product || !AppState.capturedProofs.delivery) {
-    alert('All 3 Live Verification Proofs (Invoice, Product, and Delivery Status) are mandatory.');
-    return;
-  }
-
-  if (AppState.selectedRewardPlan === 'cashback' && !upiId) {
-    alert('Please provide a valid UPI ID for 101st Day settlement.');
-    return;
-  }
-
-  alert('Claim Submitted Successfully!\nYour proofs have been routed to the Verification Desk. Track updates under the Wallet tab.');
-
-  e.target.reset();
-  AppState.capturedProofs = { invoice: null, product: null, delivery: null };
-  document.querySelectorAll('.proof-thumb').forEach(el => el.style.display = 'none');
-  document.querySelectorAll('.proof-badge').forEach(el => {
-    el.textContent = 'Pending';
-    el.classList.remove('captured');
-  });
-
-  switchTab('wallet');
-});
-
-// --- 13. SMART FAQ ACCORDION ---
-function toggleFaqAccordion(btnElement) {
-  const parentItem = btnElement.closest('.faq-accordion-item');
-  const isAlreadyActive = parentItem.classList.contains('active');
-
-  document.querySelectorAll('.faq-accordion-item').forEach(item => {
-    item.classList.remove('active');
-  });
-
-  if (!isAlreadyActive) {
-    parentItem.classList.add('active');
-  }
-}
-
-// --- 14. AUTHENTICATION GATEWAY ---
-function handleAuthButtonClick() {
-  if (AppState.currentUser.isLoggedIn) {
-    switchTab('account');
-  } else {
-    openAuthModal();
-  }
-}
-
-function openAuthModal() {
-  document.getElementById('authGatewayModal').style.display = 'flex';
-}
-
-function closeAuthModal() {
-  document.getElementById('authGatewayModal').style.display = 'none';
-}
-
-function setAuthMode(mode) {
-  const isSignup = mode === 'signup';
-  document.getElementById('btnToggleLogin').classList.toggle('active', !isSignup);
-  document.getElementById('btnToggleSignup').classList.toggle('active', isSignup);
-
-  document.getElementById('groupSignupName').style.display = isSignup ? 'block' : 'none';
-  document.getElementById('groupSignupReferral').style.display = isSignup ? 'block' : 'none';
-  document.getElementById('groupSignupAgreement').style.display = isSignup ? 'flex' : 'none';
-  document.getElementById('btnAuthAction').textContent = isSignup ? 'Create Account & Agree' : 'Sign In to Account';
-}
-
-document.getElementById('authCoreForm').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const isSignup = document.getElementById('btnToggleSignup').classList.contains('active');
-
-  if (isSignup) {
-    const agreed = document.getElementById('authAgreementBox').checked;
-    if (!agreed) {
-      alert('You must accept the Terms of Service & Cashback Policy to continue.');
-      return;
-    }
-    const name = document.getElementById('authNameInput').value.trim() || 'Verified Member';
-    AppState.currentUser.name = name;
-  } else {
-    AppState.currentUser.name = 'Verified Member';
-  }
-
-  AppState.currentUser.isLoggedIn = true;
-  syncUserStateUI();
-  closeAuthModal();
-  alert(`Welcome, ${AppState.currentUser.name}!`);
-});
-
-function performLogout() {
-  AppState.currentUser.isLoggedIn = false;
-  AppState.currentUser.name = 'Guest User';
-  syncUserStateUI();
-  alert('You have been signed out successfully.');
-}
-
-function syncUserStateUI() {
-  const pillBtn = document.getElementById('userAuthPill');
-  const pillText = document.getElementById('userPillText');
-  const nameDisp = document.getElementById('profileNameDisplay');
-  const coinAmt = document.getElementById('walletCoinAmount');
-  const cashAmt = document.getElementById('walletCashAmount');
-
-  const logged = AppState.currentUser.isLoggedIn;
-  if (pillBtn) pillBtn.classList.toggle('logged-in', logged);
-  if (pillText) pillText.textContent = logged ? AppState.currentUser.name : 'Sign In / Guest';
-  if (nameDisp) nameDisp.textContent = AppState.currentUser.name;
-  if (coinAmt) coinAmt.textContent = AppState.currentUser.coinsBalance;
-  if (cashAmt) cashAmt.textContent = `₹${AppState.currentUser.pendingCash}`;
-}
-
-// --- 15. SEARCH ENGINE & MISS FEEDBACK ---
-function setupGlobalSearch() {
-  const searchInput = document.getElementById('globalSearchInput');
-  const clearBtn = document.getElementById('btnClearSearch');
-
-  searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase().trim();
-    clearBtn.style.display = query ? 'block' : 'none';
-
-    if (AppState.currentTab === 'home') {
-      const filtered = LiveCatalogDeals.filter(d => 
-        d.title.toLowerCase().includes(query) || d.store.toLowerCase().includes(query)
-      );
-      renderDealsGrid(filtered);
-    } else if (AppState.currentTab === 'ebooks') {
-      const filtered = DigitalBooksCatalog.filter(b => 
-        b.title.toLowerCase().includes(query) || b.author.toLowerCase().includes(query)
-      );
-      renderEbooksGrid(filtered);
-    }
-  });
-
-  clearBtn.addEventListener('click', () => {
-    searchInput.value = '';
-    clearBtn.style.display = 'none';
-    if (AppState.currentTab === 'home') renderDealsGrid(LiveCatalogDeals);
-    if (AppState.currentTab === 'ebooks') renderEbooksGrid(DigitalBooksCatalog);
-  });
-}
-
-function setupCategoryFilters() {
-  document.querySelectorAll('#homeCategoriesBar .cat-pill').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#homeCategoriesBar .cat-pill').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      const cat = btn.dataset.category;
-
-      if (cat === 'all') {
-        renderDealsGrid(LiveCatalogDeals);
-      } else {
-        const filtered = LiveCatalogDeals.filter(d => d.category === cat);
-        renderDealsGrid(filtered);
-      }
-    });
-  });
-}
-
-function openSearchMissModal() {
-  document.getElementById('searchMissModal').style.display = 'flex';
-}
-
-function closeSearchMissModal() {
-  document.getElementById('searchMissModal').style.display = 'none';
-}
-
-function submitProductRequest() {
-  const url = document.getElementById('requestProductUrl').value.trim();
-  if (!url) {
-    alert('Please paste a valid Amazon or Flipkart product URL.');
-    return;
-  }
-  alert('Thank you! Your product URL has been submitted. Our team will verify and activate reward eligibility within 2 hours.');
-  document.getElementById('requestProductUrl').value = '';
-  closeSearchMissModal();
-}
-
-// --- 16. E-BOOK VIEW TOGGLE & UNLOCK ---
-function switchEbookView(view) {
-  const btnStore = document.getElementById('btnSegStore');
-  const btnLib = document.getElementById('btnSegLibrary');
-  const catalogGrid = document.getElementById('ebooksCatalogGrid');
-  const libView = document.getElementById('ebooksLibraryView');
-  const catBar = document.getElementById('ebookCategoriesBar');
-
-  if (view === 'store') {
-    btnStore.classList.add('active');
-    btnLib.classList.remove('active');
-    catalogGrid.style.display = 'grid';
-    catBar.style.display = 'flex';
-    libView.style.display = 'none';
-  } else {
-    btnLib.classList.add('active');
-    btnStore.classList.remove('active');
-    catalogGrid.style.display = 'none';
-    catBar.style.display = 'none';
-    libView.style.display = 'block';
-  }
-}
-
-function unlockEbook(bookId, coinCost) {
-  if (AppState.currentUser.coinsBalance < coinCost) {
-    const deficit = coinCost - AppState.currentUser.coinsBalance;
-    alert(`Insufficient Coins: You currently have ${AppState.currentUser.coinsBalance} Green Coins. You need ${deficit} more coins to unlock this resource.\n\nShop verified deals on Amazon or Flipkart to earn more coins!`);
-    switchTab('home');
-    return;
-  }
-
-  AppState.currentUser.coinsBalance -= coinCost;
-  syncUserStateUI();
-  alert('Congratulations! This guide has been unlocked and added to My Library.');
-}
-
-// --- 17. INVITE CODE COPY & SOCIAL SHARE ---
-function copyInviteCode() {
-  const code = document.getElementById('refCodeText').textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    alert(`Invite Code ${code} copied to clipboard!`);
-  });
-}
-
-function shareOnWhatsApp() {
-  const msg = encodeURIComponent(`Shop on Amazon & Flipkart via Super Shopping to earn verified Cashback Rewards and Green Coins! Use my invite code: ${AppState.currentUser.referralCode}`);
-  window.open(`https://api.whatsapp.com/send?text=${msg}`, '_blank');
-}
-
-// --- 18. LEGAL POLICY MODAL ---
-function openPolicyModal() {
-  document.getElementById('legalPolicyModal').style.display = 'flex';
-}
-
-function closePolicyModal() {
-  document.getElementById('legalPolicyModal').style.display = 'none';
-} 
-
-// --- 19. PRODUCT DETAIL VIEW (PDP) DYNAMIC ENGINE ---
-let currentActiveProduct = null;
-
+// --- 10. PRODUCT DETAIL VIEW (PDP) DYNAMIC ENGINE ---
 function openProductDetail(productId) {
   const product = LiveCatalogDeals.find(d => d.id === productId);
   if (!product) return;
 
   currentActiveProduct = product;
 
-  // Home pane chhipao aur PDP screen dikhao
+  // Home pane hide and show PDP
   const homePane = document.getElementById('pane-home');
   if (homePane) homePane.style.display = 'none';
 
   const pdpView = document.getElementById('productDetailView');
   if (pdpView) pdpView.style.display = 'block';
 
-  // Product Data Fill Karo
+  // Fill Product Info
   const mainImg = document.getElementById('pdpMainImg');
   if (mainImg) mainImg.src = product.imageUrl;
 
@@ -664,7 +322,7 @@ function openProductDetail(productId) {
   const buyBtn = document.getElementById('pdpBuyButton');
   if (buyBtn) {
     buyBtn.href = product.affiliateUrl;
-    buyBtn.textContent = `Buy at ₹${product.price}`;
+    buyBtn.textContent = `Buy at ₹${product.price} ⚡`;
   }
 
   // Auto Measurement / Variant Chips Setup
@@ -681,7 +339,6 @@ function openProductDetail(productId) {
         <button type="button" class="size-chip ${idx === 0 ? 'active' : ''}" onclick="selectVariantChip(this)">${v}</button>
       `).join('');
     } else {
-      // Bottle, Gadget jisme size nahi chahiye wo pura box hide
       sizeSection.style.display = 'none';
     }
   }
@@ -745,6 +402,6 @@ function shareCurrentProduct() {
       url: window.location.href
     }).catch(() => {});
   } else {
-    alert('Product link ready to share!');
+    alert('Link ready to share!');
   }
 }
