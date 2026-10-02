@@ -109,11 +109,100 @@
             </div>
           </div>
 
-          <!-- Fluid Responsive Product Grid -->
-          <div class="products-fluid-grid" id="productsFluidGrid">
-            <!-- Dynamically populated or clean zero-state via app.js -->
+          <!-- ==================== PRODUCT DETAIL VIEW (PDP SCREEN) ==================== -->
+      <section class="product-detail-view" id="productDetailView" style="display:none;">
+        <div class="content-container">
+          
+          <!-- Top Back Bar -->
+          <div class="pdp-top-bar">
+            <button type="button" class="btn-pdp-back" onclick="closeProductDetail()">
+              ← Back to Deals
+            </button>
+            <span class="pdp-share-icon" onclick="shareCurrentProduct()">🔗 Share</span>
           </div>
 
+          <!-- PDP Content Layout -->
+          <div class="pdp-layout">
+            <!-- Left/Top: Product Main Showcase & Gallery -->
+            <div class="pdp-media-box">
+              <div class="pdp-main-image-wrap">
+                <img id="pdpMainImg" src="" alt="Product" />
+                <span class="pdp-verified-badge">Verified Deal</span>
+              </div>
+              <div class="pdp-rating-pill" id="pdpRatingBadge">
+                <span class="star">★</span> <span id="pdpRatingVal">4.2</span> | <span id="pdpReviewsCount">180 reviews</span>
+              </div>
+            </div>
+
+            <!-- Right/Bottom: Product Specs & Options -->
+            <div class="pdp-info-box">
+              <h2 class="pdp-product-title" id="pdpTitle">Product Title</h2>
+              
+              <div class="pdp-reward-pill">
+                🪙 Eligible for assured Cashback & Green Coins after delivery!
+              </div>
+
+              <!-- Select Size Section -->
+              <div class="pdp-section-block" id="pdpSizeSection">
+                <div class="pdp-section-header">
+                  <strong>Select Size</strong>
+                  <span class="pdp-sublink">Size Chart</span>
+                </div>
+                <div class="pdp-chips-row" id="pdpSizeChips">
+                  <button type="button" class="size-chip active">28</button>
+                  <button type="button" class="size-chip">30</button>
+                  <button type="button" class="size-chip">32</button>
+                  <button type="button" class="size-chip">34</button>
+                </div>
+              </div>
+
+              <!-- Select Color Section -->
+              <div class="pdp-section-block" id="pdpColorSection">
+                <div class="pdp-section-header">
+                  <strong>Select Color</strong>
+                </div>
+                <div class="pdp-colors-row" id="pdpColorChips">
+                  <span class="color-dot active" style="background: #111;" title="Black"></span>
+                  <span class="color-dot" style="background: #2563eb;" title="Blue"></span>
+                  <span class="color-dot" style="background: #64748b;" title="Grey"></span>
+                </div>
+              </div>
+
+              <!-- Product Details / Description -->
+              <div class="pdp-section-block">
+                <strong class="pdp-subheading">Product Details</strong>
+                <p class="pdp-description-text" id="pdpDescription">
+                  High quality genuine merchant product. Comes with official merchant return policy and standard delivery tracking.
+                </p>
+              </div>
+
+              <!-- Related Products Shelf -->
+              <div class="pdp-section-block pdp-related-block">
+                <strong class="pdp-subheading">Related Recommendations</strong>
+                <div class="pdp-related-grid" id="pdpRelatedGrid">
+                  <!-- Dynamic related items -->
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Sticky Bottom Bar (Photo 2 Standard) -->
+        <div class="pdp-bottom-sticky">
+          <div class="pdp-sticky-container">
+            <div class="pdp-price-display">
+              <span class="pdp-price-label">Price</span>
+              <div class="pdp-price-values">
+                <strong class="pdp-curr-price" id="pdpBottomPrice">₹0</strong>
+                <span class="pdp-old-mrp" id="pdpBottomMrp">₹0</span>
+              </div>
+            </div>
+            <a href="#" target="_blank" rel="noopener noreferrer" class="btn-click-to-buy" id="pdpBuyButton">
+              Click to Buy ⚡
+            </a>
+          </div>
         </div>
       </section>
 
