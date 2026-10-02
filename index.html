@@ -3,547 +3,638 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Super Shopping - Smart Shopping & Rewards</title>
+  <title>Super Shopping | Smart Shopping & Verified Rewards</title>
   
-  <!-- Modern Inter Font -->
+  <!-- Modern Inter & Roboto Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- DESKTOP CONTAINER: Laptop par centered mobile-app frame -->
-  <div class="app-container">
+  <!-- ROOT FULL-WIDTH APP WRAPPER -->
+  <div class="site-wrapper">
 
-    <!-- TOP HEADER -->
-    <header class="app-header" id="appHeader">
-      <div class="header-top">
-        <div class="brand-logo">
-          <span class="logo-bag">🛍️</span>
-          <span class="logo-text">Super <span class="logo-highlight">Shopping</span></span>
+    <!-- GLOBAL NAVBAR (RESPONSIVE FULL WIDTH) -->
+    <header class="main-navbar" id="mainNavbar">
+      <div class="nav-container">
+        
+        <!-- Brand Logo -->
+        <div class="brand-block" onclick="switchTab('home')">
+          <div class="brand-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </div>
+          <span class="brand-name">Super<span class="brand-accent">Shopping</span></span>
         </div>
-        <div class="header-user-status" id="headerUserStatus">
-          <span class="guest-pill" id="guestPill">Guest</span>
+
+        <!-- Global Search Bar (Only shown on 'home' and 'ebooks') -->
+        <div class="nav-search-bar" id="navSearchBar">
+          <span class="search-lens">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+          </span>
+          <input 
+            type="text" 
+            id="globalSearchInput" 
+            placeholder="Search products, deals, categories..." 
+            autocomplete="off" 
+          />
+          <button type="button" class="btn-clear-search" id="btnClearSearch" style="display:none;">✕</button>
         </div>
-      </div>
 
-      <!-- SEARCH BAR: JavaScript toggles visibility: Only ON for 'home' & 'ebooks' -->
-      <div class="header-search-container" id="headerSearchContainer">
-        <span class="search-icon">🔍</span>
-        <input 
-          type="text" 
-          id="globalSearchInput" 
-          placeholder="Search products, deals, discounts..." 
-          autocomplete="off"
-        />
-        <button class="clear-search-btn" id="clearSearchBtn" style="display:none;">✕</button>
-      </div>
+        <!-- Header Title Bar for Earn, Wallet, Account -->
+        <div class="nav-title-bar" id="navTitleBar" style="display:none;">
+          <h2 class="nav-section-title" id="navSectionTitle">Earn Rewards</h2>
+        </div>
 
-      <!-- STATIC SUB-HEADER: Shown on Earn, Wallet, Account tabs instead of Search -->
-      <div class="header-title-bar" id="headerTitleBar" style="display:none;">
-        <span class="title-bar-text" id="titleBarText">Earn Rewards</span>
+        <!-- Right Side User Authentication Pill -->
+        <div class="nav-user-actions">
+          <button type="button" class="user-auth-pill" id="userAuthPill" onclick="handleAuthButtonClick()">
+            <span class="status-dot"></span>
+            <span id="userPillText">Sign In / Guest</span>
+          </button>
+        </div>
+
       </div>
     </header>
 
-    <!-- MAIN VIEWPORT CONTENT (Scrollable Area) -->
-    <main class="app-main" id="appMain">
+    <!-- MAIN VIEWPORT CONTAINER -->
+    <main class="main-content" id="mainContent">
 
-      <!-- ==================== 1. HOME TAB ==================== -->
+      <!-- ==================== TAB 1: HOME ==================== -->
       <section class="tab-pane active" id="pane-home">
-        <!-- Banner Carousel -->
-        <div class="hero-banner">
-          <div class="banner-card">
-            <span class="banner-tag">Navratri Special Launch</span>
-            <h3>Double Rewards on Every Purchase</h3>
-            <p>Shop on Amazon & Flipkart through Super Shopping</p>
-          </div>
-        </div>
-
-        <!-- Category Pills -->
-        <div class="categories-scroll" id="homeCategoryPills">
-          <button class="cat-pill active" data-category="all">All Deals</button>
-          <button class="cat-pill" data-category="electronics">Mobiles & Tech</button>
-          <button class="cat-pill" data-category="fashion">Fashion & Clothes</button>
-          <button class="cat-pill" data-category="home">Home & Kitchen</button>
-          <button class="cat-pill" data-category="beauty">Beauty & Personal</button>
-        </div>
-
-        <!-- Product Grid (Flipkart Style Cards) -->
-        <div class="section-heading">
-          <h4>Handpicked Verified Deals</h4>
-          <span class="section-sub">Direct Merchant Stores</span>
-        </div>
-        <div class="product-grid" id="productGrid">
-          <!-- Dynamic products injected by app.js -->
-        </div>
-      </section>
-
-      <!-- ==================== 2. EARN TAB (CLAIM PURCHASE REWARD) ==================== -->
-      <section class="tab-pane" id="pane-earn">
-        <div class="card earn-card">
-          <div class="form-header">
-            <h3>Claim Purchase Reward</h3>
-            <p class="form-instruction">
-              Delivery confirm hone ke <strong>1 ghante baad se 48 ghante ke andar</strong> clear proof submit karein.
-            </p>
+        <div class="content-container">
+          
+          <!-- Promo Hero Banner -->
+          <div class="hero-banner-card">
+            <div class="hero-text-content">
+              <span class="hero-tag">Special Launch Event</span>
+              <h1 class="hero-title">Shop Smart. Earn Assured Rewards.</h1>
+              <p class="hero-desc">Access direct verified discounts on Amazon & Flipkart with exclusive post-delivery Cashback & Green Coins.</p>
+            </div>
           </div>
 
-          <form id="rewardClaimForm" class="reward-form" novalidate>
-            <!-- Step 1: Order Details -->
-            <div class="form-group">
-              <label for="storeSelect">Shopping Platform *</label>
-              <select id="storeSelect" class="form-select" required>
-                <option value="amazon">Amazon Verified Store</option>
-                <option value="flipkart">Flipkart Store (EarnKaro Verified)</option>
-                <option value="myntra">Myntra Store</option>
-                <option value="other">Other Supported Partner</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="orderIdInput">Store Order ID *</label>
-              <input type="text" id="orderIdInput" class="form-input" placeholder="e.g., 402-9182371-1928301" required />
-            </div>
-
-            <div class="form-group">
-              <label for="productNameInput">Product Name / Model *</label>
-              <input type="text" id="productNameInput" class="form-input" placeholder="e.g., Cotton Casual Shirt / IQOO Z9" required />
-            </div>
-
-            <!-- Step 2: Live In-App Camera Only (No file picker bypass) -->
-            <div class="proof-upload-section">
-              <label class="proof-label-heading">Mandatory Live Verification Proofs</label>
-              
-              <!-- Proof 1: Invoice -->
-              <div class="proof-box" id="proofBoxInvoice">
-                <div class="proof-info">
-                  <span class="proof-title">1. Live Bill / Invoice Photo *</span>
-                  <span class="proof-status-tag" id="statusInvoice">Pending Capture</span>
-                </div>
-                <button type="button" class="camera-btn" onclick="openLiveCamera('invoice')">
-                  📷 Open Live Camera
-                </button>
-                <div class="preview-thumbnail" id="thumbInvoice" style="display:none;"></div>
-              </div>
-
-              <!-- Proof 2: Unboxed Product -->
-              <div class="proof-box" id="proofBoxProduct">
-                <div class="proof-info">
-                  <span class="proof-title">2. Live Unboxed Product Photo *</span>
-                  <span class="proof-status-tag" id="statusProduct">Pending Capture</span>
-                </div>
-                <button type="button" class="camera-btn" onclick="openLiveCamera('product')">
-                  📷 Open Live Camera
-                </button>
-                <div class="preview-thumbnail" id="thumbProduct" style="display:none;"></div>
-              </div>
-
-              <!-- Proof 3: Delivery Status Screenshot -->
-              <div class="proof-box" id="proofBoxDelivery">
-                <div class="proof-info">
-                  <span class="proof-title">3. Delivery Confirmed App Screenshot *</span>
-                  <span class="proof-status-tag" id="statusDelivery">Pending Capture</span>
-                </div>
-                <button type="button" class="camera-btn" onclick="openLiveCamera('delivery')">
-                  📷 Capture Screen/Proof
-                </button>
-                <div class="preview-thumbnail" id="thumbDelivery" style="display:none;"></div>
-              </div>
-            </div>
-
-            <!-- Step 3: Choose Reward Method (Two Big Interactive Cards) -->
-            <div class="reward-selection-container">
-              <label class="proof-label-heading">Choose Reward Method *</label>
-              <div class="reward-cards-grid">
-                
-                <!-- Card A: Cashback Reward -->
-                <div class="reward-action-card selected" id="cardCashback" onclick="selectRewardMethod('cashback')">
-                  <div class="card-radio-indicator"></div>
-                  <div class="card-body-content">
-                    <div class="reward-title-row">
-                      <span class="reward-icon">💰</span>
-                      <strong>Cashback Reward</strong>
-                    </div>
-                    <span class="badge-gold">100-Day Standard Clearance</span>
-                    <p class="card-subtext">Direct UPI Settlement on 101st Day via Bank pipeline</p>
-                  </div>
-                </div>
-
-                <!-- Card B: Green Coins -->
-                <div class="reward-action-card" id="cardCoins" onclick="selectRewardMethod('coins')">
-                  <div class="card-radio-indicator"></div>
-                  <div class="card-body-content">
-                    <div class="reward-title-row">
-                      <span class="reward-icon">🪙</span>
-                      <strong>Green Coins</strong>
-                    </div>
-                    <span class="badge-green">7-Day Fast Clearance</span>
-                    <p class="card-subtext">Instant redemption for E-Books & Study assets</p>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            <!-- Conditional UPI ID input (Only for Cashback Reward) -->
-            <div class="form-group slide-input" id="upiFieldContainer">
-              <label for="upiInput">Your UPI ID (For 101st Day Transfer) *</label>
-              <input type="text" id="upiInput" class="form-input" placeholder="e.g. mobileNumber@okhdfcbank / paytm" />
-            </div>
-
-            <button type="submit" class="btn btn-primary submit-claim-btn" id="submitClaimBtn">
-              🚀 Submit Claim for Audit Desk
+          <!-- Category Navigation Pills With Aesthetic Icons -->
+          <div class="categories-bar" id="homeCategoriesBar">
+            <button class="cat-pill active" data-category="all">
+              <span class="cat-icon">🔥</span> All Deals
             </button>
-          </form>
+            <button class="cat-pill" data-category="electronics">
+              <span class="cat-icon">⚡</span> Electronics & Gadgets
+            </button>
+            <button class="cat-pill" data-category="fashion">
+              <span class="cat-icon">👔</span> Fashion & Apparel
+            </button>
+            <button class="cat-pill" data-category="home">
+              <span class="cat-icon">🏠</span> Home & Living
+            </button>
+            <button class="cat-pill" data-category="beauty">
+              <span class="cat-icon">✨</span> Beauty & Personal Care
+            </button>
+          </div>
+
+          <!-- Product Feed Heading -->
+          <div class="feed-header">
+            <div>
+              <h3 class="feed-title">Handpicked Verified Offers</h3>
+              <p class="feed-subtitle">Verified Direct Merchant Store Links</p>
+            </div>
+          </div>
+
+          <!-- Fluid Responsive Product Grid -->
+          <div class="products-fluid-grid" id="productsFluidGrid">
+            <!-- Dynamically populated or clean zero-state via app.js -->
+          </div>
+
         </div>
       </section>
 
-      <!-- ==================== 3. E-BOOKS TAB ==================== -->
+      <!-- ==================== TAB 2: EARN ==================== -->
+      <section class="tab-pane" id="pane-earn">
+        <div class="content-container form-container">
+          
+          <div class="form-sheet-card">
+            <div class="form-header-block">
+              <h2 class="form-title">Claim Purchase Reward</h2>
+              <p class="form-help-text">
+                Submit authentic verification proofs within <strong>1 to 48 hours</strong> following order delivery to start audit verification.
+              </p>
+            </div>
+
+            <form id="rewardClaimForm" class="styled-form" novalidate>
+              
+              <div class="input-grid-row">
+                <div class="input-field-group">
+                  <label for="storeSelect">Merchant Platform *</label>
+                  <select id="storeSelect" class="form-control" required>
+                    <option value="amazon">Amazon Official Store</option>
+                    <option value="flipkart">Flipkart Store (EarnKaro Verified)</option>
+                    <option value="myntra">Myntra Official</option>
+                    <option value="other">Other Supported Merchants</option>
+                  </select>
+                </div>
+
+                <div class="input-field-group">
+                  <label for="orderIdInput">Store Order ID *</label>
+                  <input type="text" id="orderIdInput" class="form-control" placeholder="e.g., 402-9182371-1928301" required />
+                </div>
+              </div>
+
+              <div class="input-field-group">
+                <label for="productNameInput">Product Model / Description *</label>
+                <input type="text" id="productNameInput" class="form-control" placeholder="e.g., Men Casual Cotton Shirt / Noise Smartwatch" required />
+              </div>
+
+              <!-- Live Proof Camera Desk -->
+              <div class="verification-desk">
+                <label class="section-label">Required Live Proof Captures</label>
+                
+                <div class="proof-capture-grid">
+                  <!-- Proof 1: Invoice -->
+                  <div class="proof-card" id="cardProofInvoice">
+                    <div class="proof-meta">
+                      <span class="proof-heading">1. Tax Invoice / Paper Bill</span>
+                      <span class="proof-badge" id="badgeInvoice">Pending</span>
+                    </div>
+                    <button type="button" class="btn-camera" onclick="openLiveCamera('invoice')">
+                      📷 Open Camera
+                    </button>
+                    <div class="proof-thumb" id="thumbInvoice" style="display:none;"></div>
+                  </div>
+
+                  <!-- Proof 2: Unboxed Product -->
+                  <div class="proof-card" id="cardProofProduct">
+                    <div class="proof-meta">
+                      <span class="proof-heading">2. Unboxed Physical Item</span>
+                      <span class="proof-badge" id="badgeProduct">Pending</span>
+                    </div>
+                    <button type="button" class="btn-camera" onclick="openLiveCamera('product')">
+                      📷 Open Camera
+                    </button>
+                    <div class="proof-thumb" id="thumbProduct" style="display:none;"></div>
+                  </div>
+
+                  <!-- Proof 3: Delivery Confirmation -->
+                  <div class="proof-card" id="cardProofDelivery">
+                    <div class="proof-meta">
+                      <span class="proof-heading">3. Delivery Status Screenshot</span>
+                      <span class="proof-badge" id="badgeDelivery">Pending</span>
+                    </div>
+                    <button type="button" class="btn-camera" onclick="openLiveCamera('delivery')">
+                      📷 Capture Status
+                    </button>
+                    <div class="proof-thumb" id="thumbDelivery" style="display:none;"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Reward Selection (Two Clean Interactive Cards) -->
+              <div class="reward-selection-desk">
+                <label class="section-label">Select Reward Program</label>
+                
+                <div class="reward-cards-dual">
+                  <!-- Cashback Reward -->
+                  <div class="reward-plan-card selected" id="optCashback" onclick="selectRewardPlan('cashback')">
+                    <div class="plan-radio"></div>
+                    <div class="plan-details">
+                      <div class="plan-title-line">
+                        <span class="plan-icon">💰</span>
+                        <strong>Cashback Reward</strong>
+                      </div>
+                      <span class="plan-badge-gold">100-Day Clearance Timeline</span>
+                      <p class="plan-desc">Settled directly via UPI on Day 101 following merchant return reconciliation.</p>
+                    </div>
+                  </div>
+
+                  <!-- Green Coins -->
+                  <div class="reward-plan-card" id="optCoins" onclick="selectRewardPlan('coins')">
+                    <div class="plan-radio"></div>
+                    <div class="plan-details">
+                      <div class="plan-title-line">
+                        <span class="plan-icon">🪙</span>
+                        <strong>Green Coins</strong>
+                      </div>
+                      <span class="plan-badge-green">7-Day Fast Clearance</span>
+                      <p class="plan-desc">Accelerated settlement for instant redemption across our Digital E-Books library.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Conditional UPI Input -->
+              <div class="input-field-group" id="upiFieldBox">
+                <label for="upiAddressInput">Beneficiary UPI ID (For 101st Day Settlement) *</label>
+                <input type="text" id="upiAddressInput" class="form-control" placeholder="username@bank / mobile@upi" />
+              </div>
+
+              <button type="submit" class="btn-action-primary btn-submit-claim">
+                Submit Claim for Audit Verification
+              </button>
+            </form>
+
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: E-BOOKS ==================== -->
       <section class="tab-pane" id="pane-ebooks">
-        <!-- Store/Library Segment Selector -->
-        <div class="segment-control">
-          <button class="segment-btn active" id="segExplore" onclick="switchEbookSegment('explore')">Explore Store</button>
-          <button class="segment-btn" id="segLibrary" onclick="switchEbookSegment('library')">My Library (0)</button>
-        </div>
-
-        <!-- Topic Pills Filter -->
-        <div class="categories-scroll" id="ebookCategoryPills">
-          <button class="cat-pill active" data-ebcat="all">All Books</button>
-          <button class="cat-pill" data-ebcat="notes1112">Class 11 & 12 Notes</button>
-          <button class="cat-pill" data-ebcat="commerce">B.Com & Commerce</button>
-          <button class="cat-pill" data-ebcat="business">Affiliate & Growth</button>
-        </div>
-
-        <!-- Ebook Grid: 2-Column Book Shelf Portrait View -->
-        <div class="ebooks-grid" id="ebooksStoreGrid">
-          <!-- Populated by app.js -->
-        </div>
-
-        <!-- My Library Empty / Purchased View -->
-        <div class="library-view" id="ebooksLibraryView" style="display: none;">
-          <div class="empty-state">
-            <div class="empty-icon">📚</div>
-            <h4>Aapki Library Khali Hai</h4>
-            <p>Green Coins se E-Books unlock karein aur yahan kabhi bhi padhein.</p>
-            <button class="btn btn-secondary" onclick="switchEbookSegment('explore')">Go to E-Books Store</button>
+        <div class="content-container">
+          
+          <div class="library-segment-bar">
+            <button class="seg-btn active" id="btnSegStore" onclick="switchEbookView('store')">Catalog Store</button>
+            <button class="seg-btn" id="btnSegLibrary" onclick="switchEbookView('library')">My Library (0)</button>
           </div>
+
+          <!-- Categories Filter -->
+          <div class="categories-bar" id="ebookCategoriesBar">
+            <button class="cat-pill active" data-ebcat="all"><span class="cat-icon">📚</span> All Guides</button>
+            <button class="cat-pill" data-ebcat="notes1112"><span class="cat-icon">🎓</span> Class 11-12 Notes</button>
+            <button class="cat-pill" data-ebcat="commerce"><span class="cat-icon">📊</span> B.Com & Accounts</button>
+            <button class="cat-pill" data-ebcat="business"><span class="cat-icon">🚀</span> Growth & Marketing</button>
+          </div>
+
+          <!-- Books Fluid Grid -->
+          <div class="ebooks-fluid-grid" id="ebooksCatalogGrid">
+            <!-- Dynamic or Empty State via app.js -->
+          </div>
+
+          <!-- Empty Library Container -->
+          <div class="library-empty-view" id="ebooksLibraryView" style="display:none;">
+            <div class="empty-panel">
+              <span class="empty-glyph">📖</span>
+              <h3>Your Library is Empty</h3>
+              <p>Redeem Green Coins earned from purchases to unlock exclusive digital guides and study notes.</p>
+              <button type="button" class="btn-action-secondary" onclick="switchEbookView('store')">Browse Catalog</button>
+            </div>
+          </div>
+
         </div>
       </section>
 
-      <!-- ==================== 4. WALLET TAB ==================== -->
+      <!-- ==================== TAB 4: WALLET ==================== -->
       <section class="tab-pane" id="pane-wallet">
-        <!-- Dual High-Contrast Balance Cards -->
-        <div class="wallet-balance-row">
-          <div class="balance-card coins-card">
-            <span class="balance-label">🪙 Available Coins</span>
-            <h2 class="balance-amount" id="walletCoinBalance">0</h2>
-            <button class="card-inline-action" onclick="switchTab('ebooks')">Spend on E-Books →</button>
-          </div>
-          <div class="balance-card cash-card">
-            <span class="balance-label">💰 Upcoming Cash Pipeline</span>
-            <h2 class="balance-amount" id="walletPendingCash">₹0</h2>
-            <span class="cash-cycle-note">Settlement: 101st Day</span>
-          </div>
-        </div>
+        <div class="content-container">
+          
+          <!-- Balance Summary Cards (Real 0 Balance) -->
+          <div class="wallet-metrics-grid">
+            <div class="metric-card metric-coins">
+              <span class="metric-label">Available Green Coins</span>
+              <h2 class="metric-value" id="walletCoinAmount">0</h2>
+              <button type="button" class="metric-action-btn" onclick="switchTab('ebooks')">Explore E-Books →</button>
+            </div>
 
-        <!-- 100-Day Tracker Section -->
-        <div class="tracker-section">
-          <div class="section-heading">
-            <h4>Active Rewards Tracker (100-Day Lifecycle)</h4>
-            <span class="section-sub">Live Clearance Road</span>
+            <div class="metric-card metric-cash">
+              <span class="metric-label">Upcoming Payout Pipeline</span>
+              <h2 class="metric-value" id="walletCashAmount">₹0</h2>
+              <span class="metric-note">Standard 101st Day UPI Settlement</span>
+            </div>
           </div>
 
-          <div class="orders-pipeline-list" id="walletPipelineList">
-            <!-- Dynamic order timeline cards loaded via app.js -->
+          <!-- 100-Day Lifecycle Orders Pipeline -->
+          <div class="wallet-pipeline-desk">
+            <div class="feed-header">
+              <div>
+                <h3 class="feed-title">Order Clearance Pipeline (100-Day Tracker)</h3>
+                <p class="feed-subtitle">Live Lifecycle & Merchant Return Reconciliation</p>
+              </div>
+            </div>
+
+            <div class="pipeline-orders-list" id="pipelineOrdersList">
+              <!-- Default Clean Empty State (No Dummy Data) -->
+            </div>
           </div>
+
         </div>
       </section>
 
-      <!-- ==================== 5. ACCOUNT TAB ==================== -->
+      <!-- ==================== TAB 5: ACCOUNT ==================== -->
       <section class="tab-pane" id="pane-account">
-        <!-- Profile Header (Center Aligned Avatar) -->
-        <div class="account-profile-header">
-          <div class="avatar-wrapper">
-            <div class="profile-avatar" id="profileAvatarDisplay">
-              <span class="avatar-initials" id="avatarInitials">SS</span>
-              <img id="avatarImage" src="" alt="Profile" style="display:none;" />
+        <div class="content-container form-container">
+          
+          <!-- Account Identity Header -->
+          <div class="profile-hero-card">
+            <div class="profile-avatar-wrapper">
+              <div class="avatar-circle" id="avatarCircle">
+                <span id="avatarInitials">SS</span>
+                <img id="avatarImg" src="" alt="Profile Avatar" style="display:none;" />
+              </div>
+              <label for="dpUploadInput" class="avatar-edit-label" title="Change Avatar">📷</label>
+              <input type="file" id="dpUploadInput" accept="image/*" style="display:none;" />
             </div>
-            <label for="dpFileInput" class="avatar-edit-badge" title="Upload Profile Picture">📷</label>
-            <input type="file" id="dpFileInput" accept="image/*" style="display:none;" />
+            <h3 class="profile-user-name" id="profileNameDisplay">Guest Account</h3>
+            <span class="profile-user-id" id="profileIdDisplay">ID: SS-GUEST-0000</span>
           </div>
-          <h3 class="user-display-name" id="accountNameDisplay">Guest User</h3>
-          <p class="user-display-id" id="accountIdDisplay">ID: SS-GUEST-0000</p>
-        </div>
 
-        <!-- Personal Details Box -->
-        <div class="card account-subcard">
-          <h4 class="card-inner-title">Edit Profile Details</h4>
-          <form id="profileEditForm" class="clean-form">
-            <div class="form-group">
-              <label>Full Name</label>
-              <input type="text" id="profFullName" class="form-input" placeholder="Your Full Name" />
-            </div>
-            <div class="form-group">
-              <label>Mobile Number (+91)</label>
-              <input type="tel" id="profPhone" class="form-input" placeholder="10-digit mobile number" />
-            </div>
-            <div class="form-group">
-              <label>Delivery Address</label>
-              <textarea id="profAddress" class="form-textarea" rows="2" placeholder="Full postal delivery address..."></textarea>
-            </div>
-            <button type="submit" class="btn btn-secondary btn-full">Save Profile Details</button>
-          </form>
-        </div>
+          <!-- Profile Details Editor -->
+          <div class="setting-card">
+            <h4 class="card-title">Personal Information</h4>
+            <form id="profileUpdateForm" class="styled-form">
+              <div class="input-grid-row">
+                <div class="input-field-group">
+                  <label>Full Legal Name</label>
+                  <input type="text" id="profNameInput" class="form-control" placeholder="Enter Full Name" />
+                </div>
+                <div class="input-field-group">
+                  <label>Mobile Number (+91)</label>
+                  <input type="tel" id="profPhoneInput" class="form-control" placeholder="10-digit mobile number" />
+                </div>
+              </div>
+              <div class="input-field-group">
+                <label>Default Postal Address</label>
+                <textarea id="profAddressInput" class="form-control" rows="2" placeholder="Full residential delivery address..."></textarea>
+              </div>
+              <button type="submit" class="btn-action-secondary">Update Profile Details</button>
+            </form>
+          </div>
 
-        <!-- 5-Slot Visual Referral Hub -->
-        <div class="card account-subcard referral-box">
-          <div class="referral-head">
-            <span class="ref-icon">🎁</span>
+          <!-- 5 Visual Referral Slots Hub -->
+          <div class="setting-card referral-desk">
+            <div class="ref-hero">
+              <span class="ref-badge-icon">🎁</span>
+              <div>
+                <h4 class="card-title mb-1">Invite Friends & Earn Rewards</h4>
+                <p class="ref-info">Receive 10 Green Coins for every verified signup (5 Slots Maximum).</p>
+              </div>
+            </div>
+
+            <!-- 5 Slots Badges Grid -->
+            <div class="slots-visual-grid" id="slotsVisualGrid">
+              <!-- Injected by app.js (All Default Empty) -->
+            </div>
+
+            <div class="ref-share-bar">
+              <span class="ref-code-label">Your Exclusive Invite Code:</span>
+              <div class="ref-code-box">
+                <strong id="refCodeText">SS-REF-0000</strong>
+                <button type="button" class="btn-copy-code" onclick="copyInviteCode()">Copy</button>
+              </div>
+            </div>
+
+            <button type="button" class="btn-whatsapp-share" onclick="shareOnWhatsApp()">
+              ⚡ Share Invite Link via WhatsApp
+            </button>
+          </div>
+
+          <!-- Help & Support: 4 Smart FAQs (Accordion) -->
+          <div class="setting-card">
+            <h4 class="card-title">Frequently Asked Questions</h4>
+            <div class="faq-group" id="faqGroup">
+              
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-trigger" onclick="toggleFaqAccordion(this)">
+                  <span>1. What is Super Shopping and how does it work?</span>
+                  <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-collapse">
+                  <p>Super Shopping is a customer reward discovery portal. When you navigate through our verified catalog links to complete purchases on Amazon or Flipkart, you earn authentic <strong>Cashback Rewards</strong> or <strong>Green Coins</strong> at zero extra cost.</p>
+                </div>
+              </div>
+
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-trigger" onclick="toggleFaqAccordion(this)">
+                  <span>2. How do I claim rewards after placing an order?</span>
+                  <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-collapse">
+                  <p>Upon product delivery, access the <strong>Earn</strong> section between 1 to 48 hours. Submit your Store Order ID, Product Name, and live camera captures of your tax invoice, unboxed physical item, and delivery confirmation screenshot.</p>
+                </div>
+              </div>
+
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-trigger" onclick="toggleFaqAccordion(this)">
+                  <span>3. What is the difference between Cashback and Green Coins?</span>
+                  <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-collapse">
+                  <p><strong>Green Coins</strong> undergo a 7-day expedited clearance cycle and can be redeemed for educational notes and e-books. <strong>Cashback Rewards</strong> adhere to a standard 100-day settlement timeline and are disbursed on Day 101 directly to your bank account via UPI.</p>
+                </div>
+              </div>
+
+              <div class="faq-accordion-item">
+                <button type="button" class="faq-trigger" onclick="toggleFaqAccordion(this)">
+                  <span>4. Does shopping via Super Shopping increase product prices?</span>
+                  <span class="faq-arrow">▼</span>
+                </button>
+                <div class="faq-collapse">
+                  <p><strong>Never.</strong> You pay the exact same deal pricing, promotional offers, and shipping fees established by Amazon or Flipkart. Rewards are independent loyalty incentives distributed by Super Shopping.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Legal Policy Hub Access -->
+          <div class="setting-card policy-access-box">
             <div>
-              <h4>Refer & Earn Green Coins</h4>
-              <p class="ref-sub">Aapko 10 Coins, dost ko 6 Coins! (Max 5 Friends)</p>
+              <h4 class="card-title mb-1">📜 Legal Terms & Reward Policies</h4>
+              <p class="ref-info">Review regulatory compliance, anti-fraud rules, and terms.</p>
             </div>
+            <button type="button" class="btn-action-outline" onclick="openPolicyModal()">View Policy</button>
           </div>
 
-          <!-- 5 Visual Badges -->
-          <div class="referral-slots-grid" id="referralSlotsContainer">
-            <!-- 5 Badges populated by JS -->
+          <!-- Session Logout Action -->
+          <div class="account-footer-action">
+            <button type="button" class="btn-logout" onclick="performLogout()">
+              🚪 Sign Out of Account
+            </button>
           </div>
 
-          <div class="referral-code-bar">
-            <span class="code-label">Your Referral Code:</span>
-            <div class="code-pill">
-              <strong id="userReferralCode">SS-REF-0000</strong>
-              <button type="button" class="btn-copy" onclick="copyReferralCode()">Copy</button>
-            </div>
-          </div>
-
-          <button type="button" class="btn btn-success btn-full" onclick="sharePlatform()">
-            ⚡ Share Website Link on WhatsApp
-          </button>
-        </div>
-
-        <!-- Help & Support: 4 Core Smart FAQs (Clickable Accordion) -->
-        <div class="card account-subcard">
-          <h4 class="card-inner-title">Help & Support (Smart FAQs)</h4>
-          <div class="faq-accordion" id="faqAccordionGroup">
-            
-            <div class="faq-item">
-              <button type="button" class="faq-question" onclick="toggleFaq(this)">
-                <span>1. Super Shopping kya hai aur iska kya fayda hai?</span>
-                <span class="faq-chevron">▼</span>
-              </button>
-              <div class="faq-answer">
-                <p>Super Shopping ek smart discovery aur purchase reward platform hai. Jab aap hamare verified links ke zariye Amazon ya Flipkart se shopping karte hain, toh regular discounts ke sath aapko extra <strong>Cashback Rewards</strong> aur <strong>Green Coins</strong> milte hain bina kisi extra charge ke.</p>
-              </div>
-            </div>
-
-            <div class="faq-item">
-              <button type="button" class="faq-question" onclick="toggleFaq(this)">
-                <span>2. Shopping ke baad reward kaise claim karein?</span>
-                <span class="faq-chevron">▼</span>
-              </button>
-              <div class="faq-answer">
-                <p>Order receive hone ke <strong>1 ghante baad se 48 ghante ke andar</strong> Earn tab par jayein. Store Order ID, Product Name, Invoice ki live photo, unboxed product photo aur delivery screenshot upload karke apna reward method select karein.</p>
-              </div>
-            </div>
-
-            <div class="faq-item">
-              <button type="button" class="faq-question" onclick="toggleFaq(this)">
-                <span>3. Cashback Reward aur Green Coins me kya farq hai?</span>
-                <span class="faq-chevron">▼</span>
-              </button>
-              <div class="faq-answer">
-                <p><strong>Green Coins</strong> 7-day fast clearance ke baad unlock hote hain jinse aap E-Books store se digital study guides instant le sakte hain. <strong>Cashback Reward</strong> 100-day clearance cycle ke baad 101st day direct aapke verified UPI ID par bank transfer hota hai.</p>
-              </div>
-            </div>
-
-            <div class="faq-item">
-              <button type="button" class="faq-question" onclick="toggleFaq(this)">
-                <span>4. Kya Super Shopping use karne se price badh jati hai?</span>
-                <span class="faq-chevron">▼</span>
-              </button>
-              <div class="faq-answer">
-                <p><strong>Bilkul nahi!</strong> Product ki price, bank offers aur discounts wahi rahenge jo Amazon ya Flipkart par hain. Reward hamare platform ki taraf se verified users ke liye additional benefit hai.</p>
-              </div>
-            </div>
-
-            <!-- Expandable Space Placeholder for Future Questions -->
-            <div id="extraFaqPlaceholder"></div>
-
-          </div>
-        </div>
-
-        <!-- Permanent Legal Terms & Condition Access -->
-        <div class="card account-subcard">
-          <div class="policy-access-row">
-            <div>
-              <h4 class="card-inner-title mb-0">📜 Legal Terms & Reward Policies</h4>
-              <p class="ref-sub">Review compliance, validation rules and privacy</p>
-            </div>
-            <button class="btn btn-outline-sm" onclick="openPolicyModal()">Read Policy</button>
-          </div>
-        </div>
-
-        <!-- Logout Action -->
-        <div class="account-actions">
-          <button type="button" class="btn btn-danger-outline btn-full" onclick="handleAuthAction()">
-            🚪 Logout Account
-          </button>
         </div>
       </section>
 
     </main>
 
-    <!-- ==================== BOTTOM NAVIGATION (FLIPKART STYLE) ==================== -->
-    <nav class="bottom-nav">
-      <button class="nav-tab active" data-tab="home" onclick="switchTab('home')">
-        <span class="nav-icon">🏠</span>
-        <span class="nav-label">Home</span>
-      </button>
-      <button class="nav-tab" data-tab="earn" onclick="switchTab('earn')">
-        <span class="nav-icon">🎁</span>
-        <span class="nav-label">Earn</span>
-      </button>
-      <button class="nav-tab" data-tab="ebooks" onclick="switchTab('ebooks')">
-        <span class="nav-icon">📚</span>
-        <span class="nav-label">E-Books</span>
-      </button>
-      <button class="nav-tab" data-tab="wallet" onclick="switchTab('wallet')">
-        <span class="nav-icon">💳</span>
-        <span class="nav-label">Wallet</span>
-      </button>
-      <button class="nav-tab" data-tab="account" onclick="switchTab('account')">
-        <span class="nav-icon">👤</span>
-        <span class="nav-label">Account</span>
-      </button>
+    <!-- FIXED FLIPKART-STYLE BOTTOM NAVIGATION (ALWAYS VISIBLE) -->
+    <nav class="fixed-bottom-bar" id="fixedBottomBar">
+      <div class="bottom-bar-inner">
+        <button type="button" class="bottom-tab-btn active" data-tab="home" onclick="switchTab('home')">
+          <span class="bottom-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+          </span>
+          <span class="bottom-label">Home</span>
+        </button>
+
+        <button type="button" class="bottom-tab-btn" data-tab="earn" onclick="switchTab('earn')">
+          <span class="bottom-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <polyline points="20 12 20 22 4 22 4 12"></polyline>
+              <rect x="2" y="7" width="20" height="5"></rect>
+              <line x1="12" y1="22" x2="12" y2="7"></line>
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"></path>
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"></path>
+            </svg>
+          </span>
+          <span class="bottom-label">Earn</span>
+        </button>
+
+        <button type="button" class="bottom-tab-btn" data-tab="ebooks" onclick="switchTab('ebooks')">
+          <span class="bottom-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            </svg>
+          </span>
+          <span class="bottom-label">E-Books</span>
+        </button>
+
+        <button type="button" class="bottom-tab-btn" data-tab="wallet" onclick="switchTab('wallet')">
+          <span class="bottom-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+              <line x1="1" y1="10" x2="23" y2="10"></line>
+            </svg>
+          </span>
+          <span class="bottom-label">Wallet</span>
+        </button>
+
+        <button type="button" class="bottom-tab-btn" data-tab="account" onclick="switchTab('account')">
+          <span class="bottom-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </span>
+          <span class="bottom-label">Account</span>
+        </button>
+      </div>
     </nav>
 
-    <!-- ==================== MODAL 1: AUTH GATEWAY (LOGIN / SIGN-UP) ==================== -->
-    <div class="modal-backdrop" id="authModal" style="display:none;">
-      <div class="modal-sheet">
-        <div class="modal-header">
-          <div class="auth-brand">
-            <span class="logo-bag">🛍️</span>
-            <h3>Super Shopping</h3>
+    <!-- ==================== MODAL 1: AUTH GATEWAY ==================== -->
+    <div class="overlay-backdrop" id="authGatewayModal" style="display:none;">
+      <div class="overlay-dialog">
+        <div class="overlay-header">
+          <div class="brand-block">
+            <span class="brand-name">Super<span class="brand-accent">Shopping</span></span>
           </div>
-          <button class="close-modal-btn" onclick="closeAuthModal()">✕</button>
+          <button type="button" class="btn-close-overlay" onclick="closeAuthModal()">✕</button>
         </div>
 
-        <div class="auth-tabs">
-          <button class="auth-toggle active" id="btnAuthLogin" onclick="switchAuthMode('login')">Sign In</button>
-          <button class="auth-toggle" id="btnAuthSignup" onclick="switchAuthMode('signup')">Create Account</button>
+        <div class="auth-segment-switch">
+          <button type="button" class="segment-pill active" id="btnToggleLogin" onclick="setAuthMode('login')">Sign In</button>
+          <button type="button" class="segment-pill" id="btnToggleSignup" onclick="setAuthMode('signup')">Create Account</button>
         </div>
 
-        <form id="authForm" class="auth-form-content">
-          <div class="form-group" id="grpFullName" style="display:none;">
-            <label>Full Name *</label>
-            <input type="text" id="authFullName" class="form-input" placeholder="e.g. Ramesh Kumar" />
+        <form id="authCoreForm" class="styled-form mt-3">
+          <div class="input-field-group" id="groupSignupName" style="display:none;">
+            <label>Full Legal Name *</label>
+            <input type="text" id="authNameInput" class="form-control" placeholder="Enter Full Name" />
           </div>
 
-          <div class="form-group">
-            <label>Mobile Number or Email *</label>
-            <input type="text" id="authIdentity" class="form-input" placeholder="e.g. 9876543210 or user@gmail.com" required />
+          <div class="input-field-group">
+            <label>Email or Mobile Number *</label>
+            <input type="text" id="authIdentifierInput" class="form-control" placeholder="name@example.com / 9876543210" required />
           </div>
 
-          <div class="form-group">
+          <div class="input-field-group">
             <label>Password *</label>
-            <input type="password" id="authPassword" class="form-input" placeholder="Enter secure password" required />
+            <input type="password" id="authPasswordInput" class="form-control" placeholder="Enter secure password" required />
           </div>
 
-          <div class="form-group" id="grpReferral" style="display:none;">
+          <div class="input-field-group" id="groupSignupReferral" style="display:none;">
             <label>Referral Code (Optional)</label>
-            <input type="text" id="authRefCode" class="form-input" placeholder="Enter friend's invite code" />
+            <input type="text" id="authRefInput" class="form-control" placeholder="e.g. SS-REF-1234" />
           </div>
 
-          <!-- Mandatory T&C Checkbox for Signup -->
-          <div class="terms-checkbox-wrap" id="grpTermsCheckbox" style="display:none;">
-            <input type="checkbox" id="authTermsAgree" />
-            <label for="authTermsAgree">
-              I agree to the <a href="javascript:void(0)" onclick="openPolicyModal()">Terms of Service, Cashback Policy & Guidelines</a>.
+          <!-- Mandatory Legal Agreement -->
+          <div class="checkbox-legal-row" id="groupSignupAgreement" style="display:none;">
+            <input type="checkbox" id="authAgreementBox" />
+            <label for="authAgreementBox">
+              I certify that I agree to the <a href="javascript:void(0)" onclick="openPolicyModal()">Terms of Service, Cashback Policy & Guidelines</a>.
             </label>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-full mt-2" id="authSubmitBtn">
-            Sign In
+          <button type="submit" class="btn-action-primary w-100" id="btnAuthAction">
+            Sign In to Account
           </button>
         </form>
 
-        <div class="guest-skip-wrap">
-          <button type="button" class="btn-text-link" onclick="closeAuthModal()">Continue as Guest / Skip for Now →</button>
+        <div class="guest-bypass-box">
+          <button type="button" class="btn-text-bypass" onclick="closeAuthModal()">Continue as Guest / Browse Deals →</button>
         </div>
       </div>
     </div>
 
-    <!-- ==================== MODAL 2: IN-APP LIVE CAMERA VIEWFINDER ==================== -->
-    <div class="modal-backdrop" id="cameraModal" style="display:none;">
-      <div class="modal-camera-frame">
-        <div class="camera-top-bar">
-          <span class="camera-target-title" id="cameraTargetTitle">Live Invoice Verification</span>
-          <button class="camera-close-icon" onclick="closeLiveCamera()">✕</button>
+    <!-- ==================== MODAL 2: SEARCH NOT FOUND / REQUEST PRODUCT ==================== -->
+    <div class="overlay-backdrop" id="searchMissModal" style="display:none;">
+      <div class="overlay-dialog">
+        <div class="overlay-header">
+          <h4 class="overlay-title">Product Not Found in Catalog</h4>
+          <button type="button" class="btn-close-overlay" onclick="closeSearchMissModal()">✕</button>
         </div>
-
-        <div class="camera-viewport-wrap">
-          <video id="liveVideoFeed" playsinline autoplay muted></video>
-          <div class="camera-overlay-guideline">
-            <div class="viewfinder-box"></div>
-            <span class="viewfinder-tip">Keep document/product steady inside the box</span>
+        <div class="dialog-body-text">
+          <p>We could not find matching deals for your search term. Would you like to request reward eligibility for this product?</p>
+          <div class="input-field-group mt-3">
+            <label>Paste Amazon / Flipkart Product URL</label>
+            <input type="url" id="requestProductUrl" class="form-control" placeholder="https://www.amazon.in/dp/..." />
           </div>
-          <canvas id="liveCaptureCanvas" style="display:none;"></canvas>
-        </div>
-
-        <div class="camera-bottom-bar">
-          <button type="button" class="shutter-circle-btn" id="shutterBtn" onclick="snapPhoto()">
-            <div class="shutter-inner"></div>
+          <button type="button" class="btn-action-primary w-100 mt-2" onclick="submitProductRequest()">
+            Submit URL for Reward Activation
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ==================== MODAL 3: E-BOOK SAMPLE PREVIEWER ==================== -->
-    <div class="modal-backdrop" id="previewModal" style="display:none;">
-      <div class="modal-sheet preview-sheet">
-        <div class="modal-header">
-          <h4 id="previewModalTitle">Book Sample Preview</h4>
-          <button class="close-modal-btn" onclick="closePreviewModal()">✕</button>
+    <!-- ==================== MODAL 3: IN-APP LIVE CAMERA ==================== -->
+    <div class="overlay-backdrop" id="inAppCameraModal" style="display:none;">
+      <div class="camera-fullscreen-viewport">
+        <div class="camera-hud-top">
+          <span class="camera-target-label" id="cameraTargetLabel">Live Camera Verification</span>
+          <button type="button" class="btn-close-camera" onclick="closeLiveCamera()">✕</button>
         </div>
-        <div class="preview-content-box" id="previewContentBox">
-          <!-- Sample content / Watermarked snippet -->
+
+        <div class="camera-stream-box">
+          <video id="cameraVideoFeed" autoplay playsinline muted></video>
+          <div class="camera-frame-guide">
+            <div class="guide-box"></div>
+            <span class="guide-caption">Position bill / item clearly within the frame</span>
+          </div>
+          <canvas id="cameraCaptureCanvas" style="display:none;"></canvas>
         </div>
-        <div class="preview-footer-action">
-          <button class="btn btn-success btn-full" id="btnUnlockFromPreview">
-            🪙 Unlock Full Book with Green Coins
+
+        <div class="camera-hud-bottom">
+          <button type="button" class="btn-trigger-snap" onclick="captureLiveSnapshot()">
+            <div class="snap-core"></div>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- ==================== MODAL 4: LEGAL POLICY & COMPLIANCE ==================== -->
-    <div class="modal-backdrop" id="policyModal" style="display:none;">
-      <div class="modal-sheet policy-sheet">
-        <div class="modal-header">
-          <h4>Platform Terms, Compliance & Rules</h4>
-          <button class="close-modal-btn" onclick="closePolicyModal()">✕</button>
+    <!-- ==================== MODAL 4: LEGAL POLICY ==================== -->
+    <div class="overlay-backdrop" id="legalPolicyModal" style="display:none;">
+      <div class="overlay-dialog policy-dialog">
+        <div class="overlay-header">
+          <h4 class="overlay-title">Terms of Service & Reward Policies</h4>
+          <button type="button" class="btn-close-overlay" onclick="closePolicyModal()">✕</button>
         </div>
-        <div class="policy-body-content">
-          <h5>1. 100-Day Reward Clearance Cycle</h5>
-          <p>Super Shopping acts as an independent customer promotion and loyalty interface. All Cashback Rewards are processed after the respective merchant's return window closes and final commission reconciles, strictly payable on the 101st day via UPI.</p>
-          
-          <h5>2. Anti-Fraud & Live Audit Compliance</h5>
-          <p>To eliminate fraudulent submissions, claims must feature authentic, in-app live captures of invoice and unboxed items submitted within 48 hours of delivery. Screen captures or returned orders are immediately permanently voided.</p>
+        <div class="policy-scroll-area">
+          <h5>1. Standard 100-Day Clearance Lifecycle</h5>
+          <p>Super Shopping acts as an independent performance marketing platform. All Cashback Rewards are processed strictly following the respective merchant's statutory return window and commission reconciliation, payable on Day 101 via UPI.</p>
+
+          <h5>2. Anti-Fraud & Physical Proof Validation</h5>
+          <p>To eliminate fraudulent submissions, claims must feature authentic, in-app live captures of invoice and unboxed items submitted within 48 hours of delivery. Screen captures or returned orders are permanently voided without notice.</p>
 
           <h5>3. Merchant Association Disclaimer</h5>
-          <p>Super Shopping is an independent promotional directory and is not directly owned, affiliated, or sponsored by Amazon, Flipkart, or any third-party retailer. Product fulfillment, warranties, and logistics reside solely with respective merchants.</p>
+          <p>Super Shopping is an independent directory and is not officially associated with or endorsed by Amazon, Flipkart, or any merchant. Product delivery, warranties, and logistics reside exclusively with the merchants.</p>
 
-          <h5>4. Digital Assets & Green Coins</h5>
+          <h5>4. Digital Loyalty Assets (Green Coins)</h5>
           <p>Green Coins represent platform micro-learning loyalty credits strictly redeemable for platform digital library assets. They do not constitute official legal currency or direct demandable bank liabilities.</p>
         </div>
       </div>
     </div>
 
-  </div> <!-- End App Container -->
+  </div> <!-- End Site Wrapper -->
 
   <script src="app.js"></script>
 </body>
