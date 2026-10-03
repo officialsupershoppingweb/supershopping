@@ -1,11 +1,11 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH LOGIC LAYER (PDP, DYNAMIC VARIANTS & WISHLIST)
+   SUPERSHOPPING - SAFE PATCH LOGIC (GLOBAL DELEGATION ENGINE)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // 1. Wishlist Storage Helper
+  // 1. Wishlist Helper
   function getWishlist() {
     try {
       return JSON.parse(localStorage.getItem('ss_user_wishlist') || '[]');
@@ -19,10 +19,6 @@
       localStorage.setItem('ss_user_wishlist', JSON.stringify(list));
       updateAccountWishlistUI();
     } catch (e) {}
-  }
-
-  function isProductLiked(id) {
-    return getWishlist().includes(id);
   }
 
   function toggleProductLike(id, heartBtn) {
@@ -43,7 +39,7 @@
     setWishlist(list);
   }
 
-  // 2. Build In-DOM PDP Structure if not present
+  // 2. Ensure PDP Modal Exists in DOM
   function ensurePDPModal() {
     let modal = document.getElementById('patchPDPModal');
     if (!modal) {
@@ -105,33 +101,32 @@
     return modal;
   }
 
-  // 3. Open Detail Page with Auto Dynamic Variants
-  window.openSafeProductDetail = function (product) {
+  // 3. Open Safe PDP
+  function openSafeProductDetail(product) {
     if (!product) return;
     const modal = ensurePDPModal();
 
-    // Data Binding
     document.getElementById('patchPDPImage').src = product.imageUrl || '';
     document.getElementById('patchPDPTitle').textContent = product.title || '';
     document.getElementById('patchPDPPrice').textContent = `₹${product.price || 0}`;
     document.getElementById('patchPDPMSRP').textContent = product.mrp ? `₹${product.mrp}` : '';
     document.getElementById('patchPDPDesc').textContent = product.description || 'Verified authentic item from merchant store.';
-    document.getElementById('patchPDPRating').textContent = `★ ${product.rating || '4.2'} | ${product.reviews || 'Verified Offers'}`;
+    document.getElementById('patchPDPRating').textContent = `★ ${product.rating || '4.2'} | ${product.reviews || '150+ reviews'}`;
 
     const buyLink = document.getElementById('patchPDPBuyLink');
     buyLink.href = product.affiliateUrl || '#';
 
-    // Heart Icon state
+    // Heart (Wishlist)
     const heartBtn = document.getElementById('patchHeartBtn');
-    const liked = isProductLiked(product.id);
-    heartBtn.classList.toggle('liked', liked);
-    heartBtn.innerHTML = liked ? '❤️' : '♡';
+    const isLiked = getWishlist().includes(product.id);
+    heartBtn.classList.toggle('liked', isLiked);
+    heartBtn.innerHTML = isLiked ? '❤️' : '♡';
     heartBtn.onclick = function (e) {
       e.stopPropagation();
       toggleProductLike(product.id, heartBtn);
     };
 
-    // Share button
+    // Share Button
     const shareBtn = document.getElementById('patchShareBtn');
     shareBtn.onclick = function (e) {
       e.stopPropagation();
@@ -142,30 +137,36 @@
           url: product.affiliateUrl || window.location.href
         }).catch(() => {});
       } else {
-        alert('Product deal link copied!');
+        alert('Product link copied!');
       }
     };
 
-    // Dynamic Measurement Detection
+    // Dynamic Variant & Measurement Logic
     const variantShelf = document.getElementById('patchVariantShelf');
     const variantLabel = document.getElementById('patchVariantLabel');
     const chipsWrap = document.getElementById('patchChipsWrap');
 
     let variants = product.variants;
-    let labelText = product.variantLabel;
+    let label = product.variantLabel;
 
-    // Auto-fallback if variants not explicitly in product object
-    if (!variants && product.category === 'fashion') {
-      variants = ['28', '30', '32', '34'];
-      labelText = 'Select Size';
-    } else if (!variants && product.category === 'beauty') {
-      variants = ['50ml', '100ml', '200ml'];
-      labelText = 'Select Volume';
+    // Smart category check if not provided
+    const lowerTitle = (product.title || '').toLowerCase();
+    if (!variants) {
+      if (lowerTitle.includes('shirt') || lowerTitle.includes('jeans') || product.category === 'fashion') {
+        variants = ['28', '30', '32', '34'];
+        label = 'Select Size';
+      } else if (lowerTitle.includes('shoe') || lowerTitle.includes('slipper')) {
+        variants = ['6', '7', '8', '9', '10'];
+        label = 'Select Shoe Size';
+      } else if (lowerTitle.includes('cream') || lowerTitle.includes('wash') || product.category === 'beauty') {
+        variants = ['50ml', '100ml', '200ml'];
+        label = 'Select Volume';
+      }
     }
 
     if (variants && variants.length > 0) {
       variantShelf.style.display = 'block';
-      variantLabel.textContent = labelText || 'Select Option';
+      variantLabel.textContent = label || 'Select Option';
       chipsWrap.innerHTML = variants.map((v, i) => `
         <button type="button" class="patch-variant-chip ${i === 0 ? 'active' : ''}">${v}</button>
       `).join('');
@@ -177,14 +178,14 @@
         });
       });
     } else {
-      // Auto Hide for items without measurement (Bottle, Earphone, Gadgets)
+      // Bottle, Electronics, Headphones etc. -> Auto Hide!
       variantShelf.style.display = 'none';
     }
 
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
     modal.scrollTo({ top: 0, behavior: 'instant' });
-  };
+  }
 
   function closePDP() {
     const modal = document.getElementById('patchPDPModal');
@@ -192,51 +193,48 @@
     document.body.style.overflow = '';
   }
 
-  // 4. Intercept Card Clicks Non-Destructively
-  function attachCardListeners() {
-    const cards = document.querySelectorAll('.product-card');
-    cards.forEach((card, index) => {
-      if (card.dataset.patchBound) return;
-      card.dataset.patchBound = 'true';
+  // 4. Global Document Click Delegation (Card kabhi bhi load ho, ye pakad lega)
+  document.addEventListener('click', function (e) {
+    const card = e.target.closest('.product-card');
+    if (!card) return;
 
-      card.addEventListener('click', function (e) {
-        // If clicked specifically on native shop button, allow direct external visit if desired
-        if (e.target.closest('.btn-merchant-action') && !e.target.closest('.product-card')) return;
+    // Agar direct 'Shop on Amazon/Flipkart' button par dabaya hai toh roko mat
+    if (e.target.closest('.btn-merchant-action') && e.target.tagName.toLowerCase() === 'a') {
+      return;
+    }
 
-        e.preventDefault();
-        e.stopPropagation();
+    e.preventDefault();
+    e.stopPropagation();
 
-        // Fetch corresponding product data safely
-        let targetProduct = null;
-        if (typeof LiveCatalogDeals !== 'undefined' && LiveCatalogDeals[index]) {
-          targetProduct = LiveCatalogDeals[index];
-        } else {
-          // Fallback extraction from card DOM itself
-          const title = card.querySelector('.product-title-text')?.textContent?.trim() || 'Product';
-          const priceStr = card.querySelector('.sale-price')?.textContent?.replace(/[^0-9]/g, '') || '0';
-          const mrpStr = card.querySelector('.regular-price')?.textContent?.replace(/[^0-9]/g, '') || '0';
-          const img = card.querySelector('img')?.src || '';
-          const link = card.querySelector('a')?.href || '#';
+    // Find card index
+    const parent = card.parentElement;
+    const cardIndex = Array.from(parent.children).indexOf(card);
 
-          targetProduct = {
-            id: `DEAL-${index + 1}`,
-            title: title,
-            price: Number(priceStr),
-            mrp: Number(mrpStr),
-            imageUrl: img,
-            affiliateUrl: link,
-            category: title.toLowerCase().includes('shirt') ? 'fashion' : 'general',
-            variants: title.toLowerCase().includes('shirt') ? ['28', '30', '32', '34'] : null,
-            variantLabel: title.toLowerCase().includes('shirt') ? 'Select Size' : null
-          };
-        }
+    let product = null;
+    if (typeof LiveCatalogDeals !== 'undefined' && LiveCatalogDeals[cardIndex]) {
+      product = LiveCatalogDeals[cardIndex];
+    } else {
+      // Fallback: Read directly from card HTML
+      const title = card.querySelector('.product-title-text')?.textContent?.trim() || 'Product';
+      const price = card.querySelector('.sale-price')?.textContent?.replace(/[^0-9]/g, '') || '0';
+      const mrp = card.querySelector('.regular-price')?.textContent?.replace(/[^0-9]/g, '') || '0';
+      const img = card.querySelector('img')?.src || '';
+      const link = card.querySelector('a')?.href || '#';
 
-        window.openSafeProductDetail(targetProduct);
-      });
-    });
-  }
+      product = {
+        id: `DEAL-${cardIndex + 1}`,
+        title: title,
+        price: Number(price),
+        mrp: Number(mrp),
+        imageUrl: img,
+        affiliateUrl: link
+      };
+    }
 
-  // 5. Account Page: My Wishlist & Share Website Integration
+    openSafeProductDetail(product);
+  }, true);
+
+  // 5. Account Features: Wishlist & Share Website
   function injectAccountFeatures() {
     const accountPane = document.getElementById('pane-account');
     if (!accountPane || document.getElementById('patchAccountShelf')) return;
@@ -261,12 +259,11 @@
       </div>
     `;
 
-    // Insert cleanly inside account pane
     accountPane.appendChild(shelf);
 
     document.getElementById('patchOpenWishlistRow').addEventListener('click', () => {
       const count = getWishlist().length;
-      alert(`My Wishlist: You have ${count} saved item(s). Items you like stay saved here!`);
+      alert(`My Wishlist: You have ${count} saved item(s).`);
     });
 
     document.getElementById('patchShareAppRow').addEventListener('click', () => {
@@ -274,7 +271,7 @@
       if (navigator.share) {
         navigator.share({
           title: 'SuperShopping',
-          text: 'Explore verified deals, cashback and exclusive offers on SuperShopping!',
+          text: 'Explore verified deals and cashback rewards on SuperShopping!',
           url: siteUrl
         }).catch(() => {});
       } else {
@@ -293,21 +290,14 @@
     }
   }
 
-  // 6. Safe Observer to bind cards whenever catalog renders
-  function bootPatchEngine() {
-    attachCardListeners();
-    injectAccountFeatures();
-
-    const grid = document.getElementById('productsFluidGrid');
-    if (grid && window.MutationObserver) {
-      const observer = new MutationObserver(() => attachCardListeners());
-      observer.observe(grid, { childList: true, subtree: true });
-    }
-  }
-
+  // Boot UI
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', bootPatchEngine);
+    document.addEventListener('DOMContentLoaded', injectAccountFeatures);
   } else {
-    bootPatchEngine();
+    injectAccountFeatures();
   }
+
+  // Periodic check for account pane render
+  setInterval(injectAccountFeatures, 1500);
+
 })();
