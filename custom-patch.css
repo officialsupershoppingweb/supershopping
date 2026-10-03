@@ -1,1 +1,306 @@
 /* Safe Patch Styling Layer */
+/* ==========================================================================
+   SUPERSHOPPING - SAFE PATCH DESIGN LAYER (PDP, WISHLIST & DYNAMIC VARIANTS)
+   ========================================================================== */
+
+/* Fullscreen Overlay Sheet for PDP */
+.patch-pdp-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  z-index: 99999;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #1e293b;
+}
+
+.patch-pdp-container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding-bottom: 95px;
+  background: #ffffff;
+  position: relative;
+  min-height: 100vh;
+}
+
+/* Sticky Top Bar (Back Arrow & Actions) */
+.patch-pdp-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  z-index: 50;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.patch-btn-back {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #0f172a;
+  font-weight: 600;
+  padding: 4px;
+}
+
+/* Image Container with Floating Heart & Share */
+.patch-pdp-media-box {
+  position: relative;
+  width: 100%;
+  background-color: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  max-height: 480px;
+}
+
+.patch-pdp-media-box img {
+  width: 100%;
+  max-height: 480px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Floating Actions: Like & Share */
+.patch-floating-actions {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 10;
+}
+
+.patch-circle-action-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+  font-size: 16px;
+  color: #475569;
+}
+
+.patch-circle-action-btn:active {
+  transform: scale(0.92);
+}
+
+.patch-circle-action-btn.liked {
+  color: #e11d48;
+  background: #ffe4e6;
+  border-color: #fecdd3;
+}
+
+/* Product Info Block */
+.patch-pdp-details {
+  padding: 16px 18px;
+}
+
+.patch-rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.patch-pdp-title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #0f172a;
+  margin: 0 0 12px 0;
+}
+
+/* Dynamic Variant & Measurement Shelf */
+.patch-variant-box {
+  margin: 16px 0;
+  padding: 14px 0;
+  border-top: 1px solid #f1f5f9;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.patch-variant-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.patch-variant-header span {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.patch-chips-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.patch-variant-chip {
+  min-width: 48px;
+  padding: 9px 15px;
+  border-radius: 8px;
+  border: 1.5px solid #cbd5e1;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.patch-variant-chip.active {
+  border-color: #0284c7;
+  background: #f0f9ff;
+  color: #0284c7;
+}
+
+/* Description & Trust Points */
+.patch-desc-box {
+  margin-top: 14px;
+}
+
+.patch-desc-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 6px;
+}
+
+.patch-desc-text {
+  font-size: 13.5px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+/* Sticky Bottom Bar */
+.patch-bottom-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  border-top: 1px solid #e2e8f0;
+  padding: 12px 18px;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+}
+
+.patch-bottom-inner {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.patch-price-area {
+  display: flex;
+  flex-direction: column;
+}
+
+.patch-price-area .patch-main-price {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.patch-price-area .patch-mrp-price {
+  font-size: 12px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.patch-buy-btn {
+  flex: 1;
+  max-width: 220px;
+  background: #fbbf24;
+  color: #1e293b;
+  font-size: 14.5px;
+  font-weight: 700;
+  text-align: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.3);
+  transition: transform 0.15s ease, background 0.15s ease;
+  display: inline-block;
+}
+
+.patch-buy-btn:active {
+  transform: scale(0.97);
+  background: #f59e0b;
+}
+
+/* Account Wishlist & Share Section Styling */
+.patch-account-shelf {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.patch-account-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.patch-account-item:last-child {
+  border-bottom: none;
+}
+
+.patch-account-item-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.patch-badge-counter {
+  background: #fee2e2;
+  color: #e11d48;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
