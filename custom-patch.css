@@ -456,3 +456,14 @@
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+/* Photo 1: Personal info dabba gayab */
+#pane-account .settings-card:first-of-type {
+  display: none !important;
+}
+
+/* Photo 3: Legal Policy dabba gayab */
+#pane-account #legalTermsSection,
+#pane-account .policy-card {
+  display: none !important;
+}
