@@ -237,10 +237,27 @@
   display: inline-block;
 }
 
-/* --- 2. ACCOUNT PAGE RESTRUCTURE & MENU DRAWER --- */
+/* --- 2. ACCOUNT PAGE CLEANUP (STRICT HIDING OF UNWANTED BLOCKS) --- */
+/* Personal info form, avatar camera icon, legal policy box, old wishlist shelf completely hidden from main account view */
+#pane-account .profile-settings-card,
+#pane-account [class*="profile-settings"],
+#pane-account #legalTermsSection,
+#pane-account .policy-card,
+#pane-account .patch-account-shelf {
+  display: none !important;
+}
+
+/* Avatar camera indicator hidden on main profile */
+#pane-account .avatar-box .camera-badge,
+#pane-account .profile-avatar-wrap svg,
+#pane-account .profile-avatar-wrap .badge-camera {
+  display: none !important;
+}
+
+/* Floating Top-Right Menu & Share Icons */
 .patch-account-header-actions {
   position: absolute;
-  top: 18px;
+  top: 16px;
   right: 18px;
   display: flex;
   flex-direction: column;
@@ -254,19 +271,21 @@
   border-radius: 50%;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   font-size: 18px;
   color: #334155;
+  transition: transform 0.15s ease;
 }
 
 .patch-account-icon-btn:active {
-  transform: scale(0.92);
+  transform: scale(0.9);
 }
 
+/* Slide Menu Drawer */
 .patch-menu-drawer {
   display: none;
   position: fixed;
@@ -292,7 +311,7 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  animation: slideDrawer 0.22s ease-out;
+  animation: slideDrawer 0.2s ease-out;
 }
 
 @keyframes slideDrawer {
@@ -325,14 +344,14 @@
 .patch-drawer-menu-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .patch-drawer-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 14px;
+  padding: 13px 15px;
   background: #f8fafc;
   border-radius: 10px;
   border: 1px solid #f1f5f9;
@@ -342,21 +361,51 @@
   color: #1e293b;
 }
 
-/* Compact FAQ Trigger Button */
+/* Compact Stylish FAQ Bar Button */
 .patch-faq-trigger-btn {
   width: 100%;
-  background: #f0fdf4;
-  border: 1px solid #bbf7d0;
-  color: #166534;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
   font-weight: 700;
   font-size: 14px;
-  padding: 14px 16px;
+  padding: 14px 18px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   cursor: pointer;
-  margin: 14px 0;
+  margin: 16px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.patch-faq-trigger-btn:active {
+  background: #f1f5f9;
+}
+
+/* Personal Info Modal in Menu */
+.patch-info-modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.patch-info-modal-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 440px;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 }
 
 /* --- 3. E-BOOK CARD RATIO & GRID FIX --- */
@@ -382,7 +431,7 @@
   justify-content: center !important;
 }
 
-/* --- 4. EARN GUEST LOCK CARD --- */
+/* --- 4. EARN GUEST LOCK --- */
 .patch-guest-lock-banner {
   background: #eff6ff;
   border: 1.5px dashed #3b82f6;
