@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH LOGIC ENGINE (NO CONTAINER HIDING)
+   SUPERSHOPPING - SAFE NON-DESTRUCTIVE PATCH ENGINE
    ========================================================================== */
 
 (function () {
@@ -16,7 +16,8 @@
   function setWishlist(list) {
     try {
       localStorage.setItem('ss_user_wishlist', JSON.stringify(list));
-      updateWishlistBadge();
+      const b = document.getElementById('patchDrawerWishlistCount');
+      if (b) b.textContent = `${list.length} items`;
     } catch (e) {}
   }
 
@@ -180,7 +181,7 @@
     openPDP(prod);
   }, true);
 
-  // --- 2. PERSONAL INFO MODAL ---
+  // --- 2. EDIT PROFILE MODAL (STRICT EMAIL CHECK) ---
   function ensurePersonalInfoModal() {
     let modal = document.getElementById('patchPersonalInfoModal');
     if (!modal) {
@@ -204,7 +205,7 @@
           <input type="text" id="patchModalName" class="patch-input-box" placeholder="Enter Full Name" />
           <label class="patch-field-label">Original Email ID <span style="color:#dc2626;">*</span></label>
           <input type="email" id="patchModalEmail" class="patch-input-box" placeholder="name@example.com" required />
-          <div style="font-size:11px; color:#dc2626; font-weight:600; margin-top:3px;">⚠️ Original email is mandatory for OTP verification & payouts.</div>
+          <div style="font-size:11px; color:#dc2626; font-weight:600; margin-top:3px;">⚠️ Original email is mandatory for OTP & cashback rewards.</div>
           <label class="patch-field-label">Mobile Number (+91)</label>
           <input type="tel" id="patchModalPhone" class="patch-input-box" placeholder="10-digit mobile number" />
           <label class="patch-field-label">Default Postal Address</label>
@@ -224,7 +225,9 @@
           reader.onload = function (ev) {
             document.getElementById('patchAvatarModalPreview').innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
             const mainAvatar = document.querySelector('#pane-account .avatar-box, #pane-account .profile-avatar-wrap');
-            if (mainAvatar) mainAvatar.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            if (mainAvatar) {
+              mainAvatar.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            }
           };
           reader.readAsDataURL(file);
         }
@@ -234,7 +237,7 @@
         const email = document.getElementById('patchModalEmail').value.trim();
         const name = document.getElementById('patchModalName').value.trim();
         if (!email || !email.includes('@') || !email.includes('.')) {
-          alert('Validation Error:\nPlease enter a valid, original email address. It is required for OTP and settlement.');
+          alert('Validation Error:\nPlease enter a valid, original email address.');
           return;
         }
         if (name && typeof AppState !== 'undefined' && AppState.currentUser) {
@@ -242,48 +245,51 @@
           const nameDisp = document.getElementById('profileNameDisplay');
           if (nameDisp) nameDisp.textContent = name;
         }
-        alert('Profile updated successfully!\nYour verified email has been linked.');
+        alert('Profile updated successfully!\nYour verified email has been saved.');
         modal.style.display = 'none';
       };
     }
     return modal;
   }
 
-  // --- 3. ACCOUNT PAGE CLEANUP ---
+  // --- 3. ACCOUNT CONTROLS & DRAWER (NO BLIND HIDING) ---
   function setupAccountPageLayout() {
     const accPane = document.getElementById('pane-account');
     if (!accPane) return;
 
-    // Top-Right Floating Controls (Menu ⋮ + Share 🔗)
+    // Make sure pane-account stays visible
+    accPane.style.display = (typeof AppState !== 'undefined' && AppState.currentTab === 'account') ? 'block' : '';
+
+    // Add Top-Right buttons once
     if (!document.getElementById('patchAccControls')) {
       const controls = document.createElement('div');
       controls.id = 'patchAccControls';
       controls.className = 'patch-acc-top-controls';
       controls.innerHTML = `
-        <button type="button" class="patch-acc-circle-btn" id="patchBtnOpenDrawer" title="Account Menu">⋮</button>
+        <button type="button" class="patch-acc-circle-btn" id="patchBtnOpenDrawer" title="Menu">⋮</button>
         <button type="button" class="patch-acc-circle-btn" id="patchBtnDirectShare" title="Share Website">🔗</button>
       `;
       accPane.prepend(controls);
 
       document.getElementById('patchBtnOpenDrawer').onclick = () => {
         const wCount = getWishlist().length;
-        const countEl = document.getElementById('patchDrawerWishlistCount');
-        if (countEl) countEl.textContent = `${wCount} items`;
+        const b = document.getElementById('patchDrawerWishlistCount');
+        if (b) b.textContent = `${wCount} items`;
         document.getElementById('patchDrawerOverlay').style.display = 'block';
       };
 
       document.getElementById('patchBtnDirectShare').onclick = () => {
         const url = window.location.origin + window.location.pathname;
         if (navigator.share) {
-          navigator.share({ title: 'SuperShopping', text: 'Shop verified deals and earn rewards on SuperShopping!', url }).catch(() => {});
+          navigator.share({ title: 'SuperShopping', text: 'Shop verified deals on SuperShopping!', url }).catch(() => {});
         } else {
           navigator.clipboard.writeText(url);
-          alert('Website link copied to clipboard!');
+          alert('Website link copied!');
         }
       };
     }
 
-    // Slide Drawer
+    // Slide Drawer DOM once
     if (!document.getElementById('patchDrawerOverlay')) {
       const drawer = document.createElement('div');
       drawer.id = 'patchDrawerOverlay';
@@ -329,49 +335,18 @@
       };
     }
 
-    // TARGETED HIDE: Sirf specific card ko hide karo (bade container ko nahi!)
-    const allCards = accPane.querySelectorAll('.settings-card, .profile-settings-card');
-    allCards.forEach(card => {
-      // Agar is card ke andar input fields hain (Personal Info form), toh hide karo
-      if (card.querySelector('input') && !card.id.includes('patch')) {
-        card.style.display = 'none';
-      }
-      // Agar policy wala card hai, toh hide karo
-      if (card.textContent.includes('Legal Terms') || card.id === 'legalTermsSection') {
-        card.style.display = 'none';
-      }
-    });
+    // Specific Hides (Only direct forms, never container boxes!)
+    const infoForm = accPane.querySelector('form');
+    if (infoForm && !infoForm.id.includes('patch')) {
+      infoForm.style.display = 'none';
+    }
 
-    // Old patch shelf hide
+    // Hide old duplicate shelf if created earlier
     const oldShelf = document.getElementById('patchAccountShelf');
     if (oldShelf) oldShelf.style.display = 'none';
-
-    // FAQ Compact Strip Button
-    const faqContainer = accPane.querySelector('.faq-accordion-group, .faq-section, #accountFaqSection');
-    if (faqContainer && !document.getElementById('patchFaqToggleStrip')) {
-      const stripBtn = document.createElement('button');
-      stripBtn.type = 'button';
-      stripBtn.id = 'patchFaqToggleStrip';
-      stripBtn.className = 'patch-compact-faq-strip';
-      stripBtn.innerHTML = `<span>💬 Frequently Asked Questions</span><span>▼</span>`;
-
-      faqContainer.style.display = 'none';
-      faqContainer.parentNode.insertBefore(stripBtn, faqContainer);
-
-      stripBtn.onclick = () => {
-        const isHidden = faqContainer.style.display === 'none';
-        faqContainer.style.display = isHidden ? 'block' : 'none';
-        stripBtn.querySelector('span:last-child').textContent = isHidden ? '▲' : '▼';
-      };
-    }
   }
 
-  function updateWishlistBadge() {
-    const b = document.getElementById('patchDrawerWishlistCount');
-    if (b) b.textContent = `${getWishlist().length} items`;
-  }
-
-  // --- 4. E-BOOK CATEGORY FILTERS ---
+  // --- 4. EBOOKS & EARN LOCK ---
   function setupEbookCategoryFilters() {
     const pills = document.querySelectorAll('#ebookCategoriesBar .cat-pill');
     pills.forEach(pill => {
@@ -400,7 +375,6 @@
     });
   }
 
-  // --- 5. EARN TAB GUEST LOCK ---
   function applyEarnGuestLock() {
     const earnPane = document.getElementById('pane-earn');
     if (!earnPane) return;
