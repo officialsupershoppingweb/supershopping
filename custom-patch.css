@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH DESIGN LAYER (PDP, ACCOUNT MENU & EBOOK FIX)
+   SUPERSHOPPING - SAFE PATCH DESIGN LAYER
    ========================================================================== */
 
 /* --- 1. PRODUCT DETAIL PAGE (PDP) --- */
@@ -92,13 +92,8 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.15s ease;
   font-size: 16px;
   color: #475569;
-}
-
-.patch-circle-action-btn:active {
-  transform: scale(0.92);
 }
 
 .patch-circle-action-btn.liked {
@@ -237,240 +232,15 @@
   display: inline-block;
 }
 
-/* --- 2. ACCOUNT PAGE CLEANUP (STRICT HIDING OF UNWANTED BLOCKS) --- */
-/* Personal info form, avatar camera icon, legal policy box, old wishlist shelf completely hidden from main account view */
-#pane-account .profile-settings-card,
-#pane-account [class*="profile-settings"],
-#pane-account #legalTermsSection,
-#pane-account .policy-card,
-#pane-account .patch-account-shelf {
-  display: none !important;
-}
-
-/* Avatar camera indicator hidden on main profile */
-#pane-account .avatar-box .camera-badge,
-#pane-account .profile-avatar-wrap svg,
-#pane-account .profile-avatar-wrap .badge-camera {
-  display: none !important;
-}
-
-/* Floating Top-Right Menu & Share Icons */
-.patch-account-header-actions {
-  position: absolute;
-  top: 16px;
-  right: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 20;
-}
-
-.patch-account-icon-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-size: 18px;
-  color: #334155;
-  transition: transform 0.15s ease;
-}
-
-.patch-account-icon-btn:active {
-  transform: scale(0.9);
-}
-
-/* Slide Menu Drawer */
-.patch-menu-drawer {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
-  z-index: 999999;
-}
-
-.patch-drawer-content {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 82%;
-  max-width: 320px;
-  height: 100%;
-  background: #ffffff;
-  padding: 20px 18px;
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  animation: slideDrawer 0.2s ease-out;
-}
-
-@keyframes slideDrawer {
-  from { transform: translateX(100%); }
-  to { transform: translateX(0); }
-}
-
-.patch-drawer-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid #f1f5f9;
-  padding-bottom: 12px;
-}
-
-.patch-drawer-title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.patch-drawer-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: #64748b;
-}
-
-.patch-drawer-menu-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.patch-drawer-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 13px 15px;
-  background: #f8fafc;
-  border-radius: 10px;
-  border: 1px solid #f1f5f9;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-  color: #1e293b;
-}
-
-/* Compact Stylish FAQ Bar Button */
-.patch-faq-trigger-btn {
-  width: 100%;
-  background: #f8fafc;
-  border: 1.5px solid #e2e8f0;
-  color: #0f172a;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 14px 18px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  margin: 16px 0;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-}
-
-.patch-faq-trigger-btn:active {
-  background: #f1f5f9;
-}
-
-/* Personal Info Modal in Menu */
-.patch-info-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000000;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.patch-info-modal-card {
-  background: #ffffff;
-  width: 100%;
-  max-width: 440px;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-/* --- 3. E-BOOK CARD RATIO & GRID FIX --- */
-#ebooksCatalogGrid {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
-  gap: 16px !important;
-  padding: 12px !important;
-}
-
-#ebooksCatalogGrid .product-card {
-  max-width: 100% !important;
-  margin: 0 !important;
-  border-radius: 12px !important;
-  overflow: hidden !important;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
-}
-
-#ebooksCatalogGrid .product-thumb-box {
-  height: 140px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-/* --- 4. EARN GUEST LOCK --- */
-.patch-guest-lock-banner {
-  background: #eff6ff;
-  border: 1.5px dashed #3b82f6;
-  border-radius: 14px;
-  padding: 18px;
-  text-align: center;
-  margin-bottom: 18px;
-}
-
-.patch-guest-lock-btn {
-  background: #2563eb;
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 13.5px;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  margin-top: 10px;
-  cursor: pointer;
-}
-
-/* --- ACCOUNT PAGE CLEAN SLATE & DRAWER SYSTEM --- */
+/* --- 2. ACCOUNT PAGE TARGETED STYLING --- */
 #pane-account {
-  position: relative !important;
+  position: relative;
   max-width: 640px;
   margin: 0 auto;
-  padding: 16px 16px 85px 16px;
+  padding-bottom: 85px;
 }
 
-/* Screen se bekaar bikhre hue blocks hide karein */
-#pane-account [class*="profile-settings"],
-#pane-account .settings-card:has(input),
-#pane-account #legalTermsSection,
-#pane-account .policy-card,
-#pane-account .patch-account-shelf {
-  display: none !important;
-}
-
-/* Floating Top-Right Icons (Menu + Share) */
+/* Floating Top-Right Buttons */
 .patch-acc-top-controls {
   position: absolute;
   top: 14px;
@@ -494,11 +264,10 @@
   cursor: pointer;
   font-size: 17px;
   color: #334155;
-  transition: transform 0.15s ease;
 }
 
 .patch-acc-circle-btn:active {
-  transform: scale(0.9);
+  transform: scale(0.92);
 }
 
 /* Slide Drawer */
@@ -506,7 +275,7 @@
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.5);
+  background: rgba(15, 23, 42, 0.45);
   backdrop-filter: blur(4px);
   z-index: 999999;
 }
@@ -520,10 +289,10 @@
   height: 100%;
   background: #ffffff;
   padding: 20px 16px;
-  box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .patch-drawer-row {
@@ -597,9 +366,47 @@
   box-sizing: border-box;
 }
 
-.patch-email-notice {
-  font-size: 11px;
-  color: #dc2626;
-  font-weight: 600;
-  margin-top: 3px;
+/* --- 3. E-BOOK CARD RATIO & GRID FIX --- */
+#ebooksCatalogGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 16px !important;
+  padding: 12px !important;
+}
+
+#ebooksCatalogGrid .product-card {
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+
+#ebooksCatalogGrid .product-thumb-box {
+  height: 140px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* --- 4. EARN GUEST LOCK --- */
+.patch-guest-lock-banner {
+  background: #eff6ff;
+  border: 1.5px dashed #3b82f6;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.patch-guest-lock-btn {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
 }
