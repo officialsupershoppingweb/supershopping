@@ -427,3 +427,81 @@
 
   setInterval(runPatches, 2000);
 })();
+
+/* ==========================================================================
+   APPENDED: TARGET REMOVAL & FAQ DRAWER ENGINE
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  function applyFinalAccountFixes() {
+    const accPane = document.getElementById('pane-account');
+    if (!accPane) return;
+
+    // A. Photo 1: Personal Information card ko seedhe gayab karo
+    accPane.querySelectorAll('.settings-card').forEach(card => {
+      const text = (card.textContent || '').trim();
+      if (text.includes('Personal Information') && (card.querySelector('input') || text.length < 200)) {
+        card.style.setProperty('display', 'none', 'important');
+      }
+      // C. Photo 3: Legal Terms & Policies ko seedhe gayab karo
+      if (text.includes('Legal Terms') || text.includes('Reward Policies')) {
+        card.style.setProperty('display', 'none', 'important');
+      }
+    });
+
+    // B. Photo 2: Original FAQ ke 4 khule dabbo ko pakad kar drawer me shift karo
+    const originalFaq = accPane.querySelector('.faq-accordion-group') || 
+                        accPane.querySelector('.faq-section') ||
+                        Array.from(accPane.querySelectorAll('.settings-card')).find(c => c.textContent.includes('Frequently Asked Questions'));
+
+    if (originalFaq && !document.getElementById('patchFaqBarBtn')) {
+      // 1. WhatsApp jaisa stylish Single FAQ Bar banayein
+      const faqBar = document.createElement('button');
+      faqBar.type = 'button';
+      faqBar.id = 'patchFaqBarBtn';
+      faqBar.className = 'patch-faq-bar-btn';
+      faqBar.innerHTML = `
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span>💬</span>
+          <span>Frequently Asked Questions</span>
+        </div>
+        <span style="font-size:12px; background:#22c55e; color:#fff; padding:3px 8px; border-radius:12px;">View All ›</span>
+      `;
+
+      // 2. FAQ Drawer Overlay banao
+      const faqDrawer = document.createElement('div');
+      faqDrawer.id = 'patchFaqDrawer';
+      faqDrawer.className = 'patch-faq-drawer-overlay';
+      faqDrawer.innerHTML = `
+        <div class="patch-faq-drawer-sheet">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+            <h3 style="margin:0; font-size:16px; color:#0f172a; font-weight:700;">Frequently Asked Questions</h3>
+            <button type="button" id="patchBtnCloseFaqDrawer" style="background:none; border:none; font-size:20px; cursor:pointer; color:#64748b;">✕</button>
+          </div>
+          <div id="patchFaqQuestionsHolder"></div>
+        </div>
+      `;
+      document.body.appendChild(faqDrawer);
+
+      // Original FAQ content ko drawer ke andar move karo
+      const holder = document.getElementById('patchFaqQuestionsHolder');
+      holder.appendChild(originalFaq.cloneNode(true));
+      holder.firstElementChild.style.display = 'block';
+
+      // Original wale ko screen se permanently hide karo
+      originalFaq.style.setProperty('display', 'none', 'important');
+
+      // FAQ Bar button ko Invite card ke theek neeche lagayein
+      originalFaq.parentNode.insertBefore(faqBar, originalFaq);
+
+      // Clicks setup
+      faqBar.onclick = () => { faqDrawer.style.display = 'block'; };
+      document.getElementById('patchBtnCloseFaqDrawer').onclick = () => { faqDrawer.style.display = 'none'; };
+      faqDrawer.onclick = (e) => { if (e.target === faqDrawer) faqDrawer.style.display = 'none'; };
+    }
+  }
+
+  // Bar-bar run karein taaki dynamic render me wapas na aaye
+  setInterval(applyFinalAccountFixes, 800);
+})();
