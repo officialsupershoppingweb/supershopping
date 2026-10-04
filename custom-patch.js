@@ -1,10 +1,11 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE NON-DESTRUCTIVE PATCH ENGINE
+   SUPERSHOPPING - SAFE PATCH FINAL CLEAN ENGINE
    ========================================================================== */
 
 (function () {
   'use strict';
 
+  // 1. Wishlist Storage
   function getWishlist() {
     try {
       return JSON.parse(localStorage.getItem('ss_user_wishlist') || '[]');
@@ -33,7 +34,7 @@
     setWishlist(list);
   }
 
-  // --- 1. PRODUCT DETAIL PAGE (PDP) ---
+  // 2. Product Detail Page Modal (PDP)
   function ensurePDPModal() {
     let modal = document.getElementById('patchPDPModal');
     if (!modal) {
@@ -181,7 +182,7 @@
     openPDP(prod);
   }, true);
 
-  // --- 2. EDIT PROFILE MODAL (STRICT EMAIL CHECK) ---
+  // 3. Edit Personal Info Modal (Mandatory Original Email)
   function ensurePersonalInfoModal() {
     let modal = document.getElementById('patchPersonalInfoModal');
     if (!modal) {
@@ -203,13 +204,17 @@
           </div>
           <label class="patch-field-label">Full Legal Name</label>
           <input type="text" id="patchModalName" class="patch-input-box" placeholder="Enter Full Name" />
+          
           <label class="patch-field-label">Original Email ID <span style="color:#dc2626;">*</span></label>
           <input type="email" id="patchModalEmail" class="patch-input-box" placeholder="name@example.com" required />
-          <div style="font-size:11px; color:#dc2626; font-weight:600; margin-top:3px;">⚠️ Original email is mandatory for OTP & cashback rewards.</div>
+          <div style="font-size:11px; color:#dc2626; font-weight:600; margin-top:3px;">⚠️ Original email is mandatory for OTP verification & payouts.</div>
+          
           <label class="patch-field-label">Mobile Number (+91)</label>
           <input type="tel" id="patchModalPhone" class="patch-input-box" placeholder="10-digit mobile number" />
+          
           <label class="patch-field-label">Default Postal Address</label>
           <textarea id="patchModalAddress" class="patch-input-box" placeholder="Full residential delivery address..." rows="2" style="font-family:inherit;"></textarea>
+          
           <button type="button" id="patchBtnSaveProfileInfo" style="width:100%; background:#0284c7; color:#fff; font-weight:700; padding:12px; border:none; border-radius:8px; margin-top:14px; cursor:pointer;">Save Details ✓</button>
         </div>
       `;
@@ -225,9 +230,7 @@
           reader.onload = function (ev) {
             document.getElementById('patchAvatarModalPreview').innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
             const mainAvatar = document.querySelector('#pane-account .avatar-box, #pane-account .profile-avatar-wrap');
-            if (mainAvatar) {
-              mainAvatar.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
-            }
+            if (mainAvatar) mainAvatar.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
           };
           reader.readAsDataURL(file);
         }
@@ -252,15 +255,12 @@
     return modal;
   }
 
-  // --- 3. ACCOUNT CONTROLS & DRAWER (NO BLIND HIDING) ---
+  // 4. Clean Account Page Layout & Drawers
   function setupAccountPageLayout() {
     const accPane = document.getElementById('pane-account');
     if (!accPane) return;
 
-    // Make sure pane-account stays visible
-    accPane.style.display = (typeof AppState !== 'undefined' && AppState.currentTab === 'account') ? 'block' : '';
-
-    // Add Top-Right buttons once
+    // Top-Right Floating Controls (Menu ⋮ + Share 🔗)
     if (!document.getElementById('patchAccControls')) {
       const controls = document.createElement('div');
       controls.id = 'patchAccControls';
@@ -289,7 +289,7 @@
       };
     }
 
-    // Slide Drawer DOM once
+    // Slide Drawer DOM
     if (!document.getElementById('patchDrawerOverlay')) {
       const drawer = document.createElement('div');
       drawer.id = 'patchDrawerOverlay';
@@ -335,18 +335,86 @@
       };
     }
 
-    // Specific Hides (Only direct forms, never container boxes!)
-    const infoForm = accPane.querySelector('form');
-    if (infoForm && !infoForm.id.includes('patch')) {
-      infoForm.style.display = 'none';
+    // EXACT TARGET 1: Photo 1 - Personal Information card ko seedha dhoond kar hide karo
+    const headings = accPane.querySelectorAll('h1, h2, h3, h4, h5, .settings-card-title');
+    headings.forEach(h => {
+      const txt = (h.textContent || '').trim().toLowerCase();
+      
+      // Personal Information
+      if (txt === 'personal information' || txt.includes('personal information')) {
+        const parentCard = h.closest('.settings-card') || h.parentElement;
+        if (parentCard && parentCard !== accPane) {
+          parentCard.style.setProperty('display', 'none', 'important');
+        }
+      }
+      
+      // EXACT TARGET 3: Photo 3 - Legal Terms & Reward Policies card ko hide karo
+      if (txt.includes('legal terms') || txt.includes('reward policies')) {
+        const parentCard = h.closest('.settings-card') || h.parentElement;
+        if (parentCard && parentCard !== accPane) {
+          parentCard.style.setProperty('display', 'none', 'important');
+        }
+      }
+    });
+
+    // EXACT TARGET 2: Photo 2 - FAQ ko Compact WhatsApp-Style Bar Button banana
+    headings.forEach(h => {
+      const txt = (h.textContent || '').trim().toLowerCase();
+      if (txt.includes('frequently asked questions')) {
+        const faqCard = h.closest('.settings-card') || h.parentElement;
+        if (faqCard && faqCard !== accPane && !document.getElementById('patchFaqWhatsAppBar')) {
+          
+          // FAQ Bar button create
+          const faqBar = document.createElement('div');
+          faqBar.id = 'patchFaqWhatsAppBar';
+          faqBar.style.cssText = 'background:#f0fdf4; border:1.5px solid #86efac; color:#166534; font-weight:700; font-size:14px; padding:13px 18px; border-radius:12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; margin:14px 0; box-shadow:0 2px 6px rgba(22, 101, 52, 0.08);';
+          faqBar.innerHTML = `
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span>💬</span>
+              <span>Frequently Asked Questions</span>
+            </div>
+            <span style="font-size:12px; background:#22c55e; color:#fff; padding:3px 8px; border-radius:12px;">View All ›</span>
+          `;
+
+          // FAQ Bottom Drawer create
+          const faqDrawer = document.createElement('div');
+          faqDrawer.id = 'patchFaqDrawerModal';
+          faqDrawer.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); backdrop-filter:blur(4px); z-index:1000000;';
+          faqDrawer.innerHTML = `
+            <div style="position:absolute; bottom:0; left:0; width:100%; max-height:80vh; background:#ffffff; border-radius:20px 20px 0 0; padding:20px 18px 30px 18px; box-shadow:0 -8px 24px rgba(0,0,0,0.15); overflow-y:auto; box-sizing:border-box;">
+              <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
+                <h3 style="margin:0; font-size:16px; color:#0f172a; font-weight:700;">Frequently Asked Questions</h3>
+                <button type="button" id="patchBtnCloseFaqModal" style="background:none; border:none; font-size:20px; cursor:pointer; color:#64748b;">✕</button>
+              </div>
+              <div id="patchFaqCloneBody"></div>
+            </div>
+          `;
+          document.body.appendChild(faqDrawer);
+
+          // Clone FAQ questions into drawer
+          const cloneBody = document.getElementById('patchFaqCloneBody');
+          const faqQuestions = faqCard.cloneNode(true);
+          faqQuestions.style.display = 'block';
+          // Hide title inside clone to avoid repetition
+          const innerH = faqQuestions.querySelector('h1, h2, h3, h4, h5, .settings-card-title');
+          if (innerH) innerH.style.display = 'none';
+          cloneBody.appendChild(faqQuestions);
+
+          // Hide original card from main page
+          faqCard.style.setProperty('display', 'none', 'important');
+
+          // Place bar right there
+          faqCard.parentNode.insertBefore(faqBar, faqCard);
+
+          // Clicks
+          faqBar.onclick = () => { faqDrawer.style.display = 'block'; };
+          document.getElementById('patchBtnCloseFaqModal').onclick = () => { faqDrawer.style.display = 'none'; };
+          faqDrawer.onclick = (e) => { if (e.target === faqDrawer) faqDrawer.style.display = 'none'; };
+        }
+      }
     }
 
-    // Hide old duplicate shelf if created earlier
-    const oldShelf = document.getElementById('patchAccountShelf');
-    if (oldShelf) oldShelf.style.display = 'none';
-  }
-
-  // --- 4. EBOOKS & EARN LOCK ---
+   // 5. E-Books Filter
   function setupEbookCategoryFilters() {
     const pills = document.querySelectorAll('#ebookCategoriesBar .cat-pill');
     pills.forEach(pill => {
@@ -375,6 +443,7 @@
     });
   }
 
+  // 6. Earn Tab Guest Lock
   function applyEarnGuestLock() {
     const earnPane = document.getElementById('pane-earn');
     if (!earnPane) return;
@@ -425,83 +494,5 @@
     runPatches();
   }
 
-  setInterval(runPatches, 2000);
-})();
-
-/* ==========================================================================
-   APPENDED: TARGET REMOVAL & FAQ DRAWER ENGINE
-   ========================================================================== */
-(function () {
-  'use strict';
-
-  function applyFinalAccountFixes() {
-    const accPane = document.getElementById('pane-account');
-    if (!accPane) return;
-
-    // A. Photo 1: Personal Information card ko seedhe gayab karo
-    accPane.querySelectorAll('.settings-card').forEach(card => {
-      const text = (card.textContent || '').trim();
-      if (text.includes('Personal Information') && (card.querySelector('input') || text.length < 200)) {
-        card.style.setProperty('display', 'none', 'important');
-      }
-      // C. Photo 3: Legal Terms & Policies ko seedhe gayab karo
-      if (text.includes('Legal Terms') || text.includes('Reward Policies')) {
-        card.style.setProperty('display', 'none', 'important');
-      }
-    });
-
-    // B. Photo 2: Original FAQ ke 4 khule dabbo ko pakad kar drawer me shift karo
-    const originalFaq = accPane.querySelector('.faq-accordion-group') || 
-                        accPane.querySelector('.faq-section') ||
-                        Array.from(accPane.querySelectorAll('.settings-card')).find(c => c.textContent.includes('Frequently Asked Questions'));
-
-    if (originalFaq && !document.getElementById('patchFaqBarBtn')) {
-      // 1. WhatsApp jaisa stylish Single FAQ Bar banayein
-      const faqBar = document.createElement('button');
-      faqBar.type = 'button';
-      faqBar.id = 'patchFaqBarBtn';
-      faqBar.className = 'patch-faq-bar-btn';
-      faqBar.innerHTML = `
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span>💬</span>
-          <span>Frequently Asked Questions</span>
-        </div>
-        <span style="font-size:12px; background:#22c55e; color:#fff; padding:3px 8px; border-radius:12px;">View All ›</span>
-      `;
-
-      // 2. FAQ Drawer Overlay banao
-      const faqDrawer = document.createElement('div');
-      faqDrawer.id = 'patchFaqDrawer';
-      faqDrawer.className = 'patch-faq-drawer-overlay';
-      faqDrawer.innerHTML = `
-        <div class="patch-faq-drawer-sheet">
-          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:12px; margin-bottom:14px;">
-            <h3 style="margin:0; font-size:16px; color:#0f172a; font-weight:700;">Frequently Asked Questions</h3>
-            <button type="button" id="patchBtnCloseFaqDrawer" style="background:none; border:none; font-size:20px; cursor:pointer; color:#64748b;">✕</button>
-          </div>
-          <div id="patchFaqQuestionsHolder"></div>
-        </div>
-      `;
-      document.body.appendChild(faqDrawer);
-
-      // Original FAQ content ko drawer ke andar move karo
-      const holder = document.getElementById('patchFaqQuestionsHolder');
-      holder.appendChild(originalFaq.cloneNode(true));
-      holder.firstElementChild.style.display = 'block';
-
-      // Original wale ko screen se permanently hide karo
-      originalFaq.style.setProperty('display', 'none', 'important');
-
-      // FAQ Bar button ko Invite card ke theek neeche lagayein
-      originalFaq.parentNode.insertBefore(faqBar, originalFaq);
-
-      // Clicks setup
-      faqBar.onclick = () => { faqDrawer.style.display = 'block'; };
-      document.getElementById('patchBtnCloseFaqDrawer').onclick = () => { faqDrawer.style.display = 'none'; };
-      faqDrawer.onclick = (e) => { if (e.target === faqDrawer) faqDrawer.style.display = 'none'; };
-    }
-  }
-
-  // Bar-bar run karein taaki dynamic render me wapas na aaye
-  setInterval(applyFinalAccountFixes, 800);
+  setInterval(runPatches, 1000);
 })();
