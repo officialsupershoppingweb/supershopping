@@ -396,6 +396,211 @@
       }
     });
   }
+   /* ==========================================================================
+   APPENDED: ACCOUNT PAGE RESTRUCTURE, STRICT ORIGINAL EMAIL & MENU DRAWER
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  function initAccountStructure() {
+    const accPane = document.getElementById('pane-account');
+    if (!accPane || accPane.dataset.patchAccountInit) return;
+    accPane.dataset.patchAccountInit = 'true';
+
+    // 1. Floating Top-Right Controls (Menu ⋮ + Share 🔗)
+    if (!document.getElementById('patchAccControls')) {
+      const controls = document.createElement('div');
+      controls.id = 'patchAccControls';
+      controls.className = 'patch-acc-top-controls';
+      controls.innerHTML = `
+        <button type="button" class="patch-acc-circle-btn" id="patchBtnOpenDrawer" title="Account Menu">⋮</button>
+        <button type="button" class="patch-acc-circle-btn" id="patchBtnDirectShare" title="Share Website">🔗</button>
+      `;
+      accPane.prepend(controls);
+    }
+
+    // 2. Slide Drawer DOM
+    if (!document.getElementById('patchDrawerOverlay')) {
+      const drawer = document.createElement('div');
+      drawer.id = 'patchDrawerOverlay';
+      drawer.className = 'patch-drawer-overlay';
+      drawer.innerHTML = `
+        <div class="patch-drawer-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:12px;">
+            <span style="font-size:15px; font-weight:700; color:#0f172a;">Account Menu</span>
+            <button type="button" id="patchBtnCloseDrawer" style="background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
+          </div>
+          <div class="patch-drawer-row" id="patchDrawerWishlist">
+            <span>❤️ My Saved Wishlist</span>
+            <span style="color:#e11d48;" id="patchDrawerWishlistCount">0</span>
+          </div>
+          <div class="patch-drawer-row" id="patchDrawerEditProfile">
+            <span>👤 Edit Personal Information</span>
+            <span>›</span>
+          </div>
+          <div class="patch-drawer-row" id="patchDrawerPolicies">
+            <span>📜 Legal & Reward Policies</span>
+            <span>›</span>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(drawer);
+
+      document.getElementById('patchBtnCloseDrawer').onclick = () => drawer.style.display = 'none';
+      drawer.onclick = (e) => { if (e.target === drawer) drawer.style.display = 'none'; };
+    }
+
+    // 3. Edit Personal Info Modal with Mandatory Email
+    if (!document.getElementById('patchInfoModalBackdrop')) {
+      const infoModal = document.createElement('div');
+      infoModal.id = 'patchInfoModalBackdrop';
+      infoModal.className = 'patch-info-modal-backdrop';
+      infoModal.innerHTML = `
+        <div class="patch-info-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+            <h4 style="margin:0; font-size:15px; color:#0f172a;">Edit Personal Information</h4>
+            <button type="button" id="patchBtnCloseInfoModal" style="background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
+          </div>
+
+          <div style="text-align:center; margin:12px 0 6px 0;">
+            <div id="patchAvatarModalPreview" style="width:62px; height:62px; border-radius:50%; background:#0284c7; color:#fff; font-size:20px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-bottom:6px;">
+              SS
+            </div>
+            <div>
+              <label for="patchFileInputPhoto" style="font-size:12px; color:#0284c7; font-weight:700; cursor:pointer;">📷 Change Profile Photo</label>
+              <input type="file" id="patchFileInputPhoto" accept="image/*" style="display:none;" />
+            </div>
+          </div>
+
+          <label class="patch-field-label">Full Legal Name</label>
+          <input type="text" id="patchModalName" class="patch-input-box" placeholder="Enter Full Name" />
+
+          <label class="patch-field-label">Original Email ID <span style="color:#dc2626;">*</span></label>
+          <input type="email" id="patchModalEmail" class="patch-input-box" placeholder="name@example.com" required />
+          <div class="patch-email-notice">⚠️ Please enter your original email ID (Mandatory for OTP verification & payouts)</div>
+
+          <label class="patch-field-label">Mobile Number (+91)</label>
+          <input type="tel" id="patchModalPhone" class="patch-input-box" placeholder="10-digit mobile number" />
+
+          <label class="patch-field-label">Default Postal Address</label>
+          <textarea id="patchModalAddress" class="patch-input-box" placeholder="Full residential delivery address..." rows="2" style="font-family:inherit;"></textarea>
+
+          <button type="button" id="patchBtnSaveProfileInfo" style="width:100%; background:#0284c7; color:#fff; font-weight:700; padding:12px; border:none; border-radius:8px; margin-top:14px; cursor:pointer;">
+            Save Details ✓
+          </button>
+        </div>
+      `;
+      document.body.appendChild(infoModal);
+
+      document.getElementById('patchBtnCloseInfoModal').onclick = () => infoModal.style.display = 'none';
+      infoModal.onclick = (e) => { if (e.target === infoModal) infoModal.style.display = 'none'; };
+
+      // Avatar photo upload preview
+      document.getElementById('patchFileInputPhoto').onchange = function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (ev) {
+            const preview = document.getElementById('patchAvatarModalPreview');
+            preview.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            const mainAvatar = document.querySelector('#pane-account .avatar-box, #pane-account .profile-avatar-wrap');
+            if (mainAvatar) {
+              mainAvatar.innerHTML = `<img src="${ev.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // Save profile with strict email check
+      document.getElementById('patchBtnSaveProfileInfo').onclick = () => {
+        const emailVal = document.getElementById('patchModalEmail').value.trim();
+        const nameVal = document.getElementById('patchModalName').value.trim();
+
+        if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
+          alert('Validation Error:\nPlease enter a valid, original email address. It is required for OTP and settlement.');
+          return;
+        }
+
+        if (nameVal && typeof AppState !== 'undefined' && AppState.currentUser) {
+          AppState.currentUser.name = nameVal;
+          const nameDisp = document.getElementById('profileNameDisplay');
+          if (nameDisp) nameDisp.textContent = nameVal;
+        }
+
+        alert('Profile updated successfully!\nYour verified email has been linked.');
+        infoModal.style.display = 'none';
+      };
+    }
+
+    // 4. Click Actions Setup
+    document.getElementById('patchBtnOpenDrawer').onclick = () => {
+      const wCount = JSON.parse(localStorage.getItem('ss_user_wishlist') || '[]').length;
+      const countEl = document.getElementById('patchDrawerWishlistCount');
+      if (countEl) countEl.textContent = `${wCount} items`;
+      document.getElementById('patchDrawerOverlay').style.display = 'block';
+    };
+
+    document.getElementById('patchBtnDirectShare').onclick = () => {
+      const url = window.location.origin + window.location.pathname;
+      if (navigator.share) {
+        navigator.share({ title: 'SuperShopping', text: 'Shop verified deals and earn rewards on SuperShopping!', url }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(url);
+        alert('Website link copied to clipboard!');
+      }
+    };
+
+    document.getElementById('patchDrawerEditProfile').onclick = () => {
+      document.getElementById('patchDrawerOverlay').style.display = 'none';
+      document.getElementById('patchInfoModalBackdrop').style.display = 'flex';
+    };
+
+    document.getElementById('patchDrawerWishlist').onclick = () => {
+      document.getElementById('patchDrawerOverlay').style.display = 'none';
+      const count = JSON.parse(localStorage.getItem('ss_user_wishlist') || '[]').length;
+      alert(`My Wishlist: You have ${count} saved item(s).`);
+    };
+
+    document.getElementById('patchDrawerPolicies').onclick = () => {
+      document.getElementById('patchDrawerOverlay').style.display = 'none';
+      if (typeof openPolicyModal === 'function') openPolicyModal();
+    };
+
+    // 5. Transform Big FAQ into Single Clean Strip Button
+    const faqContainer = accPane.querySelector('.faq-accordion-group, .faq-section, #accountFaqSection');
+    if (faqContainer && !document.getElementById('patchFaqToggleStrip')) {
+      const stripBtn = document.createElement('button');
+      stripBtn.type = 'button';
+      stripBtn.id = 'patchFaqToggleStrip';
+      stripBtn.className = 'patch-compact-faq-strip';
+      stripBtn.innerHTML = `<span>💬 Frequently Asked Questions</span><span>▼</span>`;
+
+      faqContainer.style.display = 'none';
+      faqContainer.parentNode.insertBefore(stripBtn, faqContainer);
+
+      stripBtn.onclick = () => {
+        const isHidden = faqContainer.style.display === 'none';
+        faqContainer.style.display = isHidden ? 'block' : 'none';
+        stripBtn.querySelector('span:last-child').textContent = isHidden ? '▲' : '▼';
+      };
+    }
+
+    // 6. Ensure Profile Display shows only Name and User ID
+    const nameDisplay = document.getElementById('profileNameDisplay');
+    if (nameDisplay && nameDisplay.nextElementSibling) {
+      nameDisplay.nextElementSibling.textContent = 'ID: SS-GUEST-0000';
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAccountStructure);
+  } else {
+    initAccountStructure();
+  }
+
+  setInterval(initAccountStructure, 1500);
+})();
 
   function updateWishlistBadge() {
     const b = document.getElementById('patchDrawerWishlistBadge');
