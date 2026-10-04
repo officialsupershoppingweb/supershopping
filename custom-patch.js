@@ -1,11 +1,11 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH FINAL CLEAN ENGINE
+   SUPERSHOPPING - ULTIMATE SAFE PATCH LOGIC ENGINE
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // 1. Wishlist Storage
+  // --- WISHLIST STORAGE ---
   function getWishlist() {
     try {
       return JSON.parse(localStorage.getItem('ss_user_wishlist') || '[]');
@@ -34,7 +34,7 @@
     setWishlist(list);
   }
 
-  // 2. Product Detail Page Modal (PDP)
+  // --- 1. PRODUCT DETAIL PAGE (PDP) ---
   function ensurePDPModal() {
     let modal = document.getElementById('patchPDPModal');
     if (!modal) {
@@ -182,7 +182,7 @@
     openPDP(prod);
   }, true);
 
-  // 3. Edit Personal Info Modal (Mandatory Original Email)
+  // --- 2. EDIT PROFILE MODAL (STRICT EMAIL CHECK) ---
   function ensurePersonalInfoModal() {
     let modal = document.getElementById('patchPersonalInfoModal');
     if (!modal) {
@@ -204,17 +204,13 @@
           </div>
           <label class="patch-field-label">Full Legal Name</label>
           <input type="text" id="patchModalName" class="patch-input-box" placeholder="Enter Full Name" />
-          
           <label class="patch-field-label">Original Email ID <span style="color:#dc2626;">*</span></label>
           <input type="email" id="patchModalEmail" class="patch-input-box" placeholder="name@example.com" required />
-          <div style="font-size:11px; color:#dc2626; font-weight:600; margin-top:3px;">⚠️ Original email is mandatory for OTP verification & payouts.</div>
-          
+          <div style="font-size:11px; color:#dc2626; font-weight:600; margin-top:3px;">⚠️ Original email is mandatory for OTP & payouts.</div>
           <label class="patch-field-label">Mobile Number (+91)</label>
           <input type="tel" id="patchModalPhone" class="patch-input-box" placeholder="10-digit mobile number" />
-          
           <label class="patch-field-label">Default Postal Address</label>
           <textarea id="patchModalAddress" class="patch-input-box" placeholder="Full residential delivery address..." rows="2" style="font-family:inherit;"></textarea>
-          
           <button type="button" id="patchBtnSaveProfileInfo" style="width:100%; background:#0284c7; color:#fff; font-weight:700; padding:12px; border:none; border-radius:8px; margin-top:14px; cursor:pointer;">Save Details ✓</button>
         </div>
       `;
@@ -255,12 +251,12 @@
     return modal;
   }
 
-  // 4. Clean Account Page Layout & Drawers
+  // --- 3. ACCOUNT CONTROLS & CLEAN TARGETING ---
   function setupAccountPageLayout() {
     const accPane = document.getElementById('pane-account');
     if (!accPane) return;
 
-    // Top-Right Floating Controls (Menu ⋮ + Share 🔗)
+    // A. Floating Top-Right Controls (Menu ⋮ + Share 🔗)
     if (!document.getElementById('patchAccControls')) {
       const controls = document.createElement('div');
       controls.id = 'patchAccControls';
@@ -289,7 +285,7 @@
       };
     }
 
-    // Slide Drawer DOM
+    // B. Slide Drawer DOM
     if (!document.getElementById('patchDrawerOverlay')) {
       const drawer = document.createElement('div');
       drawer.id = 'patchDrawerOverlay';
@@ -335,36 +331,31 @@
       };
     }
 
-    // EXACT TARGET 1: Photo 1 - Personal Information card ko seedha dhoond kar hide karo
-    const headings = accPane.querySelectorAll('h1, h2, h3, h4, h5, .settings-card-title');
-    headings.forEach(h => {
+    // C. EXACT TARGET: Find elements by content and hide/transform safely
+    const allHeadings = accPane.querySelectorAll('h1, h2, h3, h4, h5, .settings-card-title');
+    allHeadings.forEach(h => {
       const txt = (h.textContent || '').trim().toLowerCase();
-      
-      // Personal Information
-      if (txt === 'personal information' || txt.includes('personal information')) {
-        const parentCard = h.closest('.settings-card') || h.parentElement;
-        if (parentCard && parentCard !== accPane) {
-          parentCard.style.setProperty('display', 'none', 'important');
-        }
-      }
-      
-      // EXACT TARGET 3: Photo 3 - Legal Terms & Reward Policies card ko hide karo
-      if (txt.includes('legal terms') || txt.includes('reward policies')) {
-        const parentCard = h.closest('.settings-card') || h.parentElement;
-        if (parentCard && parentCard !== accPane) {
-          parentCard.style.setProperty('display', 'none', 'important');
-        }
-      }
-    });
 
-    // EXACT TARGET 2: Photo 2 - FAQ ko Compact WhatsApp-Style Bar Button banana
-    headings.forEach(h => {
-      const txt = (h.textContent || '').trim().toLowerCase();
+      // Photo 1: Personal Information card ko seedha hide karo
+      if (txt === 'personal information' || txt.includes('personal information')) {
+        const card = h.closest('.settings-card') || h.parentElement;
+        if (card && card !== accPane) {
+          card.style.setProperty('display', 'none', 'important');
+        }
+      }
+
+      // Photo 3: Legal Terms card ko hide karo
+      if (txt.includes('legal terms') || txt.includes('reward policies')) {
+        const card = h.closest('.settings-card') || h.parentElement;
+        if (card && card !== accPane) {
+          card.style.setProperty('display', 'none', 'important');
+        }
+      }
+
+      // Photo 2: FAQ ko WhatsApp-style Bar Button banana
       if (txt.includes('frequently asked questions')) {
         const faqCard = h.closest('.settings-card') || h.parentElement;
         if (faqCard && faqCard !== accPane && !document.getElementById('patchFaqWhatsAppBar')) {
-          
-          // FAQ Bar button create
           const faqBar = document.createElement('div');
           faqBar.id = 'patchFaqWhatsAppBar';
           faqBar.style.cssText = 'background:#f0fdf4; border:1.5px solid #86efac; color:#166534; font-weight:700; font-size:14px; padding:13px 18px; border-radius:12px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; margin:14px 0; box-shadow:0 2px 6px rgba(22, 101, 52, 0.08);';
@@ -376,7 +367,6 @@
             <span style="font-size:12px; background:#22c55e; color:#fff; padding:3px 8px; border-radius:12px;">View All ›</span>
           `;
 
-          // FAQ Bottom Drawer create
           const faqDrawer = document.createElement('div');
           faqDrawer.id = 'patchFaqDrawerModal';
           faqDrawer.style.cssText = 'display:none; position:fixed; inset:0; background:rgba(15,23,42,0.5); backdrop-filter:blur(4px); z-index:1000000;';
@@ -391,30 +381,25 @@
           `;
           document.body.appendChild(faqDrawer);
 
-          // Clone FAQ questions into drawer
           const cloneBody = document.getElementById('patchFaqCloneBody');
-          const faqQuestions = faqCard.cloneNode(true);
-          faqQuestions.style.display = 'block';
-          // Hide title inside clone to avoid repetition
-          const innerH = faqQuestions.querySelector('h1, h2, h3, h4, h5, .settings-card-title');
+          const faqClone = faqCard.cloneNode(true);
+          faqClone.style.display = 'block';
+          const innerH = faqClone.querySelector('h1, h2, h3, h4, h5, .settings-card-title');
           if (innerH) innerH.style.display = 'none';
-          cloneBody.appendChild(faqQuestions);
+          cloneBody.appendChild(faqClone);
 
-          // Hide original card from main page
           faqCard.style.setProperty('display', 'none', 'important');
-
-          // Place bar right there
           faqCard.parentNode.insertBefore(faqBar, faqCard);
 
-          // Clicks
           faqBar.onclick = () => { faqDrawer.style.display = 'block'; };
           document.getElementById('patchBtnCloseFaqModal').onclick = () => { faqDrawer.style.display = 'none'; };
           faqDrawer.onclick = (e) => { if (e.target === faqDrawer) faqDrawer.style.display = 'none'; };
         }
       }
-    }
+    });
+  }
 
-   // 5. E-Books Filter
+  // --- 4. E-BOOKS FILTER ---
   function setupEbookCategoryFilters() {
     const pills = document.querySelectorAll('#ebookCategoriesBar .cat-pill');
     pills.forEach(pill => {
@@ -443,7 +428,7 @@
     });
   }
 
-  // 6. Earn Tab Guest Lock
+  // --- 5. EARN GUEST LOCK ---
   function applyEarnGuestLock() {
     const earnPane = document.getElementById('pane-earn');
     if (!earnPane) return;
@@ -494,5 +479,5 @@
     runPatches();
   }
 
-  setInterval(runPatches, 1000);
+  setInterval(runPatches, 800);
 })();
