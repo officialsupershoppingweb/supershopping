@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH COMPLETE ENGINE (V3 INTEGRATED)
+   SUPERSHOPPING - SAFE PATCH COMPLETE ENGINE (V4 STRICT ACCOUNT CLEANUP)
    ========================================================================== */
 
 (function () {
@@ -194,13 +194,97 @@
     openPDP(prod);
   }, true);
 
-  // --- 2. ACCOUNT PAGE RESTRUCTURE & SLIDE DRAWER ---
+  // --- 2. EDIT PERSONAL INFO MODAL (CALLED FROM MENU) ---
+  function ensurePersonalInfoModal() {
+    let modal = document.getElementById('patchPersonalInfoModal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'patchPersonalInfoModal';
+      modal.className = 'patch-info-modal';
+      modal.innerHTML = `
+        <div class="patch-info-modal-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #f1f5f9; padding-bottom:10px;">
+            <h3 style="margin:0; font-size:16px; color:#0f172a;">Edit Personal Information</h3>
+            <button type="button" id="patchCloseInfoModal" style="background:none; border:none; font-size:18px; cursor:pointer; color:#64748b;">✕</button>
+          </div>
+          
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="text-align:center; margin-bottom:6px;">
+              <div id="patchEditAvatarPreview" style="width:64px; height:64px; border-radius:50%; background:#0284c7; color:#fff; font-size:20px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; margin-bottom:6px;">
+                SS
+              </div>
+              <div>
+                <label for="patchPhotoInput" style="font-size:12px; color:#0284c7; font-weight:600; cursor:pointer;">📷 Change Profile Photo</label>
+                <input type="file" id="patchPhotoInput" accept="image/*" style="display:none;" />
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size:12px; font-weight:600; color:#475569;">Full Legal Name</label>
+              <input type="text" id="patchInputName" placeholder="Enter Full Name" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-top:4px;" />
+            </div>
+
+            <div>
+              <label style="font-size:12px; font-weight:600; color:#475569;">Mobile Number (+91)</label>
+              <input type="tel" id="patchInputPhone" placeholder="10-digit mobile number" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-top:4px;" />
+            </div>
+
+            <div>
+              <label style="font-size:12px; font-weight:600; color:#475569;">Default Postal Address</label>
+              <textarea id="patchInputAddress" placeholder="Full residential delivery address..." rows="2" style="width:100%; padding:10px; border:1px solid #cbd5e1; border-radius:8px; margin-top:4px; font-family:inherit;"></textarea>
+            </div>
+
+            <button type="button" id="patchSaveInfoBtn" style="background:#0284c7; color:#fff; border:none; padding:12px; border-radius:8px; font-weight:700; cursor:pointer; margin-top:6px;">
+              Save Details ✓
+            </button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+
+      document.getElementById('patchCloseInfoModal').onclick = () => { modal.style.display = 'none'; };
+      modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+      // Photo Upload Preview
+      document.getElementById('patchPhotoInput').onchange = function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (evt) {
+            const preview = document.getElementById('patchEditAvatarPreview');
+            preview.innerHTML = `<img src="${evt.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            
+            // Also update main account avatar
+            const mainAvatar = document.querySelector('#pane-account .avatar-box, #pane-account .profile-avatar-wrap');
+            if (mainAvatar) {
+              mainAvatar.innerHTML = `<img src="${evt.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      // Save Action
+      document.getElementById('patchSaveInfoBtn').onclick = () => {
+        const nameVal = document.getElementById('patchInputName').value.trim();
+        if (nameVal && typeof AppState !== 'undefined' && AppState.currentUser) {
+          AppState.currentUser.name = nameVal;
+          const nameDisp = document.getElementById('profileNameDisplay');
+          if (nameDisp) nameDisp.textContent = nameVal;
+        }
+        alert('Personal Details updated successfully!');
+        modal.style.display = 'none';
+      };
+    }
+    return modal;
+  }
+
+  // --- 3. ACCOUNT PAGE RESTRUCTURE ---
   function setupAccountPageLayout() {
     const accountPane = document.getElementById('pane-account');
-    if (!accountPane || accountPane.dataset.patchStructured) return;
-    accountPane.dataset.patchStructured = 'true';
+    if (!accountPane) return;
 
-    // Top-Right Header Icons (Photo 4)[span_0](start_span)[span_0](end_span)
+    // Top-Right Header Icons
     let headerActions = document.getElementById('patchAccountHeaderActions');
     if (!headerActions) {
       headerActions = document.createElement('div');
@@ -214,7 +298,7 @@
       accountPane.prepend(headerActions);
     }
 
-    // Slide Drawer Setup
+    // Slide Drawer
     let drawer = document.getElementById('patchMenuDrawer');
     if (!drawer) {
       drawer = document.createElement('div');
@@ -233,7 +317,7 @@
             </div>
             <div class="patch-drawer-item" id="patchMenuItemPersonalInfo">
               <span>👤 Personal Information</span>
-              <span>›</span>
+              <span>Edit ›</span>
             </div>
             <div class="patch-drawer-item" id="patchMenuItemPolicies">
               <span>📜 Legal & Reward Policies</span>
@@ -248,7 +332,7 @@
       drawer.onclick = (e) => { if (e.target === drawer) drawer.style.display = 'none'; };
     }
 
-    // Connect Top-Right Menu & Share
+    // Menu & Share Listeners
     document.getElementById('patchBtnMenu').onclick = () => {
       updateWishlistBadge();
       drawer.style.display = 'block';
@@ -264,20 +348,11 @@
       }
     };
 
-    // Hide Original Personal Info & Legal Policy blocks from main view (Shift to drawer)
-    const personalInfoBox = accountPane.querySelector('.profile-settings-card') || accountPane.querySelectorAll('.settings-card')[0];
-    if (personalInfoBox) personalInfoBox.style.display = 'none';
-
-    const policyBox = document.getElementById('legalTermsSection') || accountPane.querySelectorAll('.settings-card')[2];
-    if (policyBox) policyBox.style.display = 'none';
-
     // Drawer Item Clicks
     document.getElementById('patchMenuItemPersonalInfo').onclick = () => {
       drawer.style.display = 'none';
-      if (personalInfoBox) {
-        personalInfoBox.style.display = 'block';
-        personalInfoBox.scrollIntoView({ behavior: 'smooth' });
-      }
+      const infoModal = ensurePersonalInfoModal();
+      infoModal.style.display = 'flex';
     };
 
     document.getElementById('patchMenuItemPolicies').onclick = () => {
@@ -291,8 +366,8 @@
       alert(`My Wishlist: You have ${w.length} saved item(s).`);
     };
 
-    // Replace Big FAQ with Compact Trigger Button
-    const faqContainer = accountPane.querySelector('.faq-accordion-group') || accountPane.querySelector('.faq-section');
+    // Replace big FAQ list with single compact button bar
+    const faqContainer = accountPane.querySelector('.faq-accordion-group, .faq-section, #accountFaqSection');
     if (faqContainer && !document.getElementById('patchFaqTrigger')) {
       const faqBtn = document.createElement('button');
       faqBtn.type = 'button';
@@ -309,6 +384,17 @@
         faqBtn.querySelector('span:last-child').textContent = isHidden ? '▲' : '▼';
       };
     }
+
+    // Strict DOM Cleanup: Hide all remaining personal-info and policy cards from main page
+    accountPane.querySelectorAll('div').forEach(el => {
+      const txt = (el.textContent || '').trim();
+      if (txt.startsWith('Personal Information') && el.querySelector('input')) {
+        el.style.display = 'none';
+      }
+      if (txt.includes('Legal Terms & Reward Policies') && el.querySelector('.btn, a, button')) {
+        el.style.display = 'none';
+      }
+    });
   }
 
   function updateWishlistBadge() {
@@ -316,7 +402,7 @@
     if (b) b.textContent = `${getWishlist().length} items`;
   }
 
-  // --- 3. E-BOOK CATEGORY FILTER ENGINE ---
+  // --- 4. E-BOOK CATEGORY FILTER ENGINE ---
   function setupEbookCategoryFilters() {
     const pills = document.querySelectorAll('#ebookCategoriesBar .cat-pill');
     pills.forEach(pill => {
@@ -329,8 +415,7 @@
         this.classList.add('active');
 
         const cat = (this.textContent || '').trim().toLowerCase();
-        const container = document.getElementById('ebooksCatalogGrid');
-        if (!container || typeof DigitalBooksCatalog === 'undefined') return;
+        if (typeof DigitalBooksCatalog === 'undefined') return;
 
         let filtered = DigitalBooksCatalog;
         if (cat.includes('11-12') || cat.includes('notes')) {
@@ -348,7 +433,7 @@
     });
   }
 
-  // --- 4. EARN TAB GUEST RESTRICTION ---
+  // --- 5. EARN TAB GUEST RESTRICTION ---
   function applyEarnGuestLock() {
     const earnPane = document.getElementById('pane-earn');
     if (!earnPane) return;
@@ -383,7 +468,7 @@
     }
   }
 
-  // --- GLOBAL RUNNER ---
+  // --- RUNNER ---
   function runAllPatches() {
     setupAccountPageLayout();
     setupEbookCategoryFilters();
