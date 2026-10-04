@@ -452,3 +452,154 @@
   margin-top: 10px;
   cursor: pointer;
 }
+
+/* --- ACCOUNT PAGE CLEAN SLATE & DRAWER SYSTEM --- */
+#pane-account {
+  position: relative !important;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px 16px 85px 16px;
+}
+
+/* Screen se bekaar bikhre hue blocks hide karein */
+#pane-account [class*="profile-settings"],
+#pane-account .settings-card:has(input),
+#pane-account #legalTermsSection,
+#pane-account .policy-card,
+#pane-account .patch-account-shelf {
+  display: none !important;
+}
+
+/* Floating Top-Right Icons (Menu + Share) */
+.patch-acc-top-controls {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 30;
+}
+
+.patch-acc-circle-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 17px;
+  color: #334155;
+  transition: transform 0.15s ease;
+}
+
+.patch-acc-circle-btn:active {
+  transform: scale(0.9);
+}
+
+/* Slide Drawer */
+.patch-drawer-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 999999;
+}
+
+.patch-drawer-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 82%;
+  max-width: 310px;
+  height: 100%;
+  background: #ffffff;
+  padding: 20px 16px;
+  box-shadow: -4px 0 20px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.patch-drawer-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  cursor: pointer;
+}
+
+/* Compact FAQ Strip Button */
+.patch-compact-faq-strip {
+  width: 100%;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 14px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin: 14px 0;
+}
+
+/* Personal Info Modal */
+.patch-info-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 1000000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.patch-info-card {
+  background: #ffffff;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.patch-field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin-top: 10px;
+  margin-bottom: 4px;
+}
+
+.patch-input-box {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 13.5px;
+  box-sizing: border-box;
+}
+
+.patch-email-notice {
+  font-size: 11px;
+  color: #dc2626;
+  font-weight: 600;
+  margin-top: 3px;
+}
