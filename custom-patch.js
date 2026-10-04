@@ -1,11 +1,11 @@
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH LOGIC (GLOBAL DELEGATION ENGINE)
+   SUPERSHOPPING - SAFE PATCH COMPLETE ENGINE (V3 INTEGRATED)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // 1. Wishlist Helper
+  // --- WISHLIST STORAGE HELPERS ---
   function getWishlist() {
     try {
       return JSON.parse(localStorage.getItem('ss_user_wishlist') || '[]');
@@ -17,29 +17,29 @@
   function setWishlist(list) {
     try {
       localStorage.setItem('ss_user_wishlist', JSON.stringify(list));
-      updateAccountWishlistUI();
+      updateWishlistBadge();
     } catch (e) {}
   }
 
-  function toggleProductLike(id, heartBtn) {
+  function toggleProductLike(id, btn) {
     let list = getWishlist();
     if (list.includes(id)) {
       list = list.filter(item => item !== id);
-      if (heartBtn) {
-        heartBtn.classList.remove('liked');
-        heartBtn.innerHTML = '♡';
+      if (btn) {
+        btn.classList.remove('liked');
+        btn.innerHTML = '♡';
       }
     } else {
       list.push(id);
-      if (heartBtn) {
-        heartBtn.classList.add('liked');
-        heartBtn.innerHTML = '❤️';
+      if (btn) {
+        btn.classList.add('liked');
+        btn.innerHTML = '❤️';
       }
     }
     setWishlist(list);
   }
 
-  // 2. Ensure PDP Modal Exists in DOM
+  // --- 1. PRODUCT DETAIL PAGE (PDP) ---
   function ensurePDPModal() {
     let modal = document.getElementById('patchPDPModal');
     if (!modal) {
@@ -54,7 +54,6 @@
             </button>
             <span style="font-size: 13px; font-weight: 700; color: #64748b;">SuperShopping Deal</span>
           </div>
-
           <div class="patch-pdp-media-box">
             <img id="patchPDPImage" src="" alt="Product" />
             <div class="patch-floating-actions">
@@ -62,25 +61,18 @@
               <button type="button" class="patch-circle-action-btn" id="patchShareBtn" title="Share Deal">↗</button>
             </div>
           </div>
-
           <div class="patch-pdp-details">
             <div class="patch-rating-badge" id="patchPDPRating">★ 4.2 | 150+ reviews</div>
-            <h2 class="patch-pdp-title" id="patchPDPTitle">Product Name</h2>
-
-            <!-- Auto-Adaptive Dynamic Variant Shelf -->
+            <h2 class="patch-pdp-title" id="patchPDPTitle">Product</h2>
             <div class="patch-variant-box" id="patchVariantShelf">
-              <div class="patch-variant-header">
-                <span id="patchVariantLabel">Select Size</span>
-              </div>
+              <div class="patch-variant-header"><span id="patchVariantLabel">Select Size</span></div>
               <div class="patch-chips-wrap" id="patchChipsWrap"></div>
             </div>
-
             <div class="patch-desc-box">
               <div class="patch-desc-title">Product Details & Policy</div>
-              <p class="patch-desc-text" id="patchPDPDesc">100% genuine verified store deal with merchant return policy.</p>
+              <p class="patch-desc-text" id="patchPDPDesc">100% genuine verified store deal.</p>
             </div>
           </div>
-
           <div class="patch-bottom-bar">
             <div class="patch-bottom-inner">
               <div class="patch-price-area">
@@ -95,14 +87,15 @@
         </div>
       `;
       document.body.appendChild(modal);
-
-      document.getElementById('patchBtnClosePDP').addEventListener('click', closePDP);
+      document.getElementById('patchBtnClosePDP').addEventListener('click', () => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      });
     }
     return modal;
   }
 
-  // 3. Open Safe PDP
-  function openSafeProductDetail(product) {
+  function openPDP(product) {
     if (!product) return;
     const modal = ensurePDPModal();
 
@@ -113,73 +106,61 @@
     document.getElementById('patchPDPDesc').textContent = product.description || 'Verified authentic item from merchant store.';
     document.getElementById('patchPDPRating').textContent = `★ ${product.rating || '4.2'} | ${product.reviews || '150+ reviews'}`;
 
-    const buyLink = document.getElementById('patchPDPBuyLink');
-    buyLink.href = product.affiliateUrl || '#';
+    document.getElementById('patchPDPBuyLink').href = product.affiliateUrl || '#';
 
-    // Heart (Wishlist)
     const heartBtn = document.getElementById('patchHeartBtn');
     const isLiked = getWishlist().includes(product.id);
     heartBtn.classList.toggle('liked', isLiked);
     heartBtn.innerHTML = isLiked ? '❤️' : '♡';
-    heartBtn.onclick = function (e) {
+    heartBtn.onclick = (e) => {
       e.stopPropagation();
       toggleProductLike(product.id, heartBtn);
     };
 
-    // Share Button
-    const shareBtn = document.getElementById('patchShareBtn');
-    shareBtn.onclick = function (e) {
+    document.getElementById('patchShareBtn').onclick = (e) => {
       e.stopPropagation();
       if (navigator.share) {
-        navigator.share({
-          title: product.title,
-          text: `Check out ${product.title} on SuperShopping!`,
-          url: product.affiliateUrl || window.location.href
-        }).catch(() => {});
+        navigator.share({ title: product.title, url: product.affiliateUrl || window.location.href }).catch(() => {});
       } else {
-        alert('Product link copied!');
+        alert('Product deal link copied!');
       }
     };
 
-    // Dynamic Variant & Measurement Logic
-    const variantShelf = document.getElementById('patchVariantShelf');
-    const variantLabel = document.getElementById('patchVariantLabel');
+    // Measurement & Variant Detection
+    const shelf = document.getElementById('patchVariantShelf');
+    const label = document.getElementById('patchVariantLabel');
     const chipsWrap = document.getElementById('patchChipsWrap');
-
     let variants = product.variants;
-    let label = product.variantLabel;
+    let vLabel = product.variantLabel;
 
-    // Smart category check if not provided
-    const lowerTitle = (product.title || '').toLowerCase();
+    const lower = (product.title || '').toLowerCase();
     if (!variants) {
-      if (lowerTitle.includes('shirt') || lowerTitle.includes('jeans') || product.category === 'fashion') {
+      if (lower.includes('shirt') || lower.includes('jeans')) {
         variants = ['28', '30', '32', '34'];
-        label = 'Select Size';
-      } else if (lowerTitle.includes('shoe') || lowerTitle.includes('slipper')) {
+        vLabel = 'Select Size';
+      } else if (lower.includes('shoe')) {
         variants = ['6', '7', '8', '9', '10'];
-        label = 'Select Shoe Size';
-      } else if (lowerTitle.includes('cream') || lowerTitle.includes('wash') || product.category === 'beauty') {
+        vLabel = 'Select Shoe Size';
+      } else if (lower.includes('cream') || lower.includes('wash')) {
         variants = ['50ml', '100ml', '200ml'];
-        label = 'Select Volume';
+        vLabel = 'Select Volume';
       }
     }
 
     if (variants && variants.length > 0) {
-      variantShelf.style.display = 'block';
-      variantLabel.textContent = label || 'Select Option';
+      shelf.style.display = 'block';
+      label.textContent = vLabel || 'Select Option';
       chipsWrap.innerHTML = variants.map((v, i) => `
         <button type="button" class="patch-variant-chip ${i === 0 ? 'active' : ''}">${v}</button>
       `).join('');
-
       chipsWrap.querySelectorAll('.patch-variant-chip').forEach(btn => {
-        btn.addEventListener('click', function () {
+        btn.onclick = function () {
           chipsWrap.querySelectorAll('.patch-variant-chip').forEach(b => b.classList.remove('active'));
           this.classList.add('active');
-        });
+        };
       });
     } else {
-      // Bottle, Electronics, Headphones etc. -> Auto Hide!
-      variantShelf.style.display = 'none';
+      shelf.style.display = 'none';
     }
 
     modal.style.display = 'block';
@@ -187,117 +168,234 @@
     modal.scrollTo({ top: 0, behavior: 'instant' });
   }
 
-  function closePDP() {
-    const modal = document.getElementById('patchPDPModal');
-    if (modal) modal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-
-  // 4. Global Document Click Delegation (Card kabhi bhi load ho, ye pakad lega)
+  // Intercept Card Click
   document.addEventListener('click', function (e) {
-    const card = e.target.closest('.product-card');
+    const card = e.target.closest('#productsFluidGrid .product-card');
     if (!card) return;
 
-    // Agar direct 'Shop on Amazon/Flipkart' button par dabaya hai toh roko mat
-    if (e.target.closest('.btn-merchant-action') && e.target.tagName.toLowerCase() === 'a') {
-      return;
-    }
+    if (e.target.closest('.btn-merchant-action') && e.target.tagName.toLowerCase() === 'a') return;
 
     e.preventDefault();
     e.stopPropagation();
 
-    // Find card index
-    const parent = card.parentElement;
-    const cardIndex = Array.from(parent.children).indexOf(card);
+    const cardIndex = Array.from(card.parentElement.children).indexOf(card);
+    let prod = (typeof LiveCatalogDeals !== 'undefined' && LiveCatalogDeals[cardIndex]) ? LiveCatalogDeals[cardIndex] : null;
 
-    let product = null;
-    if (typeof LiveCatalogDeals !== 'undefined' && LiveCatalogDeals[cardIndex]) {
-      product = LiveCatalogDeals[cardIndex];
-    } else {
-      // Fallback: Read directly from card HTML
-      const title = card.querySelector('.product-title-text')?.textContent?.trim() || 'Product';
-      const price = card.querySelector('.sale-price')?.textContent?.replace(/[^0-9]/g, '') || '0';
-      const mrp = card.querySelector('.regular-price')?.textContent?.replace(/[^0-9]/g, '') || '0';
-      const img = card.querySelector('img')?.src || '';
-      const link = card.querySelector('a')?.href || '#';
-
-      product = {
+    if (!prod) {
+      prod = {
         id: `DEAL-${cardIndex + 1}`,
-        title: title,
-        price: Number(price),
-        mrp: Number(mrp),
-        imageUrl: img,
-        affiliateUrl: link
+        title: card.querySelector('.product-title-text')?.textContent?.trim() || 'Product',
+        price: Number(card.querySelector('.sale-price')?.textContent?.replace(/[^0-9]/g, '') || 0),
+        mrp: Number(card.querySelector('.regular-price')?.textContent?.replace(/[^0-9]/g, '') || 0),
+        imageUrl: card.querySelector('img')?.src || '',
+        affiliateUrl: card.querySelector('a')?.href || '#'
       };
     }
-
-    openSafeProductDetail(product);
+    openPDP(prod);
   }, true);
 
-  // 5. Account Features: Wishlist & Share Website
-  function injectAccountFeatures() {
+  // --- 2. ACCOUNT PAGE RESTRUCTURE & SLIDE DRAWER ---
+  function setupAccountPageLayout() {
     const accountPane = document.getElementById('pane-account');
-    if (!accountPane || document.getElementById('patchAccountShelf')) return;
+    if (!accountPane || accountPane.dataset.patchStructured) return;
+    accountPane.dataset.patchStructured = 'true';
 
-    const shelf = document.createElement('div');
-    shelf.id = 'patchAccountShelf';
-    shelf.className = 'patch-account-shelf';
-    shelf.innerHTML = `
-      <div class="patch-account-item" id="patchOpenWishlistRow">
-        <div class="patch-account-item-left">
-          <span>❤️</span>
-          <span>My Saved Wishlist</span>
+    // Top-Right Header Icons (Photo 4)[span_0](start_span)[span_0](end_span)
+    let headerActions = document.getElementById('patchAccountHeaderActions');
+    if (!headerActions) {
+      headerActions = document.createElement('div');
+      headerActions.id = 'patchAccountHeaderActions';
+      headerActions.className = 'patch-account-header-actions';
+      headerActions.innerHTML = `
+        <button type="button" class="patch-account-icon-btn" id="patchBtnMenu" title="Menu">⋮</button>
+        <button type="button" class="patch-account-icon-btn" id="patchBtnShareWeb" title="Share Website">🔗</button>
+      `;
+      accountPane.style.position = 'relative';
+      accountPane.prepend(headerActions);
+    }
+
+    // Slide Drawer Setup
+    let drawer = document.getElementById('patchMenuDrawer');
+    if (!drawer) {
+      drawer = document.createElement('div');
+      drawer.id = 'patchMenuDrawer';
+      drawer.className = 'patch-menu-drawer';
+      drawer.innerHTML = `
+        <div class="patch-drawer-content">
+          <div class="patch-drawer-header">
+            <span class="patch-drawer-title">Account Menu</span>
+            <button type="button" class="patch-drawer-close" id="patchCloseDrawer">✕</button>
+          </div>
+          <div class="patch-drawer-menu-list">
+            <div class="patch-drawer-item" id="patchMenuItemWishlist">
+              <span>❤️ My Saved Wishlist</span>
+              <span id="patchDrawerWishlistBadge" style="color:#e11d48;">0</span>
+            </div>
+            <div class="patch-drawer-item" id="patchMenuItemPersonalInfo">
+              <span>👤 Personal Information</span>
+              <span>›</span>
+            </div>
+            <div class="patch-drawer-item" id="patchMenuItemPolicies">
+              <span>📜 Legal & Reward Policies</span>
+              <span>›</span>
+            </div>
+          </div>
         </div>
-        <span class="patch-badge-counter" id="patchWishlistCount">0 items</span>
-      </div>
-      <div class="patch-account-item" id="patchShareAppRow">
-        <div class="patch-account-item-left">
-          <span>🔗</span>
-          <span>Share SuperShopping Website</span>
-        </div>
-        <span style="font-size: 13px; color: #0284c7; font-weight: 600;">Share ↗</span>
-      </div>
-    `;
+      `;
+      document.body.appendChild(drawer);
 
-    accountPane.appendChild(shelf);
+      document.getElementById('patchCloseDrawer').onclick = () => drawer.style.display = 'none';
+      drawer.onclick = (e) => { if (e.target === drawer) drawer.style.display = 'none'; };
+    }
 
-    document.getElementById('patchOpenWishlistRow').addEventListener('click', () => {
-      const count = getWishlist().length;
-      alert(`My Wishlist: You have ${count} saved item(s).`);
-    });
+    // Connect Top-Right Menu & Share
+    document.getElementById('patchBtnMenu').onclick = () => {
+      updateWishlistBadge();
+      drawer.style.display = 'block';
+    };
 
-    document.getElementById('patchShareAppRow').addEventListener('click', () => {
-      const siteUrl = window.location.origin + window.location.pathname;
+    document.getElementById('patchBtnShareWeb').onclick = () => {
+      const url = window.location.origin + window.location.pathname;
       if (navigator.share) {
-        navigator.share({
-          title: 'SuperShopping',
-          text: 'Explore verified deals and cashback rewards on SuperShopping!',
-          url: siteUrl
-        }).catch(() => {});
+        navigator.share({ title: 'SuperShopping', text: 'Shop smart and earn rewards on SuperShopping!', url }).catch(() => {});
       } else {
-        navigator.clipboard.writeText(siteUrl);
-        alert('SuperShopping website link copied to clipboard!');
+        navigator.clipboard.writeText(url);
+        alert('SuperShopping website link copied!');
       }
-    });
+    };
 
-    updateAccountWishlistUI();
-  }
+    // Hide Original Personal Info & Legal Policy blocks from main view (Shift to drawer)
+    const personalInfoBox = accountPane.querySelector('.profile-settings-card') || accountPane.querySelectorAll('.settings-card')[0];
+    if (personalInfoBox) personalInfoBox.style.display = 'none';
 
-  function updateAccountWishlistUI() {
-    const badge = document.getElementById('patchWishlistCount');
-    if (badge) {
-      badge.textContent = `${getWishlist().length} items`;
+    const policyBox = document.getElementById('legalTermsSection') || accountPane.querySelectorAll('.settings-card')[2];
+    if (policyBox) policyBox.style.display = 'none';
+
+    // Drawer Item Clicks
+    document.getElementById('patchMenuItemPersonalInfo').onclick = () => {
+      drawer.style.display = 'none';
+      if (personalInfoBox) {
+        personalInfoBox.style.display = 'block';
+        personalInfoBox.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    document.getElementById('patchMenuItemPolicies').onclick = () => {
+      drawer.style.display = 'none';
+      if (typeof openPolicyModal === 'function') openPolicyModal();
+    };
+
+    document.getElementById('patchMenuItemWishlist').onclick = () => {
+      drawer.style.display = 'none';
+      const w = getWishlist();
+      alert(`My Wishlist: You have ${w.length} saved item(s).`);
+    };
+
+    // Replace Big FAQ with Compact Trigger Button
+    const faqContainer = accountPane.querySelector('.faq-accordion-group') || accountPane.querySelector('.faq-section');
+    if (faqContainer && !document.getElementById('patchFaqTrigger')) {
+      const faqBtn = document.createElement('button');
+      faqBtn.type = 'button';
+      faqBtn.id = 'patchFaqTrigger';
+      faqBtn.className = 'patch-faq-trigger-btn';
+      faqBtn.innerHTML = `<span>💬 Frequently Asked Questions</span><span>▼</span>`;
+      
+      faqContainer.style.display = 'none';
+      faqContainer.parentNode.insertBefore(faqBtn, faqContainer);
+
+      faqBtn.onclick = () => {
+        const isHidden = faqContainer.style.display === 'none';
+        faqContainer.style.display = isHidden ? 'block' : 'none';
+        faqBtn.querySelector('span:last-child').textContent = isHidden ? '▲' : '▼';
+      };
     }
   }
 
-  // Boot UI
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', injectAccountFeatures);
-  } else {
-    injectAccountFeatures();
+  function updateWishlistBadge() {
+    const b = document.getElementById('patchDrawerWishlistBadge');
+    if (b) b.textContent = `${getWishlist().length} items`;
   }
 
-  // Periodic check for account pane render
-  setInterval(injectAccountFeatures, 1500);
+  // --- 3. E-BOOK CATEGORY FILTER ENGINE ---
+  function setupEbookCategoryFilters() {
+    const pills = document.querySelectorAll('#ebookCategoriesBar .cat-pill');
+    pills.forEach(pill => {
+      if (pill.dataset.patchFiltered) return;
+      pill.dataset.patchFiltered = 'true';
+
+      pill.addEventListener('click', function (e) {
+        e.preventDefault();
+        pills.forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+
+        const cat = (this.textContent || '').trim().toLowerCase();
+        const container = document.getElementById('ebooksCatalogGrid');
+        if (!container || typeof DigitalBooksCatalog === 'undefined') return;
+
+        let filtered = DigitalBooksCatalog;
+        if (cat.includes('11-12') || cat.includes('notes')) {
+          filtered = DigitalBooksCatalog.filter(b => b.category === 'commerce' || (b.title && b.title.includes('12')));
+        } else if (cat.includes('b.com') || cat.includes('account')) {
+          filtered = DigitalBooksCatalog.filter(b => b.category === 'commerce');
+        } else if (cat.includes('growth') || cat.includes('marketing')) {
+          filtered = DigitalBooksCatalog.filter(b => b.category === 'business');
+        }
+
+        if (typeof renderEbooksGrid === 'function') {
+          renderEbooksGrid(filtered);
+        }
+      });
+    });
+  }
+
+  // --- 4. EARN TAB GUEST RESTRICTION ---
+  function applyEarnGuestLock() {
+    const earnPane = document.getElementById('pane-earn');
+    if (!earnPane) return;
+
+    const isLoggedIn = (typeof AppState !== 'undefined' && AppState.currentUser && AppState.currentUser.isLoggedIn);
+    const form = document.getElementById('rewardClaimForm');
+    let lockBanner = document.getElementById('patchGuestLockBanner');
+
+    if (!isLoggedIn) {
+      if (!lockBanner && form) {
+        lockBanner = document.createElement('div');
+        lockBanner.id = 'patchGuestLockBanner';
+        lockBanner.className = 'patch-guest-lock-banner';
+        lockBanner.innerHTML = `
+          <h4 style="color:#1e3a8a; margin:0 0 6px 0;">🔒 Sign In Required to Claim Reward</h4>
+          <p style="color:#475569; font-size:13px; margin:0;">Please login or create an account to record your claim and receive cashback settlement.</p>
+          <button type="button" class="patch-guest-lock-btn" id="patchBtnGuestLogin">Sign In / Register</button>
+        `;
+        form.parentNode.insertBefore(lockBanner, form);
+
+        document.getElementById('patchBtnGuestLogin').onclick = () => {
+          if (typeof openAuthModal === 'function') openAuthModal();
+        };
+      }
+      if (form) form.style.opacity = '0.4';
+      if (form) form.style.pointerEvents = 'none';
+      if (lockBanner) lockBanner.style.display = 'block';
+    } else {
+      if (form) form.style.opacity = '1';
+      if (form) form.style.pointerEvents = 'auto';
+      if (lockBanner) lockBanner.style.display = 'none';
+    }
+  }
+
+  // --- GLOBAL RUNNER ---
+  function runAllPatches() {
+    setupAccountPageLayout();
+    setupEbookCategoryFilters();
+    applyEarnGuestLock();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', runAllPatches);
+  } else {
+    runAllPatches();
+  }
+
+  setInterval(runAllPatches, 1500);
 
 })();
