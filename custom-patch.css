@@ -1,9 +1,8 @@
-/* Safe Patch Styling Layer */
 /* ==========================================================================
-   SUPERSHOPPING - SAFE PATCH DESIGN LAYER (PDP, WISHLIST & DYNAMIC VARIANTS)
+   SUPERSHOPPING - SAFE PATCH DESIGN LAYER (PDP, ACCOUNT MENU & EBOOK FIX)
    ========================================================================== */
 
-/* Fullscreen Overlay Sheet for PDP */
+/* --- 1. PRODUCT DETAIL PAGE (PDP) --- */
 .patch-pdp-modal {
   display: none;
   position: fixed;
@@ -28,7 +27,6 @@
   min-height: 100vh;
 }
 
-/* Sticky Top Bar (Back Arrow & Actions) */
 .patch-pdp-topbar {
   display: flex;
   align-items: center;
@@ -45,17 +43,16 @@
 .patch-btn-back {
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   color: #0f172a;
-  font-weight: 600;
+  font-weight: 700;
   padding: 4px;
 }
 
-/* Image Container with Floating Heart & Share */
 .patch-pdp-media-box {
   position: relative;
   width: 100%;
@@ -74,7 +71,6 @@
   display: block;
 }
 
-/* Floating Actions: Like & Share */
 .patch-floating-actions {
   position: absolute;
   top: 14px;
@@ -96,7 +92,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease;
   font-size: 16px;
   color: #475569;
 }
@@ -111,7 +107,6 @@
   border-color: #fecdd3;
 }
 
-/* Product Info Block */
 .patch-pdp-details {
   padding: 16px 18px;
 }
@@ -138,19 +133,11 @@
   margin: 0 0 12px 0;
 }
 
-/* Dynamic Variant & Measurement Shelf */
 .patch-variant-box {
   margin: 16px 0;
   padding: 14px 0;
   border-top: 1px solid #f1f5f9;
   border-bottom: 1px solid #f1f5f9;
-}
-
-.patch-variant-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
 }
 
 .patch-variant-header span {
@@ -163,11 +150,12 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .patch-variant-chip {
   min-width: 48px;
-  padding: 9px 15px;
+  padding: 8px 14px;
   border-radius: 8px;
   border: 1.5px solid #cbd5e1;
   background: #ffffff;
@@ -175,8 +163,6 @@
   font-size: 13.5px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.15s ease;
-  text-align: center;
 }
 
 .patch-variant-chip.active {
@@ -185,7 +171,6 @@
   color: #0284c7;
 }
 
-/* Description & Trust Points */
 .patch-desc-box {
   margin-top: 14px;
 }
@@ -203,7 +188,6 @@
   line-height: 1.6;
 }
 
-/* Sticky Bottom Bar */
 .patch-bottom-bar {
   position: fixed;
   bottom: 0;
@@ -225,11 +209,6 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-}
-
-.patch-price-area {
-  display: flex;
-  flex-direction: column;
 }
 
 .patch-price-area .patch-main-price {
@@ -255,52 +234,172 @@
   padding: 12px 16px;
   border-radius: 10px;
   text-decoration: none;
-  box-shadow: 0 2px 6px rgba(251, 191, 36, 0.3);
-  transition: transform 0.15s ease, background 0.15s ease;
   display: inline-block;
 }
 
-.patch-buy-btn:active {
-  transform: scale(0.97);
-  background: #f59e0b;
+/* --- 2. ACCOUNT PAGE RESTRUCTURE & MENU DRAWER --- */
+.patch-account-header-actions {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 20;
 }
 
-/* Account Wishlist & Share Section Styling */
-.patch-account-shelf {
+.patch-account-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   background: #ffffff;
-  border-radius: 12px;
   border: 1px solid #e2e8f0;
-  margin-top: 14px;
-  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  color: #334155;
 }
 
-.patch-account-item {
+.patch-account-icon-btn:active {
+  transform: scale(0.92);
+}
+
+.patch-menu-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  z-index: 999999;
+}
+
+.patch-drawer-content {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 82%;
+  max-width: 320px;
+  height: 100%;
+  background: #ffffff;
+  padding: 20px 18px;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: slideDrawer 0.22s ease-out;
+}
+
+@keyframes slideDrawer {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.patch-drawer-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  cursor: pointer;
   border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
 }
 
-.patch-account-item:last-child {
-  border-bottom: none;
+.patch-drawer-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.patch-account-item-left {
+.patch-drawer-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.patch-drawer-menu-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.patch-drawer-item {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 1px solid #f1f5f9;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 600;
   color: #1e293b;
 }
 
-.patch-badge-counter {
-  background: #fee2e2;
-  color: #e11d48;
-  font-size: 11px;
+/* Compact FAQ Trigger Button */
+.patch-faq-trigger-btn {
+  width: 100%;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
   font-weight: 700;
-  padding: 2px 7px;
-  border-radius: 10px;
+  font-size: 14px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  margin: 14px 0;
+}
+
+/* --- 3. E-BOOK CARD RATIO & GRID FIX --- */
+#ebooksCatalogGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
+  gap: 16px !important;
+  padding: 12px !important;
+}
+
+#ebooksCatalogGrid .product-card {
+  max-width: 100% !important;
+  margin: 0 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06) !important;
+}
+
+#ebooksCatalogGrid .product-thumb-box {
+  height: 140px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* --- 4. EARN GUEST LOCK CARD --- */
+.patch-guest-lock-banner {
+  background: #eff6ff;
+  border: 1.5px dashed #3b82f6;
+  border-radius: 14px;
+  padding: 18px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.patch-guest-lock-btn {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13.5px;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  margin-top: 10px;
+  cursor: pointer;
 }
