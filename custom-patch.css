@@ -1,15 +1,12 @@
 /* ==========================================================================
-   SUPERSHOPPING - CLEAN PATCH DESIGN LAYER
+   SUPERSHOPPING - ULTIMATE SAFE PATCH DESIGN LAYER
    ========================================================================== */
 
 /* --- 1. PRODUCT DETAIL PAGE (PDP) --- */
 .patch-pdp-modal {
   display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+  inset: 0;
   background-color: #ffffff;
   z-index: 99999;
   overflow-y: auto;
@@ -232,7 +229,7 @@
   display: inline-block;
 }
 
-/* --- 2. ACCOUNT PAGE (ZERO HIDE ON CONTAINERS) --- */
+/* --- 2. ACCOUNT PAGE CLEAN STRUCTURE --- */
 #pane-account {
   position: relative !important;
 }
@@ -262,7 +259,6 @@
   color: #334155;
 }
 
-/* Drawer & Modal */
 .patch-drawer-overlay {
   display: none;
   position: fixed;
@@ -340,7 +336,7 @@
   box-sizing: border-box;
 }
 
-/* --- 3. EBOOK & EARN --- */
+/* --- 3. E-BOOKS SIZE FIX --- */
 #ebooksCatalogGrid {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)) !important;
@@ -359,6 +355,7 @@
   height: 140px !important;
 }
 
+/* --- 4. EARN GUEST LOCK --- */
 .patch-guest-lock-banner {
   background: #eff6ff;
   border: 1.5px dashed #3b82f6;
@@ -378,92 +375,4 @@
   border-radius: 8px;
   margin-top: 10px;
   cursor: pointer;
-}
-
-/* --- EXACT ACCOUNT SCREEN TARGET CLEANUP (APPENDED) --- */
-
-/* 1. Photo 1: Personal Information ka pura khali dabba gayab */
-#pane-account .settings-card:has(input),
-#pane-account [class*="profile-settings"],
-#pane-account div:has(> h4:contains("Personal Information")),
-#pane-account div:has(> .settings-card-title:contains("Personal Information")) {
-  display: none !important;
-}
-
-/* 2. Photo 3: Legal Terms & Policies ka extra dabba main screen se gayab */
-#legalTermsSection,
-#pane-account div:has(> div > h4:contains("Legal Terms")),
-#pane-account div:has(> .policy-card),
-#pane-account .policy-card {
-  display: none !important;
-}
-
-/* 3. Photo 2: WhatsApp button jaisa aesthetic FAQ Bar Button */
-.patch-faq-bar-btn {
-  width: 100%;
-  background: #f0fdf4;
-  border: 1.5px solid #86efac;
-  color: #166534;
-  font-weight: 700;
-  font-size: 14px;
-  padding: 13px 18px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  cursor: pointer;
-  margin: 14px 0;
-  box-shadow: 0 2px 6px rgba(22, 101, 52, 0.08);
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.patch-faq-bar-btn:active {
-  transform: scale(0.98);
-  background: #dcfce7;
-}
-
-/* 4. FAQ Slide Drawer */
-.patch-faq-drawer-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.5);
-  backdrop-filter: blur(4px);
-  z-index: 1000000;
-  animation: fadeIn 0.2s ease-out;
-}
-
-.patch-faq-drawer-sheet {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  max-height: 80vh;
-  background: #ffffff;
-  border-radius: 20px 20px 0 0;
-  padding: 20px 18px 30px 18px;
-  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15);
-  overflow-y: auto;
-  animation: slideUp 0.25s ease-out;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Photo 1: Personal info dabba gayab */
-#pane-account .settings-card:first-of-type {
-  display: none !important;
-}
-
-/* Photo 3: Legal Policy dabba gayab */
-#pane-account #legalTermsSection,
-#pane-account .policy-card {
-  display: none !important;
 }
