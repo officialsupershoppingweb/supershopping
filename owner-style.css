@@ -1,0 +1,326 @@
+/* ==========================================================================
+   SUPER SHOPPING - FOUNDER DESK MASTER STYLING
+   ========================================================================== */
+
+:root {
+  --bg-main: #0b0f19;
+  --bg-card: #111827;
+  --bg-card-hover: #1f2937;
+  --border-color: #1e293b;
+  --text-main: #f8fafc;
+  --text-sub: #94a3b8;
+  --accent-blue: #0284c7;
+  --accent-green: #22c55e;
+  --accent-red: #ef4444;
+  --accent-gold: #f59e0b;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 75px;
+}
+
+/* --- 1. GATEKEEPER (PASSWORD SCREEN) --- */
+.gate-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, #1e293b 0%, #0b0f19 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 999999;
+}
+
+.gate-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  padding: 30px 24px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+}
+
+.gate-icon {
+  font-size: 38px;
+  margin-bottom: 12px;
+}
+
+.gate-card h2 {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.gate-card p {
+  font-size: 13px;
+  color: var(--text-sub);
+  margin-bottom: 20px;
+}
+
+.gate-card input {
+  width: 100%;
+  background: #0b0f19;
+  border: 1.5px solid var(--border-color);
+  padding: 13px 16px;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 16px;
+  text-align: center;
+  outline: none;
+  margin-bottom: 14px;
+  letter-spacing: 2px;
+}
+
+.gate-card input:focus {
+  border-color: var(--accent-blue);
+}
+
+.gate-card button {
+  width: 100%;
+  background: var(--accent-blue);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.gate-card button:active {
+  transform: scale(0.98);
+}
+
+.gate-error {
+  color: var(--accent-red);
+  font-size: 12px;
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+/* --- 2. TOP BAR --- */
+.founder-topbar {
+  background: rgba(17, 24, 39, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand-zone {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.crown-badge {
+  font-size: 22px;
+}
+
+.brand-zone h3 {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: var(--text-main);
+}
+
+.sub-status {
+  font-size: 11px;
+  color: var(--text-sub);
+}
+
+.btn-lock-session {
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+/* --- 3. VIEW PANELS --- */
+.founder-viewport {
+  flex: 1;
+  padding: 16px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.view-panel {
+  display: none;
+}
+
+.view-panel.active {
+  display: block;
+}
+
+/* --- 4. CARDS & GRID SYSTEM --- */
+.f-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.f-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px;
+}
+
+.f-card-metric {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 6px 0 2px 0;
+  color: var(--text-main);
+}
+
+.f-card-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-sub);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- 5. TABLES --- */
+.table-responsive-box {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.f-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.f-table th {
+  background: #162032;
+  color: var(--text-sub);
+  padding: 12px 14px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.f-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.f-table tr:last-child td {
+  border-bottom: none;
+}
+
+/* --- 6. ACTION BUTTONS & CHIPS --- */
+.btn-action-sm {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-green { background: #15803d; color: #fff; }
+.btn-red { background: #b91c1c; color: #fff; }
+.btn-blue { background: #0369a1; color: #fff; }
+
+.status-badge {
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.badge-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+.badge-blocked { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+/* --- 7. BOTTOM NAVIGATION BAR --- */
+.founder-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 65px;
+  background: rgba(17, 24, 39, 0.98);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+.f-nav-item {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-sub);
+  cursor: pointer;
+  flex: 1;
+  height: 100%;
+  gap: 4px;
+  transition: 0.2s;
+}
+
+.f-nav-icon {
+  font-size: 19px;
+}
+
+.f-nav-label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.f-nav-item.active {
+  color: var(--accent-blue);
+}
+
+.f-nav-item.active .f-nav-label {
+  font-weight: 700;
+}
