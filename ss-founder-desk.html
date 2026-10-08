@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SuperShopping Founder Desk</title>
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="stylesheet" href="owner-style.css" />
+</head>
+<body>
+
+  <!-- MASTER PASSWORD GATE -->
+  <div id="gatekeeperModal" class="gate-overlay">
+    <div class="gate-card">
+      <div class="gate-icon">🔒</div>
+      <h2>Founder Desk Verification</h2>
+      <p>Enter master authentication key to access control desk.</p>
+      <input type="password" id="masterPinInput" placeholder="Enter Master Key" autocomplete="off" />
+      <button type="button" id="btnUnlockDesk">Unlock Portal ⚡</button>
+      <div id="gateErrorMsg" class="gate-error" style="display:none;">Access Denied: Invalid Key</div>
+    </div>
+  </div>
+
+  <!-- MAIN FOUNDER CONSOLE -->
+  <div id="founderApp" style="display: none;">
+    <!-- TOP STATUS BAR -->
+    <header class="founder-topbar">
+      <div class="brand-zone">
+        <span class="crown-badge">👑</span>
+        <div>
+          <h3>FOUNDER DESK</h3>
+          <span class="sub-status">Status: <b style="color: #22c55e;">● Protected</b></span>
+        </div>
+      </div>
+      <button type="button" class="btn-lock-session" id="btnLockPortal" title="Lock Desk">🔒</button>
+    </header>
+
+    <!-- WORKSPACE VIEWPORT (PAGES MOUNT HERE) -->
+    <main class="founder-viewport">
+      <section id="view-home" class="view-panel active"></section>
+      <section id="view-stock" class="view-panel"></section>
+      <section id="view-customer" class="view-panel"></section>
+      <section id="view-staff" class="view-panel"></section>
+      <section id="view-activity" class="view-panel"></section>
+    </main>
+
+    <!-- BOTTOM MASTER NAVIGATION -->
+    <nav class="founder-bottom-nav">
+      <button type="button" class="f-nav-item active" data-target="view-home">
+        <span class="f-nav-icon">🏠</span>
+        <span class="f-nav-label">Home</span>
+      </button>
+      <button type="button" class="f-nav-item" data-target="view-stock">
+        <span class="f-nav-icon">📦</span>
+        <span class="f-nav-label">Stock</span>
+      </button>
+      <button type="button" class="f-nav-item" data-target="view-customer">
+        <span class="f-nav-icon">👥</span>
+        <span class="f-nav-label">Customer</span>
+      </button>
+      <button type="button" class="f-nav-item" data-target="view-staff">
+        <span class="f-nav-icon">💼</span>
+        <span class="f-nav-label">Staff</span>
+      </button>
+      <button type="button" class="f-nav-item" data-target="view-activity">
+        <span class="f-nav-icon">🛡️</span>
+        <span class="f-nav-label">Activity</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODULAR SCRIPTS (ISOLATED EXECUTION) -->
+  <script src="owner-home.js"></script>
+  <script src="owner-stock.js"></script>
+  <script src="owner-customer.js"></script>
+  <script src="owner-staff.js"></script>
+  <script src="owner-activity.js"></script>
+
+  <!-- MASTER GATE CONTROLLER -->
+  <script>
+    (function() {
+      const pinInput = document.getElementById('masterPinInput');
+      const unlockBtn = document.getElementById('btnUnlockDesk');
+      const errorMsg = document.getElementById('gateErrorMsg');
+      const gateModal = document.getElementById('gatekeeperModal');
+      const app = document.getElementById('founderApp');
+      const lockBtn = document.getElementById('btnLockPortal');
+
+      function verifyAccess() {
+        const entered = (pinInput.value || '').trim();
+        if (entered === 'Nitish') {
+          sessionStorage.setItem('ss_founder_auth', 'unlocked');
+          gateModal.style.display = 'none';
+          app.style.display = 'block';
+          errorMsg.style.display = 'none';
+          if (window.initOwnerHome) window.initOwnerHome();
+        } else {
+          errorMsg.style.display = 'block';
+          pinInput.value = '';
+          pinInput.focus();
+        }
+      }
+
+      unlockBtn.addEventListener('click', verifyAccess);
+      pinInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') verifyAccess();
+      });
+
+      lockBtn.addEventListener('click', function() {
+        sessionStorage.removeItem('ss_founder_auth');
+        app.style.display = 'none';
+        gateModal.style.display = 'flex';
+        pinInput.value = '';
+      });
+
+      if (sessionStorage.getItem('ss_founder_auth') === 'unlocked') {
+        gateModal.style.display = 'none';
+        app.style.display = 'block';
+        if (window.initOwnerHome) window.initOwnerHome();
+      }
+
+      // BOTTOM NAVIGATION SWITCH ENGINE
+      const navItems = document.querySelectorAll('.f-nav-item');
+      navItems.forEach(item => {
+        item.addEventListener('click', function() {
+          navItems.forEach(n => n.classList.remove('active'));
+          this.classList.add('active');
+
+          const targetId = this.getAttribute('data-target');
+          document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+          const targetPanel = document.getElementById(targetId);
+          if (targetPanel) targetPanel.classList.add('active');
+
+          // Trigger view lifecycles
+          if (targetId === 'view-home' && window.initOwnerHome) window.initOwnerHome();
+          if (targetId === 'view-stock' && window.initOwnerStock) window.initOwnerStock();
+          if (targetId === 'view-customer' && window.initOwnerCustomer) window.initOwnerCustomer();
+          if (targetId === 'view-staff' && window.initOwnerStaff) window.initOwnerStaff();
+          if (targetId === 'view-activity' && window.initOwnerActivity) window.initOwnerActivity();
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
