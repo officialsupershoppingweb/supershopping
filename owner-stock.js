@@ -1,45 +1,67 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK: STOCK MODULE (SCREEN-BY-SCREEN ARCHITECTURE)
+   SUPER SHOPPING - FOUNDER DESK: STOCK MODULE (ACCURATE WORKFLOW ENGINE)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // Master Categories Matrix (SCH-01 to SCH-09)
-  const MASTER_CATEGORIES = [
-    { major: "FASHION & APPAREL", head: "Men's Wear", sub: "Men Tops, Bottoms & Ethnic" },
-    { major: "FASHION & APPAREL", head: "Women's Ethnic & Western", sub: "Sarees, Kurtis & Dresses" },
-    { major: "FASHION & APPAREL", head: "Female Specialized & Lingerie", sub: "Intimates & Sleepwear" },
-    { major: "FASHION & APPAREL", head: "Kids & Infants", sub: "Age-Wise Clothing" },
-    { major: "FOOTWEAR & ACCESSORIES", head: "Footwear (All)", sub: "Sports, Formal, Heels & Daily" },
-    { major: "FOOTWEAR & ACCESSORIES", head: "Watches & Smart Bands", sub: "Analog & Smartwatches" },
-    { major: "FOOTWEAR & ACCESSORIES", head: "Eyewear & Sunglasses", sub: "Computer Glasses & Frames" },
-    { major: "FOOTWEAR & ACCESSORIES", head: "Bags, Luggage & Wallets", sub: "Trolleys, Backpacks & Wallets" },
-    { major: "ELECTRONICS & GADGETS", head: "Mobiles & Tablets", sub: "Smartphones & 5G Pads" },
-    { major: "ELECTRONICS & GADGETS", head: "Audio & Mobile Tech", sub: "Earbuds TWS, Cables & Powerbanks" },
-    { major: "ELECTRONICS & GADGETS", head: "Computing & Desk Tech", sub: "Laptops, Mice & Keyboards" },
-    { major: "ELECTRONICS & GADGETS", head: "Smart Home & Appliances", sub: "Smart TVs, Trimmers & Kettles" },
-    { major: "BEAUTY & COSMETICS", head: "Skincare & Face Care", sub: "Face Wash, Serums & Sunscreen" },
-    { major: "BEAUTY & COSMETICS", head: "Color Cosmetics & Makeup", sub: "Lipsticks, Foundations & Eyeliners" },
-    { major: "BEAUTY & COSMETICS", head: "Female Hygiene & Wellness", sub: "Pads & Personal Care" },
-    { major: "BEAUTY & COSMETICS", head: "Hair Care & Fragrances", sub: "Shampoos, Hair Oils & Perfumes" },
-    { major: "GROCERY & SUPERMARKET", head: "Daily Staples & Cooking", sub: "Atta, Rice, Oils & Spices" },
-    { major: "GROCERY & SUPERMARKET", head: "Snacks, Beverages & Drinks", sub: "Tea, Coffee, Dry Fruits" },
-    { major: "GROCERY & SUPERMARKET", head: "Household Cleaning & Laundry", sub: "Detergents & Surface Cleaners" },
-    { major: "HOME DECOR & SPIRITUAL", head: "Spiritual, Murti & Frames", sub: "Brass/Resin Idols & Photo Frames" },
-    { major: "HOME DECOR & SPIRITUAL", head: "Wall Decor, Stickers & Art", sub: "Wall Stickers, Clocks & Paintings" },
-    { major: "HOME DECOR & SPIRITUAL", head: "Mirrors & Ambient Lighting", sub: "LED Mirrors & Fairy String Lights" },
-    { major: "FURNITURE & STUDY SETUP", head: "Study & Work-From-Home", sub: "Study Tables, Laptop Desks & Chairs" },
-    { major: "FURNITURE & STUDY SETUP", head: "Living & Bedroom Furniture", sub: "Shoe Racks, Coffee Tables & Bedside" },
-    { major: "FURNITURE & STUDY SETUP", head: "Home Furnishings", sub: "Bedsheets, Curtains & Pillows" },
-    { major: "VALUE COMBOS & HAMPERS", head: "Gift & Multi-Item Combos", sub: "Grooming Combos & Festival Hampers" },
-    { major: "DIGITAL & EDUCATION", head: "Academic & Career Notes", sub: "Commerce Notes, CBSE Guides & B.Com" }
-  ];
+  // Master Categories Dynamic Storage
+  function getMasterCategories() {
+    const defaultCats = [
+      { major: "FASHION & APPAREL", head: "Men's Wear", sub: "Men Tops, Bottoms & Ethnic" },
+      { major: "FASHION & APPAREL", head: "Women's Ethnic & Western", sub: "Sarees, Kurtis & Dresses" },
+      { major: "FASHION & APPAREL", head: "Female Specialized & Lingerie", sub: "Intimates & Sleepwear" },
+      { major: "FASHION & APPAREL", head: "Kids & Infants", sub: "Age-Wise Clothing" },
+      { major: "FOOTWEAR & ACCESSORIES", head: "Footwear (All)", sub: "Sports, Formal, Heels & Daily" },
+      { major: "FOOTWEAR & ACCESSORIES", head: "Watches & Smart Bands", sub: "Analog & Smartwatches" },
+      { major: "FOOTWEAR & ACCESSORIES", head: "Eyewear & Sunglasses", sub: "Computer Glasses & Frames" },
+      { major: "FOOTWEAR & ACCESSORIES", head: "Bags, Luggage & Wallets", sub: "Trolleys, Backpacks & Wallets" },
+      { major: "ELECTRONICS & GADGETS", head: "Mobiles & Tablets", sub: "Smartphones & 5G Pads" },
+      { major: "ELECTRONICS & GADGETS", head: "Audio & Mobile Tech", sub: "Earbuds TWS, Cables & Powerbanks" },
+      { major: "ELECTRONICS & GADGETS", head: "Computing & Desk Tech", sub: "Laptops, Mice & Keyboards" },
+      { major: "ELECTRONICS & GADGETS", head: "Smart Home & Appliances", sub: "Smart TVs, Trimmers & Kettles" },
+      { major: "BEAUTY & COSMETICS", head: "Skincare & Face Care", sub: "Face Wash, Serums & Sunscreen" },
+      { major: "BEAUTY & COSMETICS", head: "Color Cosmetics & Makeup", sub: "Lipsticks, Foundations & Eyeliners" },
+      { major: "BEAUTY & COSMETICS", head: "Female Hygiene & Wellness", sub: "Pads & Personal Care" },
+      { major: "BEAUTY & COSMETICS", head: "Hair Care & Fragrances", sub: "Shampoos, Hair Oils & Perfumes" },
+      { major: "GROCERY & SUPERMARKET", head: "Daily Staples & Cooking", sub: "Atta, Rice, Oils & Spices" },
+      { major: "GROCERY & SUPERMARKET", head: "Snacks, Beverages & Drinks", sub: "Tea, Coffee, Dry Fruits" },
+      { major: "GROCERY & SUPERMARKET", head: "Household Cleaning & Laundry", sub: "Detergents & Surface Cleaners" },
+      { major: "HOME DECOR & SPIRITUAL", head: "Spiritual, Murti & Frames", sub: "Brass/Resin Idols & Photo Frames" },
+      { major: "HOME DECOR & SPIRITUAL", head: "Wall Decor, Stickers & Art", sub: "Wall Stickers, Clocks & Paintings" },
+      { major: "HOME DECOR & SPIRITUAL", head: "Mirrors & Ambient Lighting", sub: "LED Mirrors & Fairy String Lights" },
+      { major: "FURNITURE & STUDY SETUP", head: "Study & Work-From-Home", sub: "Study Tables, Laptop Desks & Chairs" },
+      { major: "FURNITURE & STUDY SETUP", head: "Living & Bedroom Furniture", sub: "Shoe Racks, Coffee Tables & Bedside" },
+      { major: "FURNITURE & STUDY SETUP", head: "Home Furnishings", sub: "Bedsheets, Curtains & Pillows" },
+      { major: "VALUE COMBOS & HAMPERS", head: "Gift & Multi-Item Combos", sub: "Grooming Combos & Festival Hampers" },
+      { major: "DIGITAL & EDUCATION", head: "Academic & Career Notes", sub: "Commerce Notes, CBSE Guides & B.Com" }
+    ];
+    try {
+      const raw = localStorage.getItem('ss_master_categories');
+      return raw ? JSON.parse(raw) : defaultCats;
+    } catch (e) {
+      return defaultCats;
+    }
+  }
 
+  function saveMasterCategories(cats) {
+    try {
+      localStorage.setItem('ss_master_categories', JSON.stringify(cats));
+    } catch (e) {}
+  }
+
+  // Stock Store - AUTO PURGE OLD DUMMY DATA (PRD-101, 102, 103)
   function getStockStore() {
     try {
-      const raw = localStorage.getItem('ss_owner_products');
-      return raw ? JSON.parse(raw) : [];
+      let raw = localStorage.getItem('ss_owner_products');
+      if (!raw) return [];
+      let items = JSON.parse(raw);
+      // Auto-filter out old dummy products
+      const cleanItems = items.filter(i => i.id !== 'PRD-101' && i.id !== 'PRD-102' && i.id !== 'PRD-103' && i.salePrice !== undefined);
+      if (cleanItems.length !== items.length) {
+        localStorage.setItem('ss_owner_products', JSON.stringify(cleanItems));
+      }
+      return cleanItems;
     } catch (e) {
       return [];
     }
@@ -66,21 +88,19 @@
     } catch (e) {}
   }
 
-  // Gallery images temporary storage for upload session
   let uploadedPhotos = [];
 
   window.initOwnerStock = function () {
     const container = document.getElementById('view-stock');
     if (!container) return;
 
-    // Browser History Handling for Natural Back Navigation
     function pushScreenState(screenName) {
       history.pushState({ stockScreen: screenName }, '', `#stock-${screenName}`);
     }
 
     window.onpopstate = function (event) {
       if (!event.state || !event.state.stockScreen) {
-        renderLevel1();
+        renderLevel1(false);
       } else {
         const s = event.state.stockScreen;
         if (s === 'lvl1') renderLevel1(false);
@@ -95,21 +115,21 @@
     };
 
     // ==========================================
-    // SCREEN 1: LEVEL 1 (2 BADE SQUARE BUTTONS)
+    // SCREEN 1: LEVEL 1 (2 BADE BUTTONS)
     // ==========================================
     function renderLevel1(pushState = true) {
       if (pushState) pushScreenState('lvl1');
 
       container.innerHTML = `
         <div style="min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 20px 10px;">
-          <button type="button" id="btnGoProductHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28); transition: transform 0.2s;">
+          <button type="button" id="btnGoProductHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28);">
             <span style="font-size: 44px;">📦</span>
-            <span style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">Product Add</span>
+            <span style="font-size: 20px; font-weight: 800; color: #ffffff;">Product Add</span>
           </button>
 
-          <button type="button" id="btnGoEbookHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28); transition: transform 0.2s;">
+          <button type="button" id="btnGoEbookHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28);">
             <span style="font-size: 44px;">📚</span>
-            <span style="font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">Ebook Add</span>
+            <span style="font-size: 20px; font-weight: 800; color: #ffffff;">Ebook Add</span>
           </button>
         </div>
       `;
@@ -119,7 +139,7 @@
     }
 
     // ==========================================
-    // SCREEN 2: PRODUCT ADD (3 SQUARE BUTTONS)
+    // SCREEN 2: PRODUCT ADD (3 BUTTONS)
     // ==========================================
     function renderProductHub(pushState = true) {
       if (pushState) pushScreenState('product-hub');
@@ -157,11 +177,12 @@
     }
 
     // ==========================================
-    // SCREEN 3: A. STOCK ADD (FORM WITH PHOTO EDIT & AI)
+    // SCREEN 3: A. STOCK ADD (CUSTOM CATEGORY + PHOTO ADD ENGINE)
     // ==========================================
     function renderStockAdd(pushState = true) {
       if (pushState) pushScreenState('stock-add');
       uploadedPhotos = [];
+      const masterCats = getMasterCategories();
 
       container.innerHTML = `
         <div class="f-card" style="margin-bottom: 20px;">
@@ -187,13 +208,31 @@
             <input type="text" id="inpDesc" placeholder="e.g., 100% Original Brand item. 7-day return policy by store." style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:13px; color:#2b1810;" />
           </div>
 
-          <!-- Master Category Dropdown -->
-          <div style="margin-bottom: 12px;">
-            <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Master Category Allocation *</label>
-            <select id="selCategory" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:12.5px; color:#2b1810;">
-              ${MASTER_CATEGORIES.map(c => `
-                <option value="${c.major} > ${c.head} >${c.sub}">
-                  [${c.major}] ${c.head} —${c.sub}
+          <!-- Galti 1 Fix: 3 Manual Inputs (Major, Head, Sub) + Existing Quick Select Dropdown -->
+          <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 8px;">Master Category Allocation *</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Major Head (Division)</label>
+                <input type="text" id="inpCustomMajor" placeholder="e.g., FASHION & APPAREL" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Head (Department)</label>
+                <input type="text" id="inpCustomHead" placeholder="e.g., Men's Wear" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Sub Head</label>
+                <input type="text" id="inpCustomSub" placeholder="e.g., Tops, Bottoms & Ethnic" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              </div>
+            </div>
+
+            <label style="font-size: 11px; font-weight: 700; color: #785a46;">OR Select from Already Saved Categories:</label>
+            <select id="selCategory" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px; color:#2b1810; margin-top:4px;">
+              <option value="">-- Choose Existing Category --</option>
+              ${masterCats.map((c, i) => `
+                <option value="${i}">
+                  [${c.major}] ${c.head} ➔${c.sub}
                 </option>
               `).join('')}
             </select>
@@ -215,30 +254,36 @@
             </div>
           </div>
 
-          <!-- Gallery Photos (Min 3, Max 14) + Edit Suite -->
+          <!-- Galti 2 Fix: Multi-Photo Addition with Dedicated [ + Add Photo ] Button -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-              <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Upload Gallery Images (Min 3, Max 14 Photos) *</label>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Gallery Images (Min 3, Max 14 Photos) *</label>
               <span id="txtPhotoCount" style="font-size: 11px; font-weight: 700; color: #a82020;">0 / 14 selected (Minimum 3 required)</span>
             </div>
-            <input type="file" id="inpGalleryFiles" multiple accept="image/*" style="width:100%; font-size:12px; margin-bottom:8px;" />
-            
-            <!-- Photo Preview Grid & Live Editor -->
-            <div id="galleryPreviewBox" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px;"></div>
-            
+
+            <!-- Single Hidden Input triggered multiple times without overwriting -->
+            <input type="file" id="inpSinglePhotoPicker" accept="image/*" style="display:none;" />
+            <button type="button" class="btn-action-sm btn-blue" id="btnPickPhoto" style="padding: 8px 14px; margin-bottom: 10px;">
+              📷 + Add Photo from Gallery
+            </button>
+
+            <!-- Photo Grid -->
+            <div id="galleryPreviewBox" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;"></div>
+
+            <!-- Photo Edit Filter Panel -->
             <div id="imageEditorPanel" style="display: none; background: #fbf8f3; border: 1px solid #dfcfbc; border-radius: 8px; padding: 10px; margin-top: 8px;">
-              <div style="font-size: 11.5px; font-weight: 800; color: #3b2219; margin-bottom: 6px;">🎨 Adjust & Edit Selected Photo</div>
+              <div style="font-size: 11.5px; font-weight: 800; color: #3b2219; margin-bottom: 6px;">🎨 Filter & Style Selected Photo</div>
               <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                 <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="none">Normal</button>
-                <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="contrast(1.3) brightness(1.1)">Vibrant Clear</button>
+                <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="contrast(1.3) brightness(1.1)">Clear Bright</button>
                 <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="grayscale(100%)">B&W</button>
                 <button type="button" class="btn-action-sm btn-gold btn-filter" data-filter="sepia(60%)">Warm Retro</button>
-                <button type="button" class="btn-action-sm btn-green" id="btnApplyEditor">✓ Save Photo Edits</button>
+                <button type="button" class="btn-action-sm btn-green" id="btnApplyEditor">✓ Done</button>
               </div>
             </div>
           </div>
 
-          <!-- Merchant Store & Affiliate Link -->
+          <!-- Merchant & Affiliate Link -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
             <div>
               <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Merchant Store</label>
@@ -288,7 +333,7 @@
             </div>
           </div>
 
-          <!-- Staff Identity Validation Lock (Publish Button remains disabled until filled) -->
+          <!-- Staff Identity Validation Lock -->
           <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
             <div style="font-size: 12px; font-weight: 800; color: #6b3e26; margin-bottom: 6px;">🔒 Staff Audit Lock (Mandatory to Enable Publish)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -304,6 +349,21 @@
           </button>
         </div>
       `;
+
+      // Category sync: If dropdown chosen, populate 3 text boxes
+      const selCat = document.getElementById('selCategory');
+      const inMaj = document.getElementById('inpCustomMajor');
+      const inHd = document.getElementById('inpCustomHead');
+      const inSub = document.getElementById('inpCustomSub');
+
+      selCat.onchange = function () {
+        if (this.value !== "") {
+          const item = masterCats[Number(this.value)];
+          inMaj.value = item.major;
+          inHd.value = item.head;
+          inSub.value = item.sub;
+        }
+      };
 
       // Discount Auto-calculator
       const saleInp = document.getElementById('inpSale');
@@ -328,38 +388,56 @@
       const boxVar = document.getElementById('boxVariantsInput');
       chkVar.onchange = () => { boxVar.style.display = chkVar.checked ? 'block' : 'none'; };
 
-      // Photo upload & preview with Min 3 Max 14 limit
-      const fileInp = document.getElementById('inpGalleryFiles');
+      // Galti 2 Fix: Add Photo Engine
+      const photoPicker = document.getElementById('inpSinglePhotoPicker');
+      const btnPick = document.getElementById('btnPickPhoto');
       const countTxt = document.getElementById('txtPhotoCount');
       const previewBox = document.getElementById('galleryPreviewBox');
       const editorPanel = document.getElementById('imageEditorPanel');
       let activeEditingIndex = 0;
 
-      fileInp.onchange = function () {
-        const files = Array.from(this.files);
-        if (files.length > 14) {
-          alert('Maximum 14 photos allowed.');
+      btnPick.onclick = () => {
+        if (uploadedPhotos.length >= 14) {
+          alert('Maximum 14 photos limit reached.');
           return;
         }
-        uploadedPhotos = files.map(f => URL.createObjectURL(f));
-        renderPreviews();
+        photoPicker.value = '';
+        photoPicker.click();
       };
 
-      function renderPreviews() {
+      photoPicker.onchange = function () {
+        if (this.files && this.files[0]) {
+          const url = URL.createObjectURL(this.files[0]);
+          uploadedPhotos.push(url);
+          renderPhotoGrid();
+        }
+      };
+
+      function renderPhotoGrid() {
         previewBox.innerHTML = '';
         const count = uploadedPhotos.length;
         countTxt.textContent = `${count} / 14 selected ${count >= 3 ? '(✓ Valid)' : '(Minimum 3 required)'}`;
         countTxt.style.color = count >= 3 ? '#2d6a4f' : '#a82020';
 
         uploadedPhotos.forEach((src, idx) => {
-          const div = document.createElement('div');
-          div.style.cssText = 'position:relative; width:65px; height:65px; border-radius:8px; overflow:hidden; border:2px solid #dfcfbc; cursor:pointer;';
-          div.innerHTML = `<img src="${src}" style="width:100%; height:100%; object-fit:cover;" />`;
-          div.onclick = () => {
-            activeEditingIndex = idx;
-            editorPanel.style.display = 'block';
+          const wrap = document.createElement('div');
+          wrap.style.cssText = 'position:relative; width:75px; height:75px; border-radius:8px; overflow:hidden; border:2px solid #dfcfbc; cursor:pointer;';
+          wrap.innerHTML = `
+            <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:11px; cursor:pointer;" data-del="${idx}">✕</button>
+          `;
+          wrap.onclick = (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+              activeEditingIndex = idx;
+              editorPanel.style.display = 'block';
+            }
           };
-          previewBox.appendChild(div);
+          wrap.querySelector('button').onclick = (e) => {
+            e.stopPropagation();
+            uploadedPhotos.splice(idx, 1);
+            renderPhotoGrid();
+          };
+          previewBox.appendChild(wrap);
         });
         checkPublishReadiness();
       }
@@ -377,7 +455,7 @@
 
       document.getElementById('btnApplyEditor').onclick = () => {
         editorPanel.style.display = 'none';
-        alert('Photo adjustment saved for publishing.');
+        alert('Photo adjustment saved.');
       };
 
       // AI Scraper link parse
@@ -388,7 +466,7 @@
           return;
         }
         document.getElementById('inpAffLink').value = url;
-        alert('Product Link Mapped! Enter Title, Price and Upload Photos.');
+        alert('Product Link Mapped! Enter Details and Add Photos.');
       };
 
       // Staff Auth Unlocker
@@ -415,16 +493,32 @@
         const mrp = document.getElementById('inpMrp').value.trim();
         const aff = document.getElementById('inpAffLink').value.trim();
 
+        const major = inMaj.value.trim();
+        const head = inHd.value.trim();
+        const sub = inSub.value.trim();
+
         if (!title || !sale || !mrp || !aff) {
           alert('Please fill Title, Sale Price, MRP, and Affiliate Link.');
           return;
+        }
+        if (!major || !head || !sub) {
+          alert('Please specify Major Head, Head, and Sub Head for category.');
+          return;
+        }
+
+        // Auto Save to Master Categories if newly written
+        const currentCats = getMasterCategories();
+        const exists = currentCats.some(c => c.major.toLowerCase() === major.toLowerCase() && c.head.toLowerCase() === head.toLowerCase() && c.sub.toLowerCase() === sub.toLowerCase());
+        if (!exists) {
+          currentCats.push({ major, head, sub });
+          saveMasterCategories(currentCats);
         }
 
         const store = getStockStore();
         const newProduct = {
           id: `PRD-${100 + store.length + 1}`,
           title,
-          category: document.getElementById('selCategory').value,
+          category: `[${major}] ${head} ➔ ${sub}`,
           salePrice: Number(sale),
           mrpPrice: Number(mrp),
           discount: discInp.value,
@@ -442,23 +536,13 @@
         store.unshift(newProduct);
         saveStockStore(store);
 
-        // Record into Staff Work Done Ledger
-        try {
-          const staffStore = JSON.parse(localStorage.getItem('ss_owner_staff_store') || '{}');
-          if (staffStore.assignedWork) {
-            let match = staffStore.assignedWork.find(w => w.accessId === sAcc.value.trim());
-            if (match) match.productsAdded = (match.productsAdded || 0) + 1;
-            localStorage.setItem('ss_owner_staff_store', JSON.stringify(staffStore));
-          }
-        } catch (e) {}
-
-        alert(`Success! Product #${newProduct.id} is now Live on Customer Portal.`);
+        alert(`Success! Product #${newProduct.id} published to customer portal and category saved.`);
         renderProductHub(false);
       };
     }
 
-     // ==========================================
-    // SCREEN 4: B. STOCK REMOVE & SEARCH HUB
+    // ==========================================
+    // SCREEN 4: B. STOCK REMOVE (ZERO DUMMY DATA PURGED)
     // ==========================================
     function renderStockRemove(pushState = true) {
       if (pushState) pushScreenState('stock-remove');
@@ -468,19 +552,19 @@
         <div class="f-card" style="margin-bottom: 20px;">
           <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">B. Stock Remove & Status Control</h3>
 
-          <!-- Top Search Bar -->
+          <!-- Search Bar -->
           <div style="margin-bottom: 16px;">
             <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Search by Product Link, Name or ID</label>
             <input type="text" id="inpSearchDeals" placeholder="Paste product link or type name..." style="width:100%; background:#ffffff; border:1.5px solid #dfcfbc; padding:10px; border-radius:8px; font-size:13px; color:#2b1810;" />
           </div>
 
-          <!-- Category Counts Data Strip -->
+          <!-- Category Counts Strip -->
           <div style="background: #ffffff; border: 1px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
-            <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 6px;">Live Deals Distribution Across Categories:</div>
-            <div id="categorySummaryStrip" style="font-size: 12px; color: #785a46;">Total Products: <b>${store.length}</b></div>
+            <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 4px;">Live Catalog Summary:</div>
+            <div id="categorySummaryStrip" style="font-size: 12px; color: #785a46;">Total Real Products: <b>${store.length}</b></div>
           </div>
 
-          <!-- Staff Edit Authorization Box -->
+          <!-- Staff Edit Verification -->
           <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
             <div style="font-size: 11.5px; font-weight: 800; color: #6b3e26; margin-bottom: 4px;">Staff Edit Verification (Mandatory for Status Change)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -490,7 +574,7 @@
             </div>
           </div>
 
-          <!-- Live Inventory Table -->
+          <!-- Real Inventory Table (Zero Dummies) -->
           <div class="table-responsive-box">
             <table class="f-table">
               <thead>
@@ -517,8 +601,9 @@
           list = list.filter(p => (p.title + p.id + p.affLink).toLowerCase().includes(filterText.toLowerCase()));
         }
 
+        // Clean Empty State
         if (list.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#785a46;">No live products found in catalog.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No live products found in catalog. Add a deal in Stock Add to view here.</td></tr>`;
           return;
         }
 
@@ -566,18 +651,19 @@
       drawTable();
     }
 
-    // ==========================================
-    // SCREEN 5: C. INVENTORY MANAGEMENT (CATEGORY CONTROLLER)
+     // ==========================================
+    // SCREEN 5: C. INVENTORY MANAGEMENT
     // ==========================================
     function renderInventoryMgmt(pushState = true) {
       if (pushState) pushScreenState('inventory-mgmt');
+      const cats = getMasterCategories();
 
       container.innerHTML = `
         <div class="f-card" style="margin-bottom: 20px;">
           <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">C. Master Inventory & Category Management</h3>
-          <p style="font-size: 12.5px; color: #785a46; margin-bottom: 14px;">Define major heads, sub heads, and allocate products manually.</p>
+          <p style="font-size: 12.5px; color: #785a46; margin-bottom: 14px;">Define major heads, sub heads, and allocate products.</p>
 
-          <!-- Add New Head / Sub-Head Panel -->
+          <!-- Add New Category Head -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
             <div style="font-size: 13px; font-weight: 800; color: #3b2219; margin-bottom: 8px;">➕ Create Custom Category Head</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
@@ -588,7 +674,7 @@
             <button type="button" class="btn-action-sm btn-green" id="btnSaveCustomHead" style="padding: 8px 14px;">Save to Master Categories ✓</button>
           </div>
 
-          <!-- Master Schedule Overview Table -->
+          <!-- Master Categories Table -->
           <div class="table-responsive-box">
             <table class="f-table">
               <thead>
@@ -600,7 +686,7 @@
                 </tr>
               </thead>
               <tbody id="tblCategoryMasterBody">
-                ${MASTER_CATEGORIES.map((m, i) => `
+                ${cats.map((m, i) => `
                   <tr>
                     <td>${i + 1}</td>
                     <td><b>${m.major}</b></td>
@@ -624,14 +710,15 @@
           return;
         }
 
-        MASTER_CATEGORIES.push({ major: maj, head: hd, sub: sb });
+        cats.push({ major: maj, head: hd, sub: sb });
+        saveMasterCategories(cats);
         alert(`New Category Hierarchy Added: ${maj} > ${hd} > ${sb}`);
         renderInventoryMgmt(false);
       };
     }
 
     // ==========================================
-    // SCREEN 6: EBOOK ADD (2 SQUARE BUTTONS)
+    // SCREEN 6: EBOOK ADD (2 BUTTONS)
     // ==========================================
     function renderEbookHub(pushState = true) {
       if (pushState) pushScreenState('ebook-hub');
@@ -700,7 +787,6 @@
             <input type="url" id="inpEbDrive" placeholder="https://drive.google.com/..." style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12.5px;" />
           </div>
 
-          <!-- Staff Identity Lock -->
           <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
             <div style="font-size: 11.5px; font-weight: 800; color: #6b3e26; margin-bottom: 4px;">Staff Audit ID (Mandatory)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -804,7 +890,6 @@
       });
     }
 
-    // Start with Screen 1 (Level 1)
     renderLevel1(true);
   };
 })();
