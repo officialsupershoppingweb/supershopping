@@ -1,11 +1,11 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK: STOCK MODULE (PRODUCT & EBOOK ENGINE)
+   SUPER SHOPPING - FOUNDER DESK: STOCK MODULE (ZERO DUMMY DATA ENGINE)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // Local storage cache for live catalog items
+  // Real items only - No dummy entries
   function getStockItems() {
     try {
       return JSON.parse(localStorage.getItem('ss_owner_products') || '[]');
@@ -20,23 +20,14 @@
     } catch (e) {}
   }
 
-  // Pre-seed sample deals if empty
-  if (getStockItems().length === 0) {
-    saveStockItems([
-      { id: 'PRD-101', title: 'Men Slim Fit Denim Jeans', category: 'Fashion / Clothing', price: 699, mrp: 1899, store: 'Amazon', status: 'active', publishedBy: 'Rahul (MEM-STF-101)' },
-      { id: 'PRD-102', title: 'Wireless Bluetooth Earbuds TWS', category: 'Electronics / Gadgets', price: 899, mrp: 2999, store: 'Flipkart', status: 'active', publishedBy: 'Vikas (MEM-STF-102)' },
-      { id: 'PRD-103', title: 'Hydrating Face Wash 100ml', category: 'Beauty / Personal Care', price: 249, mrp: 499, store: 'Myntra', status: 'paused', publishedBy: 'Nitish (Founder)' }
-    ]);
-  }
-
   window.initOwnerStock = function () {
     const container = document.getElementById('view-stock');
     if (!container) return;
 
     container.innerHTML = `
       <div style="margin-bottom: 16px;">
-        <h2 style="font-size: 19px; font-weight: 800; color: #f8fafc; margin-bottom: 4px;">Stock & Catalog Engine</h2>
-        <p style="font-size: 12.5px; color: #94a3b8;">Manage deals, AI scrapers, stock status, and E-books.</p>
+        <h2 style="font-size: 19px; font-weight: 800; color: #3b2219; margin-bottom: 4px;">Stock & Catalog Engine</h2>
+        <p style="font-size: 12.5px; color: #785a46;">Add, control, and publish real catalog products and E-books.</p>
       </div>
 
       <!-- MAIN TABS (PRODUCT ADD / EBOOK ADD) -->
@@ -56,25 +47,28 @@
 
         <!-- 1. Stock Add Sub-Page -->
         <div id="subViewStockAdd" class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 12px;">Add Product Deal (Smart Auto-Scraper)</h4>
+          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 12px;">Add Product Deal (Smart Auto-Scraper)</h4>
           
           <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-            <input type="url" id="inpScraperUrl" placeholder="Paste Amazon / Flipkart / Myntra Deal URL..." style="flex: 1; background: #0b0f19; border: 1.5px solid #1e293b; padding: 10px; border-radius: 8px; color: #fff; font-size: 13px;" />
-            <button type="button" class="btn-action-sm btn-gold" id="btnRunScraper" style="padding: 10px 14px; background: #f59e0b; color: #000; font-weight: 700;">⚡ Fetch AI</button>
+            <input type="url" id="inpScraperUrl" placeholder="Paste Amazon / Flipkart / Myntra Deal URL..." style="flex: 1; background: #ffffff; border: 1.5px solid #dfcfbc; padding: 10px; border-radius: 8px; color: #2b1810; font-size: 13px;" />
+            <button type="button" class="btn-action-sm btn-gold" id="btnRunScraper" style="padding: 10px 14px; font-weight: 700;">⚡ Fetch AI</button>
           </div>
 
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <label style="font-size: 11px; color: #94a3b8;">Product Title / Name *</label>
-              <input type="text" id="inpProdTitle" placeholder="Short Product Name" style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
+              <label style="font-size: 11px; font-weight: 700; color: #785a46;">Product Title / Name *</label>
+              <input type="text" id="inpProdTitle" placeholder="Real Product Name" style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
             </div>
             <div>
-              <label style="font-size: 11px; color: #94a3b8;">Category *</label>
-              <select id="selProdCategory" style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;">
+              <label style="font-size: 11px; font-weight: 700; color: #785a46;">Category *</label>
+              <select id="selProdCategory" style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;">
                 <option value="Fashion / Clothing">Fashion / Clothing</option>
                 <option value="Electronics / Gadgets">Electronics / Gadgets</option>
                 <option value="Beauty / Personal Care">Beauty / Personal Care</option>
                 <option value="Footwear">Footwear</option>
+                <option value="Grocery & Supermarket">Grocery & Supermarket</option>
+                <option value="Home Decor & Spiritual">Home Decor & Spiritual</option>
+                <option value="Furniture & Study Setup">Furniture & Study Setup</option>
                 <option value="General Household">General Household</option>
               </select>
             </div>
@@ -82,41 +76,42 @@
 
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <label style="font-size: 11px; color: #94a3b8;">Sale Price (₹) *</label>
-              <input type="number" id="inpSalePrice" placeholder="499" style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
+              <label style="font-size: 11px; font-weight: 700; color: #785a46;">Sale Price (₹) *</label>
+              <input type="number" id="inpSalePrice" placeholder="e.g. 499" style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
             </div>
             <div>
-              <label style="font-size: 11px; color: #94a3b8;">MRP (₹) *</label>
-              <input type="number" id="inpRegularPrice" placeholder="1299" style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
+              <label style="font-size: 11px; font-weight: 700; color: #785a46;">MRP (₹) *</label>
+              <input type="number" id="inpRegularPrice" placeholder="e.g. 1299" style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
             </div>
             <div>
-              <label style="font-size: 11px; color: #94a3b8;">Merchant Store</label>
-              <select id="selStore" style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;">
+              <label style="font-size: 11px; font-weight: 700; color: #785a46;">Merchant Store</label>
+              <select id="selStore" style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;">
                 <option value="Amazon">Amazon</option>
                 <option value="Flipkart">Flipkart</option>
                 <option value="Myntra">Myntra</option>
                 <option value="Ajio">Ajio</option>
+                <option value="Other Store">Other Store</option>
               </select>
             </div>
           </div>
 
           <div style="margin-bottom: 10px;">
-            <label style="font-size: 11px; color: #94a3b8;">Primary Image URL *</label>
-            <input type="url" id="inpImageUrl" placeholder="https://image-link.jpg" style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
+            <label style="font-size: 11px; font-weight: 700; color: #785a46;">Primary Image URL *</label>
+            <input type="url" id="inpImageUrl" placeholder="https://..." style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
           </div>
 
           <div style="margin-bottom: 14px;">
-            <label style="font-size: 11px; color: #94a3b8;">Affiliate Redirection URL *</label>
-            <input type="url" id="inpAffiliateUrl" placeholder="https://amzn.to/affiliate-tag..." style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
+            <label style="font-size: 11px; font-weight: 700; color: #785a46;">Affiliate Redirection URL *</label>
+            <input type="url" id="inpAffiliateUrl" placeholder="https://..." style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
           </div>
 
           <!-- Staff Authorization Barrier -->
-          <div style="background: #0b0f19; border: 1px dashed #f59e0b; border-radius: 8px; padding: 12px; margin-bottom: 14px;">
-            <div style="font-size: 12px; font-weight: 700; color: #f59e0b; margin-bottom: 6px;">🔒 Staff / Publisher Audit Identity (Mandatory)</div>
+          <div style="background: #ffffff; border: 1.5px dashed var(--choc-accent); border-radius: 8px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 800; color: var(--choc-accent); margin-bottom: 6px;">🔒 Staff / Publisher Audit Identity (Mandatory)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-              <input type="text" id="inpStaffPubName" placeholder="Publisher Name" style="background: #111827; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 12px;" />
-              <input type="text" id="inpStaffPubUserId" placeholder="User ID (MEM-...)" style="background: #111827; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 12px;" />
-              <input type="password" id="inpStaffPubAccessId" placeholder="Access ID Key" style="background: #111827; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 12px;" />
+              <input type="text" id="inpStaffPubName" placeholder="Publisher Name" style="background: #fbf8f3; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 12px;" />
+              <input type="text" id="inpStaffPubUserId" placeholder="User ID (MEM-...)" style="background: #fbf8f3; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 12px;" />
+              <input type="password" id="inpStaffPubAccessId" placeholder="Access ID Key" style="background: #fbf8f3; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 12px;" />
             </div>
           </div>
 
@@ -127,8 +122,8 @@
 
         <!-- 2. Stock Control Sub-Page -->
         <div id="subViewStockRemove" class="f-card" style="display: none;">
-          <h4 style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">Stock Control & Search Hub</h4>
-          <input type="text" id="inpSearchProduct" placeholder="Search by deal title, ID or merchant link..." style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 10px; border-radius: 8px; color: #fff; font-size: 13px; margin-bottom: 14px;" />
+          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 10px;">Stock Control & Search Hub</h4>
+          <input type="text" id="inpSearchProduct" placeholder="Search by deal title, ID or merchant..." style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 10px; border-radius: 8px; color: #2b1810; font-size: 13px; margin-bottom: 14px;" />
 
           <div class="table-responsive-box">
             <table class="f-table">
@@ -148,34 +143,34 @@
           </div>
         </div>
 
-        <!-- 3. Inventory Sub-Page (Placeholder) -->
+        <!-- 3. Inventory Sub-Page (Clean placeholder) -->
         <div id="subViewStockInv" class="f-card" style="display: none;">
-          <h4 style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 6px;">Inventory Management</h4>
-          <p style="font-size: 12.5px; color: #94a3b8;">Reserved for advanced SKU sync and scheduled deal tracking.</p>
+          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 6px;">Inventory Management</h4>
+          <p style="font-size: 12.5px; color: #785a46;">Reserved space for inventory status tracking.</p>
         </div>
       </div>
 
       <!-- SECTION B: E-BOOKS MANAGER -->
       <div id="stockEbooksSection" style="display: none;">
         <div class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #f8fafc; margin-bottom: 10px;">Publish New E-Book / Study Notes</h4>
+          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 10px;">Publish New E-Book / Study Notes</h4>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-            <input type="text" id="inpEbookTitle" placeholder="E-Book Title (e.g., Class 12 Commerce)" style="background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
-            <select id="selEbookCategory" style="background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;">
+            <input type="text" id="inpEbookTitle" placeholder="E-Book Title (e.g., Class 12 Commerce)" style="background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
+            <select id="selEbookCategory" style="background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;">
               <option value="Class 11-12 Commerce">Class 11-12 Commerce</option>
               <option value="B.Com Degree">B.Com Degree</option>
               <option value="Business & Marketing">Business & Marketing</option>
             </select>
           </div>
           <div style="margin-bottom: 10px;">
-            <input type="url" id="inpEbookDriveLink" placeholder="Direct Google Drive PDF Secure Link..." style="width: 100%; background: #0b0f19; border: 1px solid #1e293b; padding: 8px; border-radius: 6px; color: #fff; font-size: 13px;" />
+            <input type="url" id="inpEbookDriveLink" placeholder="Direct Google Drive PDF Secure Link..." style="width: 100%; background: #ffffff; border: 1px solid #dfcfbc; padding: 8px; border-radius: 6px; color: #2b1810; font-size: 13px;" />
           </div>
           <button type="button" class="btn-action-sm btn-green" id="btnPublishEbook" style="width: 100%; padding: 11px; font-size: 13.5px; justify-content: center;">Publish E-Book 📚</button>
         </div>
       </div>
     `;
 
-    // Tab Switching Logic (Products vs Ebooks)
+    // Tab Switching
     const tabProducts = document.getElementById('tabBtnProducts');
     const tabEbooks = document.getElementById('tabBtnEbooks');
     const secProducts = document.getElementById('stockProductsSection');
@@ -195,7 +190,7 @@
       secEbooks.style.display = 'block';
     };
 
-    // Sub-view Switching (Stock Add / Control / Inventory)
+    // Sub-pills
     const btnAdd = document.getElementById('btnSubStockAdd');
     const btnRemove = document.getElementById('btnSubStockRemove');
     const btnInv = document.getElementById('btnSubStockInv');
@@ -212,22 +207,18 @@
     btnRemove.onclick = () => { resetPills(); btnRemove.style.opacity = '1'; viewRemove.style.display = 'block'; renderStockTable(); };
     btnInv.onclick = () => { resetPills(); btnInv.style.opacity = '1'; viewInv.style.display = 'block'; };
 
-    // AI Scraper Simulation
+    // AI Scraper link parse (Populates URL directly)
     document.getElementById('btnRunScraper').onclick = () => {
       const url = document.getElementById('inpScraperUrl').value.trim();
       if (!url) {
-        alert('Please paste a deal URL first.');
+        alert('Please paste a product URL first.');
         return;
       }
-      document.getElementById('inpProdTitle').value = 'Men Regular Fit Solid Casual Shirt';
-      document.getElementById('inpSalePrice').value = '499';
-      document.getElementById('inpRegularPrice').value = '1499';
-      document.getElementById('inpImageUrl').value = 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500';
       document.getElementById('inpAffiliateUrl').value = url;
-      alert('AI Auto-Fill Completed: Title, Price, Discount and Image populated!');
+      alert('Link mapped! Please enter the real Product Name, Price, and Image.');
     };
 
-    // Render Stock Control Table
+    // Render Table (Zero Dummy Data)
     function renderStockTable(filter = '') {
       const tbody = document.getElementById('stockCatalogTableBody');
       if (!tbody) return;
@@ -235,16 +226,22 @@
       if (filter) {
         items = items.filter(i => (i.title + i.id + i.store).toLowerCase().includes(filter.toLowerCase()));
       }
+
+      if (items.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 24px; color:#785a46; font-weight:600;">No products in catalog. Add a deal to start.</td></tr>`;
+        return;
+      }
+
       tbody.innerHTML = items.map((item, index) => `
         <tr>
-          <td><b style="color:#38bdf8;">${item.id}</b></td>
-          <td>${item.title}</td>
-          <td>₹${item.price} <s style="font-size:11px; color:#64748b;">₹${item.mrp}</s></td>
+          <td><b style="color:var(--choc-dark);">${item.id}</b></td>
+          <td><b>${item.title}</b></td>
+          <td>₹${item.price} <s style="font-size:11px; color:#785a46;">₹${item.mrp}</s></td>
           <td>${item.store}</td>
           <td>
             <span class="status-badge ${item.status === 'active' ? 'badge-active' : 'badge-pending'}">${item.status.toUpperCase()}</span>
           </td>
-          <td style="font-size:11.5px; color:#94a3b8;">${item.publishedBy}</td>
+          <td style="font-size:11.5px; color:#785a46;">${item.publishedBy}</td>
           <td>
             <button type="button" class="btn-action-sm ${item.status === 'active' ? 'btn-red' : 'btn-green'} btn-toggle-status" data-idx="${index}">
               ${item.status === 'active' ? 'Pause' : 'Activate'}
@@ -268,7 +265,7 @@
       renderStockTable(this.value.trim());
     };
 
-    // Publish New Deal with Staff Auth Validation
+    // Publish Real Deal
     document.getElementById('btnPublishProduct').onclick = () => {
       const title = document.getElementById('inpProdTitle').value.trim();
       const price = document.getElementById('inpSalePrice').value.trim();
@@ -303,10 +300,12 @@
       saveStockItems(all);
 
       alert(`Success! Deal #${newDeal.id} published to customer catalog.`);
-      btnAdd.click();
       document.getElementById('inpProdTitle').value = '';
       document.getElementById('inpSalePrice').value = '';
       document.getElementById('inpRegularPrice').value = '';
+      document.getElementById('inpImageUrl').value = '';
+      document.getElementById('inpAffiliateUrl').value = '';
+      btnRemove.click();
     };
 
     // E-Book Publish
