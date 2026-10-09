@@ -1,18 +1,20 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK MASTER STYLING
+   SUPER SHOPPING - FOUNDER DESK MASTER STYLING (CREAM & CHOCOLATE THEME)
    ========================================================================== */
 
 :root {
-  --bg-main: #0b0f19;
-  --bg-card: #111827;
-  --bg-card-hover: #1f2937;
-  --border-color: #1e293b;
-  --text-main: #f8fafc;
-  --text-sub: #94a3b8;
-  --accent-blue: #0284c7;
-  --accent-green: #22c55e;
-  --accent-red: #ef4444;
-  --accent-gold: #f59e0b;
+  --bg-main: #fbf8f3;          /* Soft Rich Cream */
+  --bg-card: #f4ece1;          /* Warm Cream Container */
+  --bg-card-hover: #ebe0d0;    /* Latte Hover */
+  --border-color: #dfcfbc;     /* Light Cocoa Border */
+  --text-main: #2b1810;        /* Deep Dark Chocolate */
+  --text-sub: #785a46;         /* Milk Chocolate / Mocha */
+  --choc-dark: #3b2219;        /* Dark Cocoa */
+  --choc-accent: #6b3e26;      /* Rich Chocolate Button */
+  --choc-light: #8d5b3d;       /* Warm Caramel / Mocha */
+  --accent-green: #2d6a4f;     /* Deep Sage / Olive Green */
+  --accent-red: #a82020;       /* Crimson Rust */
+  --accent-gold: #c68a4c;      /* Golden Toffee */
 }
 
 * {
@@ -36,7 +38,7 @@ body {
 .gate-overlay {
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at center, #1e293b 0%, #0b0f19 100%);
+  background: radial-gradient(circle at center, #f4ece1 0%, #ebe0d0 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,14 +47,14 @@ body {
 }
 
 .gate-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  padding: 30px 24px;
-  border-radius: 18px;
+  background: #ffffff;
+  border: 1.5px solid var(--border-color);
+  padding: 32px 24px;
+  border-radius: 20px;
   width: 100%;
   max-width: 360px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 15px 35px rgba(59, 34, 25, 0.12);
 }
 
 .gate-icon {
@@ -61,39 +63,39 @@ body {
 }
 
 .gate-card h2 {
-  font-size: 19px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 800;
   margin-bottom: 6px;
-  color: var(--text-main);
+  color: var(--choc-dark);
 }
 
 .gate-card p {
   font-size: 13px;
   color: var(--text-sub);
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .gate-card input {
   width: 100%;
-  background: #0b0f19;
+  background: var(--bg-main);
   border: 1.5px solid var(--border-color);
   padding: 13px 16px;
   border-radius: 10px;
-  color: #fff;
+  color: var(--choc-dark);
   font-size: 16px;
   text-align: center;
   outline: none;
   margin-bottom: 14px;
-  letter-spacing: 2px;
+  font-weight: 600;
 }
 
 .gate-card input:focus {
-  border-color: var(--accent-blue);
+  border-color: var(--choc-accent);
 }
 
 .gate-card button {
   width: 100%;
-  background: var(--accent-blue);
+  background: var(--choc-dark);
   color: #fff;
   border: none;
   padding: 13px;
@@ -110,16 +112,16 @@ body {
 
 .gate-error {
   color: var(--accent-red);
-  font-size: 12px;
+  font-size: 12.5px;
   margin-top: 12px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* --- 2. TOP BAR --- */
 .founder-topbar {
-  background: rgba(17, 24, 39, 0.95);
+  background: rgba(251, 248, 243, 0.96);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1.5px solid var(--border-color);
   padding: 12px 18px;
   display: flex;
   align-items: center;
@@ -143,7 +145,7 @@ body {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 1px;
-  color: var(--text-main);
+  color: var(--choc-dark);
 }
 
 .sub-status {
@@ -152,9 +154,9 @@ body {
 }
 
 .btn-lock-session {
-  background: var(--bg-card-hover);
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  color: var(--text-main);
+  color: var(--choc-dark);
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -182,7 +184,7 @@ body {
   display: block;
 }
 
-/* --- 4. CARDS & GRID SYSTEM --- */
+/* --- 4. CARDS & GRID --- */
 .f-grid-2 {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -195,18 +197,19 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 16px;
+  box-shadow: 0 4px 12px rgba(59, 34, 25, 0.04);
 }
 
 .f-card-metric {
   font-size: 24px;
   font-weight: 800;
   margin: 6px 0 2px 0;
-  color: var(--text-main);
+  color: var(--choc-dark);
 }
 
 .f-card-label {
-  font-size: 12px;
-  font-weight: 600;
+  font-size: 11.5px;
+  font-weight: 700;
   color: var(--text-sub);
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -216,7 +219,7 @@ body {
 .table-responsive-box {
   width: 100%;
   overflow-x: auto;
-  background: var(--bg-card);
+  background: #ffffff;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   margin-top: 12px;
@@ -230,11 +233,11 @@ body {
 }
 
 .f-table th {
-  background: #162032;
-  color: var(--text-sub);
+  background: #f0e6d8;
+  color: var(--choc-dark);
   padding: 12px 14px;
-  font-weight: 600;
-  border-bottom: 1px solid var(--border-color);
+  font-weight: 700;
+  border-bottom: 1.5px solid var(--border-color);
   white-space: nowrap;
 }
 
@@ -249,10 +252,10 @@ body {
   border-bottom: none;
 }
 
-/* --- 6. ACTION BUTTONS & CHIPS --- */
+/* --- 6. BUTTONS & CHIPS --- */
 .btn-action-sm {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 7px 14px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
   border: none;
@@ -260,11 +263,17 @@ body {
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  transition: 0.15s;
 }
 
-.btn-green { background: #15803d; color: #fff; }
-.btn-red { background: #b91c1c; color: #fff; }
-.btn-blue { background: #0369a1; color: #fff; }
+.btn-action-sm:active {
+  transform: scale(0.97);
+}
+
+.btn-blue { background: var(--choc-dark); color: #fff; }
+.btn-green { background: var(--accent-green); color: #fff; }
+.btn-red { background: var(--accent-red); color: #fff; }
+.btn-gold { background: var(--accent-gold); color: #fff; }
 
 .status-badge {
   padding: 3px 8px;
@@ -273,9 +282,9 @@ body {
   font-weight: 700;
 }
 
-.badge-pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
-.badge-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
-.badge-blocked { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+.badge-pending { background: #faeccf; color: #8c5b16; border: 1px solid #e7cb95; }
+.badge-active { background: #d8f3e5; color: #1b683e; border: 1px solid #a6e3c0; }
+.badge-blocked { background: #fde2e2; color: #9f1c1c; border: 1px solid #f8b4b4; }
 
 /* --- 7. BOTTOM NAVIGATION BAR --- */
 .founder-bottom-nav {
@@ -284,9 +293,9 @@ body {
   left: 0;
   width: 100%;
   height: 65px;
-  background: rgba(17, 24, 39, 0.98);
+  background: rgba(251, 248, 243, 0.98);
   backdrop-filter: blur(12px);
-  border-top: 1px solid var(--border-color);
+  border-top: 1.5px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -314,13 +323,14 @@ body {
 
 .f-nav-label {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .f-nav-item.active {
-  color: var(--accent-blue);
+  color: var(--choc-dark);
 }
 
 .f-nav-item.active .f-nav-label {
-  font-weight: 700;
+  font-weight: 800;
+  color: var(--choc-dark);
 }
