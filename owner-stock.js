@@ -748,148 +748,333 @@
     }
 
     // ==========================================
-    // SCREEN 7: 1. ADD EBOOK
+    // SCREEN 7: 1. ADD EBOOK (COVER, CONTENT, COIN/CASH, PDF & AUDIT LOCK)
     // ==========================================
     function renderEbookAdd(pushState = true) {
       if (pushState) pushScreenState('ebook-add');
 
+      const masterCats = getMasterCategories();
+      let ebookCoverPhotos = [];
+      let ebookContentPhotos = [];
+      let ebookPdfFile = null;
+
       container.innerHTML = `
         <div class="f-card" style="margin-bottom: 20px;">
-          <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">1. Add New E-Book</h3>
+          <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 14px; text-transform: uppercase;">1. Add New E-Book</h3>
 
-          <div style="margin-bottom: 10px;">
+          <!-- Book Title -->
+          <div style="margin-bottom: 12px;">
             <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Product Title / Book Name *</label>
-            <input type="text" id="inpEbTitle" placeholder="e.g., Class 12 Commerce Complete Accountancy Notes" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:13px;" />
+            <input type="text" id="inpEbTitle" placeholder="e.g., Class 12 Business Studies with Case Studies" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:13px; color:#2b1810;" />
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;">
-            <div>
-              <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Category</label>
-              <select id="selEbCat" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12.5px;">
-                <option value="Class 11-12 Commerce">Class 11-12 Commerce</option>
-                <option value="B.Com Degree">B.Com Degree</option>
-                <option value="Business & Marketing">Business & Marketing</option>
-              </select>
+          <!-- Category (3 Manual Inputs + Existing Dropdown) -->
+          <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+            <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 8px;">E-Book Category Allocation *</div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Major Head</label>
+                <input type="text" id="inpEbMajor" placeholder="e.g., DIGITAL & EDUCATION" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Head (Department)</label>
+                <input type="text" id="inpEbHead" placeholder="e.g., Class 11-12 Commerce" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              </div>
+              <div>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Sub Head</label>
+                <input type="text" id="inpEbSub" placeholder="e.g., Business Studies Guides" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              </div>
+            </div>
+
+            <label style="font-size: 11px; font-weight: 700; color: #785a46;">OR Select from Saved Categories:</label>
+            <select id="selEbCategory" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px; color:#2b1810; margin-top:4px;">
+              <option value="">-- Choose Existing Category --</option>
+              ${masterCats.map((c, i) => `
+                <option value="${i}">[${c.major}] ${c.head} ➔${c.sub}</option>
+              `).join('')}
+            </select>
+          </div>
+
+          <!-- Pricing Choice: Cash (₹) OR Green Coins -->
+          <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+            <label style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 8px; display:block;">Pricing Method (Choose Cash or Green Coin) *</label>
+            <div style="display: flex; gap: 20px; margin-bottom: 10px;">
+              <label style="font-size: 12.5px; font-weight: 700; color: #2b1810; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="radio" name="ebPriceType" value="cash" checked style="transform: scale(1.2);" /> Real Price (₹)
+              </label>
+              <label style="font-size: 12.5px; font-weight: 700; color: #2d6a4f; display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="radio" name="ebPriceType" value="coins" style="transform: scale(1.2);" /> Green Coins
+              </label>
             </div>
             <div>
-              <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Price (₹)</label>
-              <input type="number" id="inpEbPrice" placeholder="49" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12.5px;" />
+              <input type="number" id="inpEbPriceValue" placeholder="Enter Cash Price in ₹ (e.g., 49)" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:13px; color:#2b1810;" />
             </div>
           </div>
 
-          <div style="margin-bottom: 10px;">
-            <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Index & Content Short Description</label>
-            <textarea id="inpEbDesc" rows="3" placeholder="Overview of index chapters and summary formula sheets..." style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px;"></textarea>
+          <!-- Cover Photos (Min 2, Max 4) -->
+          <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">E-Book Front/Back Cover Photos (Min 2, Max 4) *</label>
+              <span id="txtCoverCount" style="font-size: 11px; font-weight: 700; color: #a82020;">0 / 4 selected (Min 2 required)</span>
+            </div>
+            <input type="file" id="inpCoverPicker" accept="image/*" style="display:none;" />
+            <button type="button" class="btn-action-sm btn-blue" id="btnPickCover" style="padding: 7px 12px; margin-bottom: 8px;">
+              📷 + Add Cover Photo
+            </button>
+            <div id="coverPreviewBox" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
           </div>
 
-          <div style="margin-bottom: 10px;">
-            <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Google Drive Secure PDF Link *</label>
-            <input type="url" id="inpEbDrive" placeholder="https://drive.google.com/..." style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12.5px;" />
+          <!-- Content / Sample Pages (Min 2-3, Max 5) -->
+          <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+              <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Content / Sample Chapter Pages (Min 2-3, Max 5) *</label>
+              <span id="txtContentCount" style="font-size: 11px; font-weight: 700; color: #a82020;">0 / 5 selected (Min 2 required)</span>
+            </div>
+            <input type="file" id="inpContentPicker" accept="image/*" style="display:none;" />
+            <button type="button" class="btn-action-sm btn-gold" id="btnPickContent" style="padding: 7px 12px; margin-bottom: 8px;">
+              📄 + Add Content Page Photo
+            </button>
+            <div id="contentPreviewBox" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
           </div>
 
-          <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
-            <div style="font-size: 11.5px; font-weight: 800; color: #6b3e26; margin-bottom: 4px;">Staff Audit ID (Mandatory)</div>
+          <!-- Index & Short Description -->
+          <div style="margin-bottom: 14px;">
+            <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Index & Content Short Description *</label>
+            <textarea id="inpEbDesc" rows="3" placeholder="Overview of index chapters, formula sheets, assertion-reason topics..." style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:12px; color:#2b1810;"></textarea>
+          </div>
+
+          <!-- PDF Document Direct Upload -->
+          <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
+            <label style="font-size: 11.5px; font-weight: 700; color: #785a46; display:block; margin-bottom:6px;">Upload Full E-Book PDF Document *</label>
+            <input type="file" id="inpPdfFile" accept="application/pdf" style="width:100%; font-size:12px; color:#2b1810;" />
+            <span id="txtPdfStatus" style="font-size: 11px; color:#6b3e26; display:block; margin-top:4px;">No PDF attached yet.</span>
+          </div>
+
+          <!-- Staff Identity Validation Lock (Mandatory) -->
+          <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
+            <div style="font-size: 12px; font-weight: 800; color: #6b3e26; margin-bottom: 6px;">🔒 Staff Audit Lock (Mandatory to Enable Publish)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
-              <input type="text" id="inpEbStaffName" placeholder="Staff Name" style="background:#ffffff; border:1px solid #dfcfbc; padding:6px; border-radius:6px; font-size:12px;" />
-              <input type="text" id="inpEbStaffUid" placeholder="User ID" style="background:#ffffff; border:1px solid #dfcfbc; padding:6px; border-radius:6px; font-size:12px;" />
-              <input type="password" id="inpEbStaffAccess" placeholder="Access ID Key" style="background:#ffffff; border:1px solid #dfcfbc; padding:6px; border-radius:6px; font-size:12px;" />
+              <input type="text" id="inpEbStaffName" placeholder="Staff Name *" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              <input type="text" id="inpEbStaffUid" placeholder="User ID (MEM-...) *" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              <input type="password" id="inpEbStaffAccess" placeholder="Access ID Key *" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px; color:#2b1810;" />
             </div>
           </div>
 
-          <button type="button" class="btn-action-sm btn-green" id="btnPublishEb" style="width:100%; padding:12px; font-size:14px; font-weight:800; justify-content:center;">
+          <!-- Final Publish Button -->
+          <button type="button" class="btn-action-sm btn-green" id="btnPublishEb" disabled style="width:100%; padding:14px; font-size:15px; font-weight:800; justify-content:center; opacity:0.5; cursor:not-allowed;">
             Publish E-Book to Customer Portal 📚
           </button>
         </div>
       `;
 
-      document.getElementById('btnPublishEb').onclick = () => {
-        const title = document.getElementById('inpEbTitle').value.trim();
-        const drive = document.getElementById('inpEbDrive').value.trim();
-        const stName = document.getElementById('inpEbStaffName').value.trim();
-        const stUid = document.getElementById('inpEbStaffUid').value.trim();
-        const stAcc = document.getElementById('inpEbStaffAccess').value.trim();
+      // Category Sync Dropdown
+      const selCat = document.getElementById('selEbCategory');
+      const inMaj = document.getElementById('inpEbMajor');
+      const inHd = document.getElementById('inpEbHead');
+      const inSub = document.getElementById('inpEbSub');
 
-        if (!title || !drive) {
-          alert('Title and PDF drive link are mandatory.');
+      selCat.onchange = function () {
+        if (this.value !== "") {
+          const item = masterCats[Number(this.value)];
+          inMaj.value = item.major;
+          inHd.value = item.head;
+          inSub.value = item.sub;
+        }
+      };
+
+      // Pricing Type Toggle
+      const radioCash = document.querySelector('input[name="ebPriceType"][value="cash"]');
+      const radioCoins = document.querySelector('input[name="ebPriceType"][value="coins"]');
+      const valInput = document.getElementById('inpEbPriceValue');
+
+      function updatePricePlaceholder() {
+        if (radioCoins.checked) {
+          valInput.placeholder = "Enter Green Coins required (e.g., 50 Coins)";
+        } else {
+          valInput.placeholder = "Enter Cash Price in ₹ (e.g., 49)";
+        }
+      }
+      radioCash.onchange = updatePricePlaceholder;
+      radioCoins.onchange = updatePricePlaceholder;
+
+      // Cover Photos Picker
+      const btnPickCover = document.getElementById('btnPickCover');
+      const coverInput = document.getElementById('inpCoverPicker');
+      const coverBox = document.getElementById('coverPreviewBox');
+      const txtCover = document.getElementById('txtCoverCount');
+
+      btnPickCover.onclick = () => {
+        if (ebookCoverPhotos.length >= 4) {
+          alert('Maximum 4 Cover Photos allowed.');
           return;
         }
-        if (!stName || !stUid || !stAcc) {
-          alert('Staff Name, User ID, and Access ID are strictly required.');
+        coverInput.value = '';
+        coverInput.click();
+      };
+
+      coverInput.onchange = function () {
+        if (this.files && this.files[0]) {
+          ebookCoverPhotos.push(URL.createObjectURL(this.files[0]));
+          renderCovers();
+        }
+      };
+
+      function renderCovers() {
+        coverBox.innerHTML = '';
+        const c = ebookCoverPhotos.length;
+        txtCover.textContent = `${c} / 4 selected ${c >= 2 ? '(✓ Valid)' : '(Min 2 required)'}`;
+        txtCover.style.color = c >= 2 ? '#2d6a4f' : '#a82020';
+
+        ebookCoverPhotos.forEach((src, idx) => {
+          const w = document.createElement('div');
+          w.style.cssText = 'position:relative; width:65px; height:80px; border-radius:6px; overflow:hidden; border:2px solid #dfcfbc;';
+          w.innerHTML = `
+            <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer;" data-del="${idx}">✕</button>
+          `;
+          w.querySelector('button').onclick = () => {
+            ebookCoverPhotos.splice(idx, 1);
+            renderCovers();
+          };
+          coverBox.appendChild(w);
+        });
+        checkEbookReady();
+      }
+
+      // Content Photos Picker
+      const btnPickContent = document.getElementById('btnPickContent');
+      const contentInput = document.getElementById('inpContentPicker');
+      const contentBox = document.getElementById('contentPreviewBox');
+      const txtContent = document.getElementById('txtContentCount');
+
+      btnPickContent.onclick = () => {
+        if (ebookContentPhotos.length >= 5) {
+          alert('Maximum 5 Content/Sample Pages allowed.');
           return;
+        }
+        contentInput.value = '';
+        contentInput.click();
+      };
+
+      contentInput.onchange = function () {
+        if (this.files && this.files[0]) {
+          ebookContentPhotos.push(URL.createObjectURL(this.files[0]));
+          renderContents();
+        }
+      };
+
+      function renderContents() {
+        contentBox.innerHTML = '';
+        const c = ebookContentPhotos.length;
+        txtContent.textContent = `${c} / 5 selected ${c >= 2 ? '(✓ Valid)' : '(Min 2 required)'}`;
+        txtContent.style.color = c >= 2 ? '#2d6a4f' : '#a82020';
+
+        ebookContentPhotos.forEach((src, idx) => {
+          const w = document.createElement('div');
+          w.style.cssText = 'position:relative; width:65px; height:80px; border-radius:6px; overflow:hidden; border:2px solid #dfcfbc;';
+          w.innerHTML = `
+            <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer;" data-del="${idx}">✕</button>
+          `;
+          w.querySelector('button').onclick = () => {
+            ebookContentPhotos.splice(idx, 1);
+            renderContents();
+          };
+          contentBox.appendChild(w);
+        });
+        checkEbookReady();
+      }
+
+      // PDF Document Upload
+      const pdfInput = document.getElementById('inpPdfFile');
+      const txtPdf = document.getElementById('txtPdfStatus');
+
+      pdfInput.onchange = function () {
+        if (this.files && this.files[0]) {
+          ebookPdfFile = this.files[0].name;
+          txtPdf.textContent = `✓ PDF Ready: ${ebookPdfFile}`;
+          txtPdf.style.color = '#2d6a4f';
+        } else {
+          ebookPdfFile = null;
+          txtPdf.textContent = 'No PDF attached yet.';
+          txtPdf.style.color = '#6b3e26';
+        }
+        checkEbookReady();
+      };
+
+      // Staff Validation & Publish Enabler
+      const sName = document.getElementById('inpEbStaffName');
+      const sUid = document.getElementById('inpEbStaffUid');
+      const sAcc = document.getElementById('inpEbStaffAccess');
+      const pubBtn = document.getElementById('btnPublishEb');
+
+      function checkEbookReady() {
+        const staffFilled = sName.value.trim() && sUid.value.trim() && sAcc.value.trim();
+        const coversOk = ebookCoverPhotos.length >= 2;
+        const contentOk = ebookContentPhotos.length >= 2;
+        const pdfOk = ebookPdfFile !== null;
+
+        const isReady = staffFilled && coversOk && contentOk && pdfOk;
+        pubBtn.disabled = !isReady;
+        pubBtn.style.opacity = isReady ? '1' : '0.5';
+        pubBtn.style.cursor = isReady ? 'pointer' : 'not-allowed';
+      }
+
+      sName.oninput = checkEbookReady;
+      sUid.oninput = checkEbookReady;
+      sAcc.oninput = checkEbookReady;
+
+      // Final Publish Action
+      pubBtn.onclick = () => {
+        const title = document.getElementById('inpEbTitle').value.trim();
+        const major = inMaj.value.trim();
+        const head = inHd.value.trim();
+        const sub = inSub.value.trim();
+        const val = valInput.value.trim();
+        const desc = document.getElementById('inpEbDesc').value.trim();
+
+        if (!title || !major || !head || !sub || !val || !desc) {
+          alert('Please fill Book Title, Categories, Price, and Index Description.');
+          return;
+        }
+
+        // Auto Save to Master Categories
+        const exists = masterCats.some(c => c.major.toLowerCase() === major.toLowerCase() && c.head.toLowerCase() === head.toLowerCase() && c.sub.toLowerCase() === sub.toLowerCase());
+        if (!exists) {
+          masterCats.push({ major, head, sub });
+          saveMasterCategories(masterCats);
         }
 
         const ebooks = getEbookStore();
         ebooks.unshift({
           id: `EBK-${100 + ebooks.length + 1}`,
           title,
-          category: document.getElementById('selEbCat').value,
-          price: document.getElementById('inpEbPrice').value || 49,
-          driveLink: drive,
+          category: `[${major}] ${head} ➔ ${sub}`,
+          priceType: radioCoins.checked ? 'Coins' : 'INR',
+          priceValue: Number(val),
+          description: desc,
+          coverPhotos: ebookCoverPhotos,
+          contentSamplePages: ebookContentPhotos,
+          pdfDocName: ebookPdfFile,
           status: 'active',
-          publishedBy: `${stName} (${stUid})`
+          publishedBy: `${sName.value.trim()} (${sUid.value.trim()})`,
+          accessKey: sAcc.value.trim(),
+          datePublished: new Date().toLocaleString()
         });
         saveEbookStore(ebooks);
 
-        alert(`E-Book "${title}" Published successfully!`);
+        // Update Staff work count
+        try {
+          const staffStore = JSON.parse(localStorage.getItem('ss_owner_staff_store') || '{}');
+          if (staffStore.assignedWork) {
+            let match = staffStore.assignedWork.find(w => w.accessId === sAcc.value.trim());
+            if (match) match.ebooksAdded = (match.ebooksAdded || 0) + 1;
+            localStorage.setItem('ss_owner_staff_store', JSON.stringify(staffStore));
+          }
+        } catch (e) {}
+
+        alert(`Success! E-Book "${title}" is now published.`);
         renderEbookHub(false);
       };
     }
-
-    // ==========================================
-    // SCREEN 8: 2. REMOVE / EDIT EBOOK
-    // ==========================================
-    function renderEbookEdit(pushState = true) {
-      if (pushState) pushScreenState('ebook-edit');
-      const ebooks = getEbookStore();
-
-      container.innerHTML = `
-        <div class="f-card" style="margin-bottom: 20px;">
-          <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">2. Remove / Edit E-Books</h3>
-
-          <div class="table-responsive-box">
-            <table class="f-table">
-              <thead>
-                <tr>
-                  <th>E-Book ID</th>
-                  <th>Title</th>
-                  <th>Price</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${ebooks.length === 0
-                  ? '<tr><td colspan="5" style="text-align:center; padding:24px; color:#785a46;">No E-Books published yet.</td></tr>'
-                  : ebooks.map((eb, idx) => `
-                    <tr>
-                      <td><b style="color:#0284c7;">${eb.id}</b></td>
-                      <td><b>${eb.title}</b></td>
-                      <td>₹${eb.price}</td>
-                      <td><span class="status-badge ${eb.status === 'active' ? 'badge-active' : 'badge-pending'}">${eb.status.toUpperCase()}</span></td>
-                      <td>
-                        <button type="button" class="btn-action-sm ${eb.status === 'active' ? 'btn-red' : 'btn-green'} btn-toggle-eb" data-idx="${idx}">
-                          ${eb.status === 'active' ? 'Pause' : 'Activate'}
-                        </button>
-                      </td>
-                    </tr>
-                  `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-
-      container.querySelectorAll('.btn-toggle-eb').forEach(btn => {
-        btn.onclick = function () {
-          const idx = Number(this.getAttribute('data-idx'));
-          const all = getEbookStore();
-          all[idx].status = all[idx].status === 'active' ? 'paused' : 'active';
-          saveEbookStore(all);
-          renderEbookEdit(false);
-        };
-      });
-    }
-
-    renderLevel1(true);
-  };
-})();
