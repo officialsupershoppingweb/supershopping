@@ -1,11 +1,11 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK: STOCK MODULE (ACCURATE WORKFLOW ENGINE)
+   SUPER SHOPPING - FOUNDER DESK: STOCK MODULE (FULL COMPLETE ENGINE)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  // Master Categories Dynamic Storage
+  // 1. MASTER CATEGORIES STORE
   function getMasterCategories() {
     const defaultCats = [
       { major: "FASHION & APPAREL", head: "Men's Wear", sub: "Men Tops, Bottoms & Ethnic" },
@@ -50,18 +50,17 @@
     } catch (e) {}
   }
 
-  // Stock Store - AUTO PURGE OLD DUMMY DATA (PRD-101, 102, 103)
+  // 2. PRODUCT STORE (ZERO DUMMY DATA PURGE)
   function getStockStore() {
     try {
       let raw = localStorage.getItem('ss_owner_products');
       if (!raw) return [];
       let items = JSON.parse(raw);
-      // Auto-filter out old dummy products
-      const cleanItems = items.filter(i => i.id !== 'PRD-101' && i.id !== 'PRD-102' && i.id !== 'PRD-103' && i.salePrice !== undefined);
-      if (cleanItems.length !== items.length) {
-        localStorage.setItem('ss_owner_products', JSON.stringify(cleanItems));
+      const clean = items.filter(i => i.id !== 'PRD-101' && i.id !== 'PRD-102' && i.id !== 'PRD-103' && i.salePrice !== undefined);
+      if (clean.length !== items.length) {
+        localStorage.setItem('ss_owner_products', JSON.stringify(clean));
       }
-      return cleanItems;
+      return clean;
     } catch (e) {
       return [];
     }
@@ -73,6 +72,7 @@
     } catch (e) {}
   }
 
+  // 3. EBOOK STORE
   function getEbookStore() {
     try {
       const raw = localStorage.getItem('ss_owner_ebooks');
@@ -88,7 +88,11 @@
     } catch (e) {}
   }
 
-  let uploadedPhotos = [];
+  // Temporary State
+  let uploadedProductPhotos = [];
+  let uploadedCoverPhotos = [];
+  let uploadedContentPhotos = [];
+  let uploadedEbookPdfName = null;
 
   window.initOwnerStock = function () {
     const container = document.getElementById('view-stock');
@@ -122,12 +126,12 @@
 
       container.innerHTML = `
         <div style="min-height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; padding: 20px 10px;">
-          <button type="button" id="btnGoProductHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28);">
+          <button type="button" id="btnGoProductHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28); transition: transform 0.2s;">
             <span style="font-size: 44px;">📦</span>
             <span style="font-size: 20px; font-weight: 800; color: #ffffff;">Product Add</span>
           </button>
 
-          <button type="button" id="btnGoEbookHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28);">
+          <button type="button" id="btnGoEbookHub" class="stock-square-card" style="width: 260px; height: 180px; background: #0284c7; border: none; border-radius: 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; cursor: pointer; box-shadow: 0 16px 32px rgba(2, 132, 199, 0.28); transition: transform 0.2s;">
             <span style="font-size: 44px;">📚</span>
             <span style="font-size: 20px; font-weight: 800; color: #ffffff;">Ebook Add</span>
           </button>
@@ -139,7 +143,7 @@
     }
 
     // ==========================================
-    // SCREEN 2: PRODUCT ADD (3 BUTTONS)
+    // SCREEN 2: PRODUCT ADD (3 BADE BUTTONS)
     // ==========================================
     function renderProductHub(pushState = true) {
       if (pushState) pushScreenState('product-hub');
@@ -177,18 +181,17 @@
     }
 
     // ==========================================
-    // SCREEN 3: A. STOCK ADD (CUSTOM CATEGORY + PHOTO ADD ENGINE)
+    // SCREEN 3: A. STOCK ADD (FORM + AUDIT LOCK)
     // ==========================================
     function renderStockAdd(pushState = true) {
       if (pushState) pushScreenState('stock-add');
-      uploadedPhotos = [];
+      uploadedProductPhotos = [];
       const masterCats = getMasterCategories();
 
       container.innerHTML = `
         <div class="f-card" style="margin-bottom: 20px;">
           <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 14px; text-transform: uppercase;">A. Stock Add Portal</h3>
 
-          <!-- Smart Auto Scraper -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
             <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">⚡ Smart Auto-Scraper & AI Auto-Fill</label>
             <div style="display: flex; gap: 8px; margin-top: 6px;">
@@ -197,7 +200,6 @@
             </div>
           </div>
 
-          <!-- Product Identity -->
           <div style="margin-bottom: 12px;">
             <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Product Title / Name *</label>
             <input type="text" id="inpTitle" placeholder="e.g., Men Slim Fit Denim Jeans" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:13px; color:#2b1810;" />
@@ -208,13 +210,13 @@
             <input type="text" id="inpDesc" placeholder="e.g., 100% Original Brand item. 7-day return policy by store." style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:13px; color:#2b1810;" />
           </div>
 
-          <!-- Galti 1 Fix: 3 Manual Inputs (Major, Head, Sub) + Existing Quick Select Dropdown -->
+          <!-- Category Allocation: 3 Boxes + Dropdown -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
             <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 8px;">Master Category Allocation *</div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
               <div>
-                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Major Head (Division)</label>
+                <label style="font-size: 11px; font-weight: 700; color: #785a46;">Major Head</label>
                 <input type="text" id="inpCustomMajor" placeholder="e.g., FASHION & APPAREL" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
               </div>
               <div>
@@ -231,14 +233,11 @@
             <select id="selCategory" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:8px; border-radius:6px; font-size:12px; color:#2b1810; margin-top:4px;">
               <option value="">-- Choose Existing Category --</option>
               ${masterCats.map((c, i) => `
-                <option value="${i}">
-                  [${c.major}] ${c.head} ➔${c.sub}
-                </option>
+                <option value="${i}">[${c.major}] ${c.head} ➔ ${c.sub}</option>
               `).join('')}
             </select>
           </div>
 
-          <!-- Pricing & Auto Discount -->
           <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 12px;">
             <div>
               <label style="font-size: 11px; font-weight: 700; color: #785a46;">Sale Price (₹) *</label>
@@ -254,36 +253,21 @@
             </div>
           </div>
 
-          <!-- Galti 2 Fix: Multi-Photo Addition with Dedicated [ + Add Photo ] Button -->
+          <!-- Multi-Photo Gallery Upload -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Gallery Images (Min 3, Max 14 Photos) *</label>
               <span id="txtPhotoCount" style="font-size: 11px; font-weight: 700; color: #a82020;">0 / 14 selected (Minimum 3 required)</span>
             </div>
 
-            <!-- Single Hidden Input triggered multiple times without overwriting -->
             <input type="file" id="inpSinglePhotoPicker" accept="image/*" style="display:none;" />
             <button type="button" class="btn-action-sm btn-blue" id="btnPickPhoto" style="padding: 8px 14px; margin-bottom: 10px;">
               📷 + Add Photo from Gallery
             </button>
 
-            <!-- Photo Grid -->
-            <div id="galleryPreviewBox" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 8px;"></div>
-
-            <!-- Photo Edit Filter Panel -->
-            <div id="imageEditorPanel" style="display: none; background: #fbf8f3; border: 1px solid #dfcfbc; border-radius: 8px; padding: 10px; margin-top: 8px;">
-              <div style="font-size: 11.5px; font-weight: 800; color: #3b2219; margin-bottom: 6px;">🎨 Filter & Style Selected Photo</div>
-              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="none">Normal</button>
-                <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="contrast(1.3) brightness(1.1)">Clear Bright</button>
-                <button type="button" class="btn-action-sm btn-blue btn-filter" data-filter="grayscale(100%)">B&W</button>
-                <button type="button" class="btn-action-sm btn-gold btn-filter" data-filter="sepia(60%)">Warm Retro</button>
-                <button type="button" class="btn-action-sm btn-green" id="btnApplyEditor">✓ Done</button>
-              </div>
-            </div>
+            <div id="galleryPreviewBox" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
           </div>
 
-          <!-- Merchant & Affiliate Link -->
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
             <div>
               <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Merchant Store</label>
@@ -301,7 +285,6 @@
             </div>
           </div>
 
-          <!-- Dynamic Measurement Variants & Badges -->
           <div style="background:#ffffff; border:1px solid #dfcfbc; border-radius:8px; padding:12px; margin-bottom:14px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
               <span style="font-size:12px; font-weight:700; color:#3b2219;">Has Dynamic Variants / Sizes?</span>
@@ -309,7 +292,7 @@
             </div>
             <div id="boxVariantsInput" style="display:none; margin-top:8px;">
               <label style="font-size:11px; color:#785a46;">Size / Volume Chips (Comma separated)</label>
-              <input type="text" id="inpVariantsList" placeholder="e.g., 28, 30, 32, 34 OR S, M, L, XL OR 50ml, 100ml" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
+              <input type="text" id="inpVariantsList" placeholder="e.g., 28, 30, 32, 34 OR S, M, L, XL" style="width:100%; background:#fbf8f3; border:1px solid #dfcfbc; padding:7px; border-radius:6px; font-size:12px; color:#2b1810;" />
             </div>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:8px; margin-top:10px;">
@@ -333,7 +316,7 @@
             </div>
           </div>
 
-          <!-- Staff Identity Validation Lock -->
+          <!-- Staff Audit Identity Barrier -->
           <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
             <div style="font-size: 12px; font-weight: 800; color: #6b3e26; margin-bottom: 6px;">🔒 Staff Audit Lock (Mandatory to Enable Publish)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -343,14 +326,13 @@
             </div>
           </div>
 
-          <!-- Final Publish Button -->
           <button type="button" class="btn-action-sm btn-green" id="btnPublishProduct" disabled style="width: 100%; padding: 14px; font-size: 15px; font-weight: 800; justify-content: center; opacity: 0.5; cursor: not-allowed;">
             Publish Product to Customer Portal ⚡
           </button>
         </div>
       `;
 
-      // Category sync: If dropdown chosen, populate 3 text boxes
+      // Category Sync
       const selCat = document.getElementById('selCategory');
       const inMaj = document.getElementById('inpCustomMajor');
       const inHd = document.getElementById('inpCustomHead');
@@ -365,7 +347,7 @@
         }
       };
 
-      // Discount Auto-calculator
+      // Discount Calc
       const saleInp = document.getElementById('inpSale');
       const mrpInp = document.getElementById('inpMrp');
       const discInp = document.getElementById('inpDiscount');
@@ -383,21 +365,18 @@
       saleInp.oninput = calcDisc;
       mrpInp.oninput = calcDisc;
 
-      // Variants Checkbox
       const chkVar = document.getElementById('chkVariants');
       const boxVar = document.getElementById('boxVariantsInput');
       chkVar.onchange = () => { boxVar.style.display = chkVar.checked ? 'block' : 'none'; };
 
-      // Galti 2 Fix: Add Photo Engine
+      // Photo Picker Engine
       const photoPicker = document.getElementById('inpSinglePhotoPicker');
       const btnPick = document.getElementById('btnPickPhoto');
       const countTxt = document.getElementById('txtPhotoCount');
       const previewBox = document.getElementById('galleryPreviewBox');
-      const editorPanel = document.getElementById('imageEditorPanel');
-      let activeEditingIndex = 0;
 
       btnPick.onclick = () => {
-        if (uploadedPhotos.length >= 14) {
+        if (uploadedProductPhotos.length >= 14) {
           alert('Maximum 14 photos limit reached.');
           return;
         }
@@ -407,58 +386,33 @@
 
       photoPicker.onchange = function () {
         if (this.files && this.files[0]) {
-          const url = URL.createObjectURL(this.files[0]);
-          uploadedPhotos.push(url);
-          renderPhotoGrid();
+          uploadedProductPhotos.push(URL.createObjectURL(this.files[0]));
+          renderPhotos();
         }
       };
 
-      function renderPhotoGrid() {
+      function renderPhotos() {
         previewBox.innerHTML = '';
-        const count = uploadedPhotos.length;
+        const count = uploadedProductPhotos.length;
         countTxt.textContent = `${count} / 14 selected ${count >= 3 ? '(✓ Valid)' : '(Minimum 3 required)'}`;
         countTxt.style.color = count >= 3 ? '#2d6a4f' : '#a82020';
 
-        uploadedPhotos.forEach((src, idx) => {
+        uploadedProductPhotos.forEach((src, idx) => {
           const wrap = document.createElement('div');
-          wrap.style.cssText = 'position:relative; width:75px; height:75px; border-radius:8px; overflow:hidden; border:2px solid #dfcfbc; cursor:pointer;';
+          wrap.style.cssText = 'position:relative; width:75px; height:75px; border-radius:8px; overflow:hidden; border:2px solid #dfcfbc;';
           wrap.innerHTML = `
             <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
-            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:11px; cursor:pointer;" data-del="${idx}">✕</button>
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:18px; height:18px; font-size:11px; cursor:pointer;">✕</button>
           `;
-          wrap.onclick = (e) => {
-            if (e.target.tagName !== 'BUTTON') {
-              activeEditingIndex = idx;
-              editorPanel.style.display = 'block';
-            }
-          };
-          wrap.querySelector('button').onclick = (e) => {
-            e.stopPropagation();
-            uploadedPhotos.splice(idx, 1);
-            renderPhotoGrid();
+          wrap.querySelector('button').onclick = () => {
+            uploadedProductPhotos.splice(idx, 1);
+            renderPhotos();
           };
           previewBox.appendChild(wrap);
         });
-        checkPublishReadiness();
+        checkProductPublish();
       }
 
-      // Filter Adjustment Editor
-      document.querySelectorAll('.btn-filter').forEach(btn => {
-        btn.onclick = function () {
-          const f = this.getAttribute('data-filter');
-          const imgs = previewBox.querySelectorAll('img');
-          if (imgs[activeEditingIndex]) {
-            imgs[activeEditingIndex].style.filter = f;
-          }
-        };
-      });
-
-      document.getElementById('btnApplyEditor').onclick = () => {
-        editorPanel.style.display = 'none';
-        alert('Photo adjustment saved.');
-      };
-
-      // AI Scraper link parse
       document.getElementById('btnScrapeAi').onclick = () => {
         const url = document.getElementById('inpDealUrl').value.trim();
         if (!url) {
@@ -475,38 +429,31 @@
       const sAcc = document.getElementById('inpStaffAccess');
       const pubBtn = document.getElementById('btnPublishProduct');
 
-      function checkPublishReadiness() {
-        const ready = sName.value.trim() && sUid.value.trim() && sAcc.value.trim() && uploadedPhotos.length >= 3;
+      function checkProductPublish() {
+        const ready = sName.value.trim() && sUid.value.trim() && sAcc.value.trim() && uploadedProductPhotos.length >= 3;
         pubBtn.disabled = !ready;
         pubBtn.style.opacity = ready ? '1' : '0.5';
         pubBtn.style.cursor = ready ? 'pointer' : 'not-allowed';
       }
 
-      sName.oninput = checkPublishReadiness;
-      sUid.oninput = checkPublishReadiness;
-      sAcc.oninput = checkPublishReadiness;
+      sName.oninput = checkProductPublish;
+      sUid.oninput = checkProductPublish;
+      sAcc.oninput = checkProductPublish;
 
-      // Publish Action
       pubBtn.onclick = () => {
         const title = document.getElementById('inpTitle').value.trim();
         const sale = document.getElementById('inpSale').value.trim();
         const mrp = document.getElementById('inpMrp').value.trim();
         const aff = document.getElementById('inpAffLink').value.trim();
-
         const major = inMaj.value.trim();
         const head = inHd.value.trim();
         const sub = inSub.value.trim();
 
-        if (!title || !sale || !mrp || !aff) {
-          alert('Please fill Title, Sale Price, MRP, and Affiliate Link.');
-          return;
-        }
-        if (!major || !head || !sub) {
-          alert('Please specify Major Head, Head, and Sub Head for category.');
+        if (!title || !sale || !mrp || !aff || !major || !head || !sub) {
+          alert('Please fill all mandatory fields including Major Head, Head, and Sub Head.');
           return;
         }
 
-        // Auto Save to Master Categories if newly written
         const currentCats = getMasterCategories();
         const exists = currentCats.some(c => c.major.toLowerCase() === major.toLowerCase() && c.head.toLowerCase() === head.toLowerCase() && c.sub.toLowerCase() === sub.toLowerCase());
         if (!exists) {
@@ -536,13 +483,13 @@
         store.unshift(newProduct);
         saveStockStore(store);
 
-        alert(`Success! Product #${newProduct.id} published to customer portal and category saved.`);
+        alert(`Success! Product #${newProduct.id} published to customer portal.`);
         renderProductHub(false);
       };
     }
 
     // ==========================================
-    // SCREEN 4: B. STOCK REMOVE (ZERO DUMMY DATA PURGED)
+    // SCREEN 4: B. STOCK REMOVE (ZERO DUMMY)
     // ==========================================
     function renderStockRemove(pushState = true) {
       if (pushState) pushScreenState('stock-remove');
@@ -552,19 +499,16 @@
         <div class="f-card" style="margin-bottom: 20px;">
           <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">B. Stock Remove & Status Control</h3>
 
-          <!-- Search Bar -->
           <div style="margin-bottom: 16px;">
             <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Search by Product Link, Name or ID</label>
             <input type="text" id="inpSearchDeals" placeholder="Paste product link or type name..." style="width:100%; background:#ffffff; border:1.5px solid #dfcfbc; padding:10px; border-radius:8px; font-size:13px; color:#2b1810;" />
           </div>
 
-          <!-- Category Counts Strip -->
           <div style="background: #ffffff; border: 1px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
             <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 4px;">Live Catalog Summary:</div>
             <div id="categorySummaryStrip" style="font-size: 12px; color: #785a46;">Total Real Products: <b>${store.length}</b></div>
           </div>
 
-          <!-- Staff Edit Verification -->
           <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 8px; padding: 10px; margin-bottom: 14px;">
             <div style="font-size: 11.5px; font-weight: 800; color: #6b3e26; margin-bottom: 4px;">Staff Edit Verification (Mandatory for Status Change)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -574,7 +518,6 @@
             </div>
           </div>
 
-          <!-- Real Inventory Table (Zero Dummies) -->
           <div class="table-responsive-box">
             <table class="f-table">
               <thead>
@@ -601,7 +544,6 @@
           list = list.filter(p => (p.title + p.id + p.affLink).toLowerCase().includes(filterText.toLowerCase()));
         }
 
-        // Clean Empty State
         if (list.length === 0) {
           tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No live products found in catalog. Add a deal in Stock Add to view here.</td></tr>`;
           return;
@@ -663,7 +605,6 @@
           <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">C. Master Inventory & Category Management</h3>
           <p style="font-size: 12.5px; color: #785a46; margin-bottom: 14px;">Define major heads, sub heads, and allocate products.</p>
 
-          <!-- Add New Category Head -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
             <div style="font-size: 13px; font-weight: 800; color: #3b2219; margin-bottom: 8px;">➕ Create Custom Category Head</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px;">
@@ -674,7 +615,6 @@
             <button type="button" class="btn-action-sm btn-green" id="btnSaveCustomHead" style="padding: 8px 14px;">Save to Master Categories ✓</button>
           </div>
 
-          <!-- Master Categories Table -->
           <div class="table-responsive-box">
             <table class="f-table">
               <thead>
@@ -712,13 +652,13 @@
 
         cats.push({ major: maj, head: hd, sub: sb });
         saveMasterCategories(cats);
-        alert(`New Category Hierarchy Added: ${maj} > ${hd} > ${sb}`);
+        alert(`New Category Added: ${maj} > ${hd} > ${sb}`);
         renderInventoryMgmt(false);
       };
     }
 
     // ==========================================
-    // SCREEN 6: EBOOK ADD (2 BUTTONS)
+    // SCREEN 6: EBOOK ADD (2 BADE BUTTONS)
     // ==========================================
     function renderEbookHub(pushState = true) {
       if (pushState) pushScreenState('ebook-hub');
@@ -748,27 +688,26 @@
     }
 
     // ==========================================
-    // SCREEN 7: 1. ADD EBOOK (COVER, CONTENT, COIN/CASH, PDF & AUDIT LOCK)
+    // SCREEN 7: 1. ADD EBOOK (COVERS, CONTENT, COIN/CASH, PDF & LOCK)
     // ==========================================
     function renderEbookAdd(pushState = true) {
       if (pushState) pushScreenState('ebook-add');
 
       const masterCats = getMasterCategories();
-      let ebookCoverPhotos = [];
-      let ebookContentPhotos = [];
-      let ebookPdfFile = null;
+      uploadedCoverPhotos = [];
+      uploadedContentPhotos = [];
+      uploadedEbookPdfName = null;
 
       container.innerHTML = `
         <div class="f-card" style="margin-bottom: 20px;">
           <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 14px; text-transform: uppercase;">1. Add New E-Book</h3>
 
-          <!-- Book Title -->
           <div style="margin-bottom: 12px;">
             <label style="font-size: 11.5px; font-weight: 700; color: #785a46;">Product Title / Book Name *</label>
             <input type="text" id="inpEbTitle" placeholder="e.g., Class 12 Business Studies with Case Studies" style="width:100%; background:#ffffff; border:1px solid #dfcfbc; padding:9px; border-radius:6px; font-size:13px; color:#2b1810;" />
           </div>
 
-          <!-- Category (3 Manual Inputs + Existing Dropdown) -->
+          <!-- Category (3 Inputs + Dropdown) -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
             <div style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 8px;">E-Book Category Allocation *</div>
             
@@ -796,7 +735,7 @@
             </select>
           </div>
 
-          <!-- Pricing Choice: Cash (₹) OR Green Coins -->
+          <!-- Price Choice (Cash vs Coins) -->
           <div style="background: #ffffff; border: 1.5px solid #dfcfbc; border-radius: 10px; padding: 12px; margin-bottom: 14px;">
             <label style="font-size: 12px; font-weight: 800; color: #3b2219; margin-bottom: 8px; display:block;">Pricing Method (Choose Cash or Green Coin) *</label>
             <div style="display: flex; gap: 20px; margin-bottom: 10px;">
@@ -851,7 +790,7 @@
             <span id="txtPdfStatus" style="font-size: 11px; color:#6b3e26; display:block; margin-top:4px;">No PDF attached yet.</span>
           </div>
 
-          <!-- Staff Identity Validation Lock (Mandatory) -->
+          <!-- Staff Identity Validation Lock -->
           <div style="background: #fbf8f3; border: 1.5px dashed #6b3e26; border-radius: 10px; padding: 12px; margin-bottom: 16px;">
             <div style="font-size: 12px; font-weight: 800; color: #6b3e26; margin-bottom: 6px;">🔒 Staff Audit Lock (Mandatory to Enable Publish)</div>
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
@@ -868,7 +807,7 @@
         </div>
       `;
 
-      // Category Sync Dropdown
+      // Category Sync
       const selCat = document.getElementById('selEbCategory');
       const inMaj = document.getElementById('inpEbMajor');
       const inHd = document.getElementById('inpEbHead');
@@ -883,7 +822,7 @@
         }
       };
 
-      // Pricing Type Toggle
+      // Pricing Type
       const radioCash = document.querySelector('input[name="ebPriceType"][value="cash"]');
       const radioCoins = document.querySelector('input[name="ebPriceType"][value="coins"]');
       const valInput = document.getElementById('inpEbPriceValue');
@@ -898,14 +837,14 @@
       radioCash.onchange = updatePricePlaceholder;
       radioCoins.onchange = updatePricePlaceholder;
 
-      // Cover Photos Picker
+      // Cover Picker
       const btnPickCover = document.getElementById('btnPickCover');
       const coverInput = document.getElementById('inpCoverPicker');
       const coverBox = document.getElementById('coverPreviewBox');
       const txtCover = document.getElementById('txtCoverCount');
 
       btnPickCover.onclick = () => {
-        if (ebookCoverPhotos.length >= 4) {
+        if (uploadedCoverPhotos.length >= 4) {
           alert('Maximum 4 Cover Photos allowed.');
           return;
         }
@@ -915,26 +854,26 @@
 
       coverInput.onchange = function () {
         if (this.files && this.files[0]) {
-          ebookCoverPhotos.push(URL.createObjectURL(this.files[0]));
+          uploadedCoverPhotos.push(URL.createObjectURL(this.files[0]));
           renderCovers();
         }
       };
 
       function renderCovers() {
         coverBox.innerHTML = '';
-        const c = ebookCoverPhotos.length;
+        const c = uploadedCoverPhotos.length;
         txtCover.textContent = `${c} / 4 selected ${c >= 2 ? '(✓ Valid)' : '(Min 2 required)'}`;
         txtCover.style.color = c >= 2 ? '#2d6a4f' : '#a82020';
 
-        ebookCoverPhotos.forEach((src, idx) => {
+        uploadedCoverPhotos.forEach((src, idx) => {
           const w = document.createElement('div');
           w.style.cssText = 'position:relative; width:65px; height:80px; border-radius:6px; overflow:hidden; border:2px solid #dfcfbc;';
           w.innerHTML = `
             <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
-            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer;" data-del="${idx}">✕</button>
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer;">✕</button>
           `;
           w.querySelector('button').onclick = () => {
-            ebookCoverPhotos.splice(idx, 1);
+            uploadedCoverPhotos.splice(idx, 1);
             renderCovers();
           };
           coverBox.appendChild(w);
@@ -942,14 +881,14 @@
         checkEbookReady();
       }
 
-      // Content Photos Picker
+      // Content Picker
       const btnPickContent = document.getElementById('btnPickContent');
       const contentInput = document.getElementById('inpContentPicker');
       const contentBox = document.getElementById('contentPreviewBox');
       const txtContent = document.getElementById('txtContentCount');
 
       btnPickContent.onclick = () => {
-        if (ebookContentPhotos.length >= 5) {
+        if (uploadedContentPhotos.length >= 5) {
           alert('Maximum 5 Content/Sample Pages allowed.');
           return;
         }
@@ -959,26 +898,26 @@
 
       contentInput.onchange = function () {
         if (this.files && this.files[0]) {
-          ebookContentPhotos.push(URL.createObjectURL(this.files[0]));
+          uploadedContentPhotos.push(URL.createObjectURL(this.files[0]));
           renderContents();
         }
       };
 
       function renderContents() {
         contentBox.innerHTML = '';
-        const c = ebookContentPhotos.length;
+        const c = uploadedContentPhotos.length;
         txtContent.textContent = `${c} / 5 selected ${c >= 2 ? '(✓ Valid)' : '(Min 2 required)'}`;
         txtContent.style.color = c >= 2 ? '#2d6a4f' : '#a82020';
 
-        ebookContentPhotos.forEach((src, idx) => {
+        uploadedContentPhotos.forEach((src, idx) => {
           const w = document.createElement('div');
           w.style.cssText = 'position:relative; width:65px; height:80px; border-radius:6px; overflow:hidden; border:2px solid #dfcfbc;';
           w.innerHTML = `
             <img src="${src}" style="width:100%; height:100%; object-fit:cover;" />
-            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer;" data-del="${idx}">✕</button>
+            <button type="button" style="position:absolute; top:2px; right:2px; background:rgba(168,32,32,0.85); color:#fff; border:none; border-radius:50%; width:16px; height:16px; font-size:10px; cursor:pointer;">✕</button>
           `;
           w.querySelector('button').onclick = () => {
-            ebookContentPhotos.splice(idx, 1);
+            uploadedContentPhotos.splice(idx, 1);
             renderContents();
           };
           contentBox.appendChild(w);
@@ -986,24 +925,24 @@
         checkEbookReady();
       }
 
-      // PDF Document Upload
+      // PDF File Input
       const pdfInput = document.getElementById('inpPdfFile');
       const txtPdf = document.getElementById('txtPdfStatus');
 
       pdfInput.onchange = function () {
         if (this.files && this.files[0]) {
-          ebookPdfFile = this.files[0].name;
-          txtPdf.textContent = `✓ PDF Ready: ${ebookPdfFile}`;
+          uploadedEbookPdfName = this.files[0].name;
+          txtPdf.textContent = `✓ PDF Ready: ${uploadedEbookPdfName}`;
           txtPdf.style.color = '#2d6a4f';
         } else {
-          ebookPdfFile = null;
+          uploadedEbookPdfName = null;
           txtPdf.textContent = 'No PDF attached yet.';
           txtPdf.style.color = '#6b3e26';
         }
         checkEbookReady();
       };
 
-      // Staff Validation & Publish Enabler
+      // Staff Audit Lock Validation
       const sName = document.getElementById('inpEbStaffName');
       const sUid = document.getElementById('inpEbStaffUid');
       const sAcc = document.getElementById('inpEbStaffAccess');
@@ -1011,9 +950,9 @@
 
       function checkEbookReady() {
         const staffFilled = sName.value.trim() && sUid.value.trim() && sAcc.value.trim();
-        const coversOk = ebookCoverPhotos.length >= 2;
-        const contentOk = ebookContentPhotos.length >= 2;
-        const pdfOk = ebookPdfFile !== null;
+        const coversOk = uploadedCoverPhotos.length >= 2;
+        const contentOk = uploadedContentPhotos.length >= 2;
+        const pdfOk = uploadedEbookPdfName !== null;
 
         const isReady = staffFilled && coversOk && contentOk && pdfOk;
         pubBtn.disabled = !isReady;
@@ -1025,7 +964,6 @@
       sUid.oninput = checkEbookReady;
       sAcc.oninput = checkEbookReady;
 
-      // Final Publish Action
       pubBtn.onclick = () => {
         const title = document.getElementById('inpEbTitle').value.trim();
         const major = inMaj.value.trim();
@@ -1039,11 +977,11 @@
           return;
         }
 
-        // Auto Save to Master Categories
-        const exists = masterCats.some(c => c.major.toLowerCase() === major.toLowerCase() && c.head.toLowerCase() === head.toLowerCase() && c.sub.toLowerCase() === sub.toLowerCase());
+        const currentCats = getMasterCategories();
+        const exists = currentCats.some(c => c.major.toLowerCase() === major.toLowerCase() && c.head.toLowerCase() === head.toLowerCase() && c.sub.toLowerCase() === sub.toLowerCase());
         if (!exists) {
-          masterCats.push({ major, head, sub });
-          saveMasterCategories(masterCats);
+          currentCats.push({ major, head, sub });
+          saveMasterCategories(currentCats);
         }
 
         const ebooks = getEbookStore();
@@ -1054,9 +992,9 @@
           priceType: radioCoins.checked ? 'Coins' : 'INR',
           priceValue: Number(val),
           description: desc,
-          coverPhotos: ebookCoverPhotos,
-          contentSamplePages: ebookContentPhotos,
-          pdfDocName: ebookPdfFile,
+          coverPhotos: uploadedCoverPhotos,
+          contentSamplePages: uploadedContentPhotos,
+          pdfDocName: uploadedEbookPdfName,
           status: 'active',
           publishedBy: `${sName.value.trim()} (${sUid.value.trim()})`,
           accessKey: sAcc.value.trim(),
@@ -1064,17 +1002,70 @@
         });
         saveEbookStore(ebooks);
 
-        // Update Staff work count
-        try {
-          const staffStore = JSON.parse(localStorage.getItem('ss_owner_staff_store') || '{}');
-          if (staffStore.assignedWork) {
-            let match = staffStore.assignedWork.find(w => w.accessId === sAcc.value.trim());
-            if (match) match.ebooksAdded = (match.ebooksAdded || 0) + 1;
-            localStorage.setItem('ss_owner_staff_store', JSON.stringify(staffStore));
-          }
-        } catch (e) {}
-
         alert(`Success! E-Book "${title}" is now published.`);
         renderEbookHub(false);
       };
     }
+
+    // ==========================================
+    // SCREEN 8: 2. REMOVE / EDIT EBOOK
+    // ==========================================
+    function renderEbookEdit(pushState = true) {
+      if (pushState) pushScreenState('ebook-edit');
+      const ebooks = getEbookStore();
+
+      container.innerHTML = `
+        <div class="f-card" style="margin-bottom: 20px;">
+          <h3 style="font-size: 16px; font-weight: 800; color: #3b2219; margin-bottom: 12px; text-transform: uppercase;">2. Remove / Edit E-Books</h3>
+
+          <div class="table-responsive-box">
+            <table class="f-table">
+              <thead>
+                <tr>
+                  <th>E-Book ID</th>
+                  <th>Title</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="tblEbookEditBody"></tbody>
+            </table>
+          </div>
+        </div>
+      `;
+
+      const tbody = document.getElementById('tblEbookEditBody');
+      if (ebooks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No E-Books published yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = ebooks.map((eb, idx) => `
+        <tr>
+          <td><b style="color:#0284c7;">${eb.id}</b></td>
+          <td><b>${eb.title}</b></td>
+          <td>${eb.priceType === 'Coins' ? eb.priceValue + ' Coins' : '₹' + eb.priceValue}</td>
+          <td><span class="status-badge ${eb.status === 'active' ? 'badge-active' : 'badge-pending'}">${eb.status.toUpperCase()}</span></td>
+          <td>
+            <button type="button" class="btn-action-sm ${eb.status === 'active' ? 'btn-red' : 'btn-green'} btn-toggle-eb" data-idx="${idx}">
+              ${eb.status === 'active' ? 'Pause' : 'Activate'}
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      tbody.querySelectorAll('.btn-toggle-eb').forEach(btn => {
+        btn.onclick = function () {
+          const idx = Number(this.getAttribute('data-idx'));
+          const all = getEbookStore();
+          all[idx].status = all[idx].status === 'active' ? 'paused' : 'active';
+          saveEbookStore(all);
+          renderEbookEdit(false);
+        };
+      });
+    }
+
+    renderLevel1(true);
+  };
+})();
