@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK: CUSTOMER MANAGEMENT (CRASH-PROOF ENGINE)
+   SUPER SHOPPING - FOUNDER DESK: CUSTOMER MANAGEMENT HUB (FAIL-SAFE + NATIVE BACK)
    ========================================================================== */
 
 (function () {
@@ -41,31 +41,37 @@
     var mount = document.getElementById('view-customer');
     if (!mount) return;
 
-    mount.style.width = '100%';
-    mount.style.maxWidth = '100%';
+    // Isolate customer view display
+    document.querySelectorAll('.f-view').forEach(function(el) {
+      if (el.id !== 'view-customer') {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      }
+    });
+    mount.classList.add('active');
     mount.style.display = 'block';
 
-    var screenHistory = [];
+    // Hardware / Laptop Back Button System
+    var viewHistory = [];
 
-    function render(screenFn) {
-      screenHistory.push(screenFn);
-      screenFn();
+    function pushView(fn, screenName) {
+      viewHistory.push(fn);
+      history.pushState({ panel: 'customer', screen: screenName, idx: viewHistory.length }, '');
+      fn();
     }
 
-    // Keyboard Back (Backspace or Alt+Left)
-    window.onkeydown = function (e) {
-      if ((e.altKey && e.key === 'ArrowLeft') || (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
-        if (screenHistory.length > 1) {
-          e.preventDefault();
-          screenHistory.pop();
-          var prev = screenHistory[screenHistory.length - 1];
-          if (prev) prev();
-        }
+    window.onpopstate = function (e) {
+      if (viewHistory.length > 1) {
+        viewHistory.pop();
+        var prevScreen = viewHistory[viewHistory.length - 1];
+        if (prevScreen) prevScreen();
+      } else {
+        showLevel1();
       }
     };
 
     // -------------------------------------------------------------
-    // LEVEL 1: 6 BADE BLUE CARDS (PHOTO 1)
+    // LEVEL 1: 6 BADE BLUE BUTTONS (PHOTO 1)
     // -------------------------------------------------------------
     function showLevel1() {
       mount.innerHTML = `
@@ -103,16 +109,16 @@
         </div>
       `;
 
-      document.getElementById('cHub1').onclick = function() { render(showClaimsDesk); };
-      document.getElementById('cHub2').onclick = function() { render(showEbookHub); };
-      document.getElementById('cHub3').onclick = function() { render(showRegisterHub); };
-      document.getElementById('cHub4').onclick = function() { render(showVisitorHub); };
-      document.getElementById('cHub5').onclick = function() { render(showClickAnalytics); };
-      document.getElementById('cHub6').onclick = function() { render(showSecurityDesk); };
+      document.getElementById('cHub1').onclick = function() { pushView(showClaimsDesk, 'claims'); };
+      document.getElementById('cHub2').onclick = function() { pushView(showEbookHub, 'ebooks'); };
+      document.getElementById('cHub3').onclick = function() { pushView(showRegisterHub, 'register'); };
+      document.getElementById('cHub4').onclick = function() { pushView(showVisitorHub, 'visitors'); };
+      document.getElementById('cHub5').onclick = function() { pushView(showClickAnalytics, 'clicks'); };
+      document.getElementById('cHub6').onclick = function() { pushView(showSecurityDesk, 'security'); };
     }
 
     // -------------------------------------------------------------
-    // LEVEL 2: CLAIMS DESK (PHOTO 2)
+    // LEVEL 2: CUSTOMER REQUEST CLAIM (PHOTO 2)
     // -------------------------------------------------------------
     function showClaimsDesk() {
       mount.innerHTML = `
@@ -133,8 +139,8 @@
         </div>
       `;
 
-      document.getElementById('btnDeskCash').onclick = function() { render(showCashback6Cards); };
-      document.getElementById('btnDeskCoin').onclick = function() { render(showGreenCoin5Cards); };
+      document.getElementById('btnDeskCash').onclick = function() { pushView(showCashback6Cards, 'cb-stages'); };
+      document.getElementById('btnDeskCoin').onclick = function() { pushView(showGreenCoin5Cards, 'gc-stages'); };
     }
 
     // -------------------------------------------------------------
@@ -157,15 +163,15 @@
         </div>
       `;
 
-      document.getElementById('cbs1').onclick = function() { render(function() { showCbTable(1); }); };
-      document.getElementById('cbs2').onclick = function() { render(function() { showCbTable(2); }); };
-      document.getElementById('cbs3').onclick = function() { render(function() { showCbTable(3); }); };
-      document.getElementById('cbs4').onclick = function() { render(function() { showCbTable(4); }); };
-      document.getElementById('cbs5').onclick = function() { render(function() { showCbTable(5); }); };
-      document.getElementById('cbs6').onclick = function() { render(showCbHistoryHub); };
+      document.getElementById('cbs1').onclick = function() { pushView(function() { showCbStepTable(1); }, 'cb-1'); };
+      document.getElementById('cbs2').onclick = function() { pushView(function() { showCbStepTable(2); }, 'cb-2'); };
+      document.getElementById('cbs3').onclick = function() { pushView(function() { showCbStepTable(3); }, 'cb-3'); };
+      document.getElementById('cbs4').onclick = function() { pushView(function() { showCbStepTable(4); }, 'cb-4'); };
+      document.getElementById('cbs5').onclick = function() { pushView(function() { showCbStepTable(5); }, 'cb-5'); };
+      document.getElementById('cbs6').onclick = function() { pushView(showCbHistoryHub, 'cb-history'); };
     }
 
-    function showCbTable(step) {
+    function showCbStepTable(step) {
       var titles = {
         1: "1. New Request Claim Under 1 to 25 Days",
         2: "2. Under 26 to 50 Days (Verified Desk)",
@@ -224,8 +230,8 @@
           </div>
         </div>
       `;
-      document.getElementById('hC1').onclick = function() { render(function() { showFullTable('A) Completed Cashback Transfers', 'No completed payout records yet.'); }); };
-      document.getElementById('hC2').onclick = function() { render(function() { showFullTable('B) Recycling Bin (Cancelled / Blocked)', 'Recycling bin is clean.'); }); };
+      document.getElementById('hC1').onclick = function() { pushView(function() { showFullTable('A) Completed Cashback Transfers', 'No completed payout records yet.'); }, 'cb-h-c'); };
+      document.getElementById('hC2').onclick = function() { pushView(function() { showFullTable('B) Recycling Bin (Cancelled / Blocked)', 'Recycling bin is clean.'); }, 'cb-h-b'); };
     }
 
     // -------------------------------------------------------------
@@ -247,11 +253,11 @@
         </div>
       `;
 
-      document.getElementById('gcs1').onclick = function() { render(function() { showFullTable('1. Green Coin Requests (48h Audit)', 'No new requests.'); }); };
-      document.getElementById('gcs2').onclick = function() { render(function() { showFullTable('2. Under 1 to 7 Days (Verified)', 'No claims under 1-7 days.'); }); };
-      document.getElementById('gcs3').onclick = function() { render(function() { showFullTable('3. Under 8 to 12 Days (Coin Generated)', 'No claims under 8-12 days.'); }); };
-      document.getElementById('gcs4').onclick = function() { render(function() { showFullTable('4. Final Step', 'No pending final rewards.'); }); };
-      document.getElementById('gcs5').onclick = function() { render(showGreenCoinHistoryHub); };
+      document.getElementById('gcs1').onclick = function() { pushView(function() { showFullTable('1. Green Coin Requests (48h Audit)', 'No new requests.'); }, 'gc-1'); };
+      document.getElementById('gcs2').onclick = function() { pushView(function() { showFullTable('2. Under 1 to 7 Days (Verified)', 'No claims under 1-7 days.'); }, 'gc-2'); };
+      document.getElementById('gcs3').onclick = function() { pushView(function() { showFullTable('3. Under 8 to 12 Days (Coin Generated)', 'No claims under 8-12 days.'); }, 'gc-3'); };
+      document.getElementById('gcs4').onclick = function() { pushView(function() { showFullTable('4. Final Step', 'No pending final rewards.'); }, 'gc-4'); };
+      document.getElementById('gcs5').onclick = function() { pushView(showGreenCoinHistoryHub, 'gc-history'); };
     }
 
     function showGreenCoinHistoryHub() {
@@ -276,9 +282,9 @@
           </div>
         </div>
       `;
-      document.getElementById('gH1').onclick = function() { render(function() { showFullTable('Completed Green Coins', 'No completed coin claims logged.'); }); };
-      document.getElementById('gH2').onclick = function() { render(function() { showFullTable('Recycling Bin (AI Anomaly)', 'No AI auto-rejected records.'); }); };
-      document.getElementById('gH3').onclick = function() { render(function() { showFullTable('Recycling Bin (Manual Rejected)', 'No manual rejected records.'); }); };
+      document.getElementById('gH1').onclick = function() { pushView(function() { showFullTable('Completed Green Coins', 'No completed coin claims logged.'); }, 'gc-h-1'); };
+      document.getElementById('gH2').onclick = function() { pushView(function() { showFullTable('Recycling Bin (AI Anomaly)', 'No AI auto-rejected records.'); }, 'gc-h-2'); };
+      document.getElementById('gH3').onclick = function() { pushView(function() { showFullTable('Recycling Bin (Manual Rejected)', 'No manual rejected records.'); }, 'gc-h-3'); };
     }
 
     // -------------------------------------------------------------
@@ -304,9 +310,9 @@
         </div>
       `;
 
-      document.getElementById('eb1').onclick = function() { render(showEbCashSub); };
-      document.getElementById('eb2').onclick = function() { render(showEbCoinSub); };
-      document.getElementById('eb3').onclick = function() { render(function() { showFullTable('🏦 Bank (Central Green Coin Vault)', 'No transactions in Coin Bank Vault yet.'); }); };
+      document.getElementById('eb1').onclick = function() { pushView(showEbCashSub, 'eb-cash'); };
+      document.getElementById('eb2').onclick = function() { pushView(showEbCoinSub, 'eb-coin'); };
+      document.getElementById('eb3').onclick = function() { pushView(function() { showFullTable('🏦 Bank (Central Green Coin Vault)', 'No transactions in Coin Bank Vault yet.'); }, 'eb-bank'); };
     }
 
     function showEbCashSub() {
@@ -324,10 +330,10 @@
         </div>
       `;
 
-      document.getElementById('ebc1').onclick = function() { render(function() { showFullTable('1. Customer Transfer Details (AI Auto-Delivery)', 'No live E-Book purchase orders yet.'); }); };
-      document.getElementById('ebc2').onclick = function() { render(function() { showFullTable('2. Sales Details & Bank Verification', 'No sales records logged yet.'); }); };
-      document.getElementById('ebc3').onclick = function() { render(function() { showFullTable('3. Failed / Dropped Transactions', 'No failed transactions found.'); }); };
-      document.getElementById('ebc4').onclick = function() { render(function() { showFullTable('4. Financial Ledger Account', 'Ledger is clean for this period.'); }); };
+      document.getElementById('ebc1').onclick = function() { pushView(function() { showFullTable('1. Customer Transfer Details (AI Auto-Delivery)', 'No live E-Book purchase orders yet.'); }, 'eb-c-1'); };
+      document.getElementById('ebc2').onclick = function() { pushView(function() { showFullTable('2. Sales Details & Bank Verification', 'No sales records logged yet.'); }, 'eb-c-2'); };
+      document.getElementById('ebc3').onclick = function() { pushView(function() { showFullTable('3. Failed / Dropped Transactions', 'No failed transactions found.'); }, 'eb-c-3'); };
+      document.getElementById('ebc4').onclick = function() { pushView(function() { showFullTable('4. Financial Ledger Account', 'Ledger is clean for this period.'); }, 'eb-c-4'); };
     }
 
     function showEbCoinSub() {
@@ -345,13 +351,13 @@
         </div>
       `;
 
-      document.getElementById('ebg1').onclick = function() { render(function() { showFullTable('1. Sale By Green Coins (AI Verified)', 'No Green Coin purchases yet.'); }); };
-      document.getElementById('ebg2').onclick = function() { render(function() { showFullTable('2. Green Coin Sales Detail 2', 'No sales records logged yet.'); }); };
-      document.getElementById('ebg3').onclick = function() { render(function() { showFullTable('3. Wrong Transaction Desk', 'No wrong transactions.'); }); };
-      document.getElementById('ebg4').onclick = function() { render(function() { showFullTable('4. Green Coin Transaction Book', 'Transaction book is clean.'); }); };
+      document.getElementById('ebg1').onclick = function() { pushView(function() { showFullTable('1. Sale By Green Coins (AI Verified)', 'No Green Coin purchases yet.'); }, 'eb-g-1'); };
+      document.getElementById('ebg2').onclick = function() { pushView(function() { showFullTable('2. Sales Detail 2', 'No records logged.'); }, 'eb-g-2'); };
+      document.getElementById('ebg3').onclick = function() { pushView(function() { showFullTable('3. Wrong Transaction Desk', 'No wrong transactions.'); }, 'eb-g-3'); };
+      document.getElementById('ebg4').onclick = function() { pushView(function() { showFullTable('4. Green Coin Transaction Book', 'Transaction book is clean.'); }, 'eb-g-4'); };
     }
 
-    // -------------------------------------------------------------
+     // -------------------------------------------------------------
     // REGISTER ID MATRIX
     // -------------------------------------------------------------
     function showRegisterHub() {
@@ -369,10 +375,10 @@
         </div>
       `;
 
-      document.getElementById('rg1').onclick = function() { render(function() { showFullTable('1. Customer Register Detail', 'No registered customer accounts yet.'); }); };
-      document.getElementById('rg2').onclick = function() { render(showReferralSplit); };
-      document.getElementById('rg3').onclick = function() { render(function() { showFullTable('3. Accounts via Referral Code', 'No accounts created via referral code yet.'); }); };
-      document.getElementById('rg4').onclick = function() { render(function() { showFullTable('4. Blocked Customer Database', 'No blocked customer accounts.'); }); };
+      document.getElementById('rg1').onclick = function() { pushView(function() { showFullTable('1. Customer Register Detail', 'No registered customer accounts yet.'); }, 'rg-1'); };
+      document.getElementById('rg2').onclick = function() { pushView(showReferralSplit, 'rg-2'); };
+      document.getElementById('rg3').onclick = function() { pushView(function() { showFullTable('3. Accounts via Referral Code', 'No accounts created via referral code yet.'); }, 'rg-3'); };
+      document.getElementById('rg4').onclick = function() { pushView(function() { showFullTable('4. Blocked Customer Database', 'No blocked customer accounts.'); }, 'rg-4'); };
     }
 
     function showReferralSplit() {
@@ -430,8 +436,8 @@
           </div>
         </div>
       `;
-      document.getElementById('v1').onclick = function() { render(function() { showFullTable('Guest Mode Visitors (Unregistered)', '0 guest visitors logged.'); }); };
-      document.getElementById('v2').onclick = function() { render(function() { showFullTable('Logged In Member Visitors', '0 active members logged.'); }); };
+      document.getElementById('v1').onclick = function() { pushView(function() { showFullTable('Guest Mode Visitors (Unregistered)', '0 guest visitors logged.'); }, 'v-1'); };
+      document.getElementById('v2').onclick = function() { pushView(function() { showFullTable('Logged In Member Visitors', '0 active members logged.'); }, 'v-2'); };
     }
 
     function showClickAnalytics() {
@@ -496,7 +502,8 @@
       `;
     }
 
-    // Direct Initial Start
-    render(showLevel1);
+    // Initial Mount
+    viewHistory = [showLevel1];
+    showLevel1();
   };
 })();
