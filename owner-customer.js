@@ -1,77 +1,44 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK: CUSTOMER MANAGEMENT HUB (FAIL-SAFE + NATIVE BACK)
+   SUPER SHOPPING - FOUNDER DESK: CUSTOMER HUB (CONNECTED TO TABLES)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  function getDB() {
-    try {
-      var d = localStorage.getItem('ss_owner_cust_master_db');
-      return d ? JSON.parse(d) : {
-        cashbackClaims: [], greenCoinClaims: [], cashEbookSales: [], coinEbookSales: [],
-        failedCashOrders: [], failedCoinOrders: [], coinBankVault: [], registeredUsers: [],
-        referralLedger: [], blockedUsers: [], recycleBinCashback: []
-      };
-    } catch (e) {
-      return {
-        cashbackClaims: [], greenCoinClaims: [], cashEbookSales: [], coinEbookSales: [],
-        failedCashOrders: [], failedCoinOrders: [], coinBankVault: [], registeredUsers: [],
-        referralLedger: [], blockedUsers: [], recycleBinCashback: []
-      };
-    }
-  }
-
-  function getFilterBar() {
-    return `
-      <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:14px; align-items:center; background:#ffffff; border:1px solid #dfcfbc; padding:10px 14px; border-radius:10px; width:100%; box-sizing:border-box;">
-        <span style="font-size:12px; font-weight:800; color:#3b2219; margin-right:4px;">📅 Filter:</span>
-        <button type="button" class="btn-action-sm btn-blue" style="padding:5px 12px; font-size:11.5px;">All</button>
-        <button type="button" class="btn-action-sm btn-blue" style="padding:5px 12px; font-size:11.5px; opacity:0.6;">Today</button>
-        <button type="button" class="btn-action-sm btn-blue" style="padding:5px 12px; font-size:11.5px; opacity:0.6;">Tomorrow</button>
-        <button type="button" class="btn-action-sm btn-blue" style="padding:5px 12px; font-size:11.5px; opacity:0.6;">Weekly</button>
-        <button type="button" class="btn-action-sm btn-blue" style="padding:5px 12px; font-size:11.5px; opacity:0.6;">Monthly</button>
-        <button type="button" class="btn-action-sm btn-blue" style="padding:5px 12px; font-size:11.5px; opacity:0.6;">Yearly</button>
-        <input type="date" style="background:#fbf8f3; border:1px solid #dfcfbc; padding:4px 8px; border-radius:6px; font-size:11.5px; color:#2b1810; margin-left:auto;" />
-      </div>
-    `;
-  }
-
   window.initOwnerCustomer = function () {
     var mount = document.getElementById('view-customer');
     if (!mount) return;
 
-    // Isolate customer view display
-    document.querySelectorAll('.f-view').forEach(function(el) {
-      if (el.id !== 'view-customer') {
-        el.classList.remove('active');
-        el.style.display = 'none';
-      }
-    });
-    mount.classList.add('active');
+    mount.style.width = '100%';
+    mount.style.maxWidth = '100%';
     mount.style.display = 'block';
 
-    // Hardware / Laptop Back Button System
-    var viewHistory = [];
+    var screenHistory = [];
 
-    function pushView(fn, screenName) {
-      viewHistory.push(fn);
-      history.pushState({ panel: 'customer', screen: screenName, idx: viewHistory.length }, '');
-      fn();
+    function render(screenFn) {
+      screenHistory.push(screenFn);
+      screenFn();
     }
 
-    window.onpopstate = function (e) {
-      if (viewHistory.length > 1) {
-        viewHistory.pop();
-        var prevScreen = viewHistory[viewHistory.length - 1];
-        if (prevScreen) prevScreen();
-      } else {
-        showLevel1();
+    // Direct Table Page Redirector
+    function openTable(tableKey) {
+      window.location.href = 'customer-tables.html?table=' + tableKey;
+    }
+
+    // Laptop / Keyboard Back Button
+    window.onkeydown = function (e) {
+      if ((e.altKey && e.key === 'ArrowLeft') || (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
+        if (screenHistory.length > 1) {
+          e.preventDefault();
+          screenHistory.pop();
+          var prev = screenHistory[screenHistory.length - 1];
+          if (prev) prev();
+        }
       }
     };
 
     // -------------------------------------------------------------
-    // LEVEL 1: 6 BADE BLUE BUTTONS (PHOTO 1)
+    // LEVEL 1: 6 BADE BLUE CARDS (PHOTO 1)
     // -------------------------------------------------------------
     function showLevel1() {
       mount.innerHTML = `
@@ -109,16 +76,16 @@
         </div>
       `;
 
-      document.getElementById('cHub1').onclick = function() { pushView(showClaimsDesk, 'claims'); };
-      document.getElementById('cHub2').onclick = function() { pushView(showEbookHub, 'ebooks'); };
-      document.getElementById('cHub3').onclick = function() { pushView(showRegisterHub, 'register'); };
-      document.getElementById('cHub4').onclick = function() { pushView(showVisitorHub, 'visitors'); };
-      document.getElementById('cHub5').onclick = function() { pushView(showClickAnalytics, 'clicks'); };
-      document.getElementById('cHub6').onclick = function() { pushView(showSecurityDesk, 'security'); };
+      document.getElementById('cHub1').onclick = function() { render(showClaimsDesk); };
+      document.getElementById('cHub2').onclick = function() { render(showEbookHub); };
+      document.getElementById('cHub3').onclick = function() { render(showRegisterHub); };
+      document.getElementById('cHub4').onclick = function() { render(showVisitorHub); };
+      document.getElementById('cHub5').onclick = function() { openTable('click-analytics'); };
+      document.getElementById('cHub6').onclick = function() { render(showSecurityDesk); };
     }
 
     // -------------------------------------------------------------
-    // LEVEL 2: CUSTOMER REQUEST CLAIM (PHOTO 2)
+    // LEVEL 2: CLAIMS DESK (PHOTO 2)
     // -------------------------------------------------------------
     function showClaimsDesk() {
       mount.innerHTML = `
@@ -139,8 +106,8 @@
         </div>
       `;
 
-      document.getElementById('btnDeskCash').onclick = function() { pushView(showCashback6Cards, 'cb-stages'); };
-      document.getElementById('btnDeskCoin').onclick = function() { pushView(showGreenCoin5Cards, 'gc-stages'); };
+      document.getElementById('btnDeskCash').onclick = function() { render(showCashback6Cards); };
+      document.getElementById('btnDeskCoin').onclick = function() { render(showGreenCoin5Cards); };
     }
 
     // -------------------------------------------------------------
@@ -163,53 +130,13 @@
         </div>
       `;
 
-      document.getElementById('cbs1').onclick = function() { pushView(function() { showCbStepTable(1); }, 'cb-1'); };
-      document.getElementById('cbs2').onclick = function() { pushView(function() { showCbStepTable(2); }, 'cb-2'); };
-      document.getElementById('cbs3').onclick = function() { pushView(function() { showCbStepTable(3); }, 'cb-3'); };
-      document.getElementById('cbs4').onclick = function() { pushView(function() { showCbStepTable(4); }, 'cb-4'); };
-      document.getElementById('cbs5').onclick = function() { pushView(function() { showCbStepTable(5); }, 'cb-5'); };
-      document.getElementById('cbs6').onclick = function() { pushView(showCbHistoryHub, 'cb-history'); };
-    }
-
-    function showCbStepTable(step) {
-      var titles = {
-        1: "1. New Request Claim Under 1 to 25 Days",
-        2: "2. Under 26 to 50 Days (Verified Desk)",
-        3: "3. Under 51 to 75 Days (Income Allocation)",
-        4: "4. Under 76 to 100 Days (Method Review & Confirm)",
-        5: "5. 101 Send Reward (Final Payout Dispatch)"
-      };
-
-      mount.innerHTML = `
-        <div style="width:100%; padding:10px 0;">
-          <div style="background:#ffffff; border:1px solid #dfcfbc; border-radius:10px; padding:12px 18px; margin-bottom:14px;">
-            <h3 style="font-size:16px; font-weight:800; color:#3b2219; margin:0; text-transform:uppercase;">${titles[step]}</h3>
-          </div>
-          ${getFilterBar()}
-          <div style="width:100%; overflow-x:auto; background:#ffffff; border:1px solid #dfcfbc; border-radius:10px;">
-            <table class="f-table" style="width:100%; min-width:1150px;">
-              <thead>
-                <tr>
-                  <th>S.No.</th><th>Date/Time</th><th>User ID</th><th>Name</th><th>Email</th><th>Phone</th>
-                  <th>Product Price</th><th>Product Name</th><th>Proof Doc</th><th>Progress</th>
-                  ${step === 1 ? '<th>Status (Action)</th>' : ''}
-                  ${step === 2 ? '<th>Account</th><th>Status</th>' : ''}
-                  ${step === 3 ? '<th>Income Generated</th><th>Method (UPI/QR)</th><th>Status</th>' : ''}
-                  ${step === 4 ? '<th>Income</th><th>Method</th><th>Status</th><th>Request</th>' : ''}
-                  ${step === 5 ? '<th>Income</th><th>Method</th><th>Action</th><th>Status</th>' : ''}
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="15" style="text-align:center; padding:36px; color:#785a46; font-weight:700;">No live customer claims under this stage right now.</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div style="background:#fbf8f3; border:1px solid #dfcfbc; padding:12px 18px; border-radius:10px; margin-top:14px; display:flex; justify-content:space-between; font-size:13px; font-weight:800; color:#3b2219;">
-            <div>Total Records: 0</div>
-            <div>Total Value: ₹0</div>
-          </div>
-        </div>
-      `;
+      // Direct Table Links
+      document.getElementById('cbs1').onclick = function() { openTable('cb-1'); };
+      document.getElementById('cbs2').onclick = function() { openTable('cb-2'); };
+      document.getElementById('cbs3').onclick = function() { openTable('cb-3'); };
+      document.getElementById('cbs4').onclick = function() { openTable('cb-4'); };
+      document.getElementById('cbs5').onclick = function() { openTable('cb-5'); };
+      document.getElementById('cbs6').onclick = function() { render(showCbHistoryHub); };
     }
 
     function showCbHistoryHub() {
@@ -230,12 +157,12 @@
           </div>
         </div>
       `;
-      document.getElementById('hC1').onclick = function() { pushView(function() { showFullTable('A) Completed Cashback Transfers', 'No completed payout records yet.'); }, 'cb-h-c'); };
-      document.getElementById('hC2').onclick = function() { pushView(function() { showFullTable('B) Recycling Bin (Cancelled / Blocked)', 'Recycling bin is clean.'); }, 'cb-h-b'); };
+      document.getElementById('hC1').onclick = function() { openTable('cb-hist-completed'); };
+      document.getElementById('hC2').onclick = function() { openTable('cb-hist-bin'); };
     }
 
     // -------------------------------------------------------------
-    // GREEN COIN STAGES
+    // LEVEL 3: GREEN COIN 5 BUTTONS
     // -------------------------------------------------------------
     function showGreenCoin5Cards() {
       mount.innerHTML = `
@@ -253,11 +180,11 @@
         </div>
       `;
 
-      document.getElementById('gcs1').onclick = function() { pushView(function() { showFullTable('1. Green Coin Requests (48h Audit)', 'No new requests.'); }, 'gc-1'); };
-      document.getElementById('gcs2').onclick = function() { pushView(function() { showFullTable('2. Under 1 to 7 Days (Verified)', 'No claims under 1-7 days.'); }, 'gc-2'); };
-      document.getElementById('gcs3').onclick = function() { pushView(function() { showFullTable('3. Under 8 to 12 Days (Coin Generated)', 'No claims under 8-12 days.'); }, 'gc-3'); };
-      document.getElementById('gcs4').onclick = function() { pushView(function() { showFullTable('4. Final Step', 'No pending final rewards.'); }, 'gc-4'); };
-      document.getElementById('gcs5').onclick = function() { pushView(showGreenCoinHistoryHub, 'gc-history'); };
+      document.getElementById('gcs1').onclick = function() { openTable('gc-1'); };
+      document.getElementById('gcs2').onclick = function() { openTable('gc-2'); };
+      document.getElementById('gcs3').onclick = function() { openTable('gc-3'); };
+      document.getElementById('gcs4').onclick = function() { openTable('gc-4'); };
+      document.getElementById('gcs5').onclick = function() { render(showGreenCoinHistoryHub); };
     }
 
     function showGreenCoinHistoryHub() {
@@ -282,9 +209,9 @@
           </div>
         </div>
       `;
-      document.getElementById('gH1').onclick = function() { pushView(function() { showFullTable('Completed Green Coins', 'No completed coin claims logged.'); }, 'gc-h-1'); };
-      document.getElementById('gH2').onclick = function() { pushView(function() { showFullTable('Recycling Bin (AI Anomaly)', 'No AI auto-rejected records.'); }, 'gc-h-2'); };
-      document.getElementById('gH3').onclick = function() { pushView(function() { showFullTable('Recycling Bin (Manual Rejected)', 'No manual rejected records.'); }, 'gc-h-3'); };
+      document.getElementById('gH1').onclick = function() { openTable('gc-hist-completed'); };
+      document.getElementById('gH2').onclick = function() { openTable('gc-hist-bin-ai'); };
+      document.getElementById('gH3').onclick = function() { openTable('gc-hist-bin-manual'); };
     }
 
     // -------------------------------------------------------------
@@ -310,9 +237,9 @@
         </div>
       `;
 
-      document.getElementById('eb1').onclick = function() { pushView(showEbCashSub, 'eb-cash'); };
-      document.getElementById('eb2').onclick = function() { pushView(showEbCoinSub, 'eb-coin'); };
-      document.getElementById('eb3').onclick = function() { pushView(function() { showFullTable('🏦 Bank (Central Green Coin Vault)', 'No transactions in Coin Bank Vault yet.'); }, 'eb-bank'); };
+      document.getElementById('eb1').onclick = function() { render(showEbCashSub); };
+      document.getElementById('eb2').onclick = function() { render(showEbCoinSub); };
+      document.getElementById('eb3').onclick = function() { openTable('eb-bank-vault'); };
     }
 
     function showEbCashSub() {
@@ -321,7 +248,7 @@
           <div style="background:#1e3a8a; border:2px solid #172554; border-radius:12px; padding:10px 26px; margin-bottom:28px;">
             <h3 style="font-size:17px; font-weight:900; color:#ffffff; margin:0; text-transform:uppercase;">Sales By Cash (UPI / PG)</h3>
           </div>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 170px)); gap:18px; justify-content:center; width:100%; max-width:580px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 170px); gap:18px; justify-content:center; width:100%; max-width:580px;">
             <button type="button" id="ebc1" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer;">1. CUSTOMER<br/>TRANSFER</button>
             <button type="button" id="ebc2" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer;">2. SALES<br/>DETAILS</button>
             <button type="button" id="ebc3" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer;">3. FAILED<br/>ORDERS</button>
@@ -330,10 +257,10 @@
         </div>
       `;
 
-      document.getElementById('ebc1').onclick = function() { pushView(function() { showFullTable('1. Customer Transfer Details (AI Auto-Delivery)', 'No live E-Book purchase orders yet.'); }, 'eb-c-1'); };
-      document.getElementById('ebc2').onclick = function() { pushView(function() { showFullTable('2. Sales Details & Bank Verification', 'No sales records logged yet.'); }, 'eb-c-2'); };
-      document.getElementById('ebc3').onclick = function() { pushView(function() { showFullTable('3. Failed / Dropped Transactions', 'No failed transactions found.'); }, 'eb-c-3'); };
-      document.getElementById('ebc4').onclick = function() { pushView(function() { showFullTable('4. Financial Ledger Account', 'Ledger is clean for this period.'); }, 'eb-c-4'); };
+      document.getElementById('ebc1').onclick = function() { openTable('eb-cash-trans'); };
+      document.getElementById('ebc2').onclick = function() { openTable('eb-cash-sales'); };
+      document.getElementById('ebc3').onclick = function() { openTable('eb-cash-failed'); };
+      document.getElementById('ebc4').onclick = function() { openTable('eb-cash-ledger'); };
     }
 
     function showEbCoinSub() {
@@ -351,13 +278,13 @@
         </div>
       `;
 
-      document.getElementById('ebg1').onclick = function() { pushView(function() { showFullTable('1. Sale By Green Coins (AI Verified)', 'No Green Coin purchases yet.'); }, 'eb-g-1'); };
-      document.getElementById('ebg2').onclick = function() { pushView(function() { showFullTable('2. Sales Detail 2', 'No records logged.'); }, 'eb-g-2'); };
-      document.getElementById('ebg3').onclick = function() { pushView(function() { showFullTable('3. Wrong Transaction Desk', 'No wrong transactions.'); }, 'eb-g-3'); };
-      document.getElementById('ebg4').onclick = function() { pushView(function() { showFullTable('4. Green Coin Transaction Book', 'Transaction book is clean.'); }, 'eb-g-4'); };
+      document.getElementById('ebg1').onclick = function() { openTable('eb-coin-trans'); };
+      document.getElementById('ebg2').onclick = function() { openTable('eb-coin-sales'); };
+      document.getElementById('ebg3').onclick = function() { openTable('eb-coin-failed'); };
+      document.getElementById('ebg4').onclick = function() { openTable('eb-coin-book'); };
     }
 
-     // -------------------------------------------------------------
+    // -------------------------------------------------------------
     // REGISTER ID MATRIX
     // -------------------------------------------------------------
     function showRegisterHub() {
@@ -375,50 +302,14 @@
         </div>
       `;
 
-      document.getElementById('rg1').onclick = function() { pushView(function() { showFullTable('1. Customer Register Detail', 'No registered customer accounts yet.'); }, 'rg-1'); };
-      document.getElementById('rg2').onclick = function() { pushView(showReferralSplit, 'rg-2'); };
-      document.getElementById('rg3').onclick = function() { pushView(function() { showFullTable('3. Accounts via Referral Code', 'No accounts created via referral code yet.'); }, 'rg-3'); };
-      document.getElementById('rg4').onclick = function() { pushView(function() { showFullTable('4. Blocked Customer Database', 'No blocked customer accounts.'); }, 'rg-4'); };
-    }
-
-    function showReferralSplit() {
-      mount.innerHTML = `
-        <div style="width:100%; padding:10px 0;">
-          <div style="background:#ffffff; border:1px solid #dfcfbc; border-radius:10px; padding:12px 18px; margin-bottom:14px;">
-            <h3 style="font-size:16px; font-weight:800; color:#0284c7; margin:0;">2. CUSTOMER REFERRAL MATCH LEDGER</h3>
-          </div>
-          ${getFilterBar()}
-          <div style="width:100%; overflow-x:auto; background:#ffffff; border:1px solid #dfcfbc; border-radius:10px;">
-            <table class="f-table" style="width:100%; min-width:1400px;">
-              <thead>
-                <tr>
-                  <th colspan="5" style="background:#0284c7; color:#fff; text-align:center;">New User Details (Sky Blue Section)</th>
-                  <th style="background:#000; width:6px; padding:0;"></th>
-                  <th colspan="5" style="background:#ca8a04; color:#fff; text-align:center;">5 Match Rows (Yellow Section)</th>
-                  <th style="background:#000; width:6px; padding:0;"></th>
-                  <th colspan="4" style="background:#db2777; color:#fff; text-align:center;">Referrer Info (Pink Section)</th>
-                  <th style="background:#16a34a; color:#fff; text-align:center;">Transfer Status</th>
-                </tr>
-                <tr>
-                  <th style="color:#0284c7;">S.No.</th><th style="color:#0284c7;">Date/Time</th><th style="color:#0284c7;">User ID</th><th style="color:#0284c7;">Name</th><th style="color:#0284c7;">Email</th>
-                  <th style="background:#000; width:6px; padding:0;"></th>
-                  <th style="color:#ca8a04;">Invite Code</th><th style="color:#ca8a04;">Received Code</th><th style="color:#ca8a04;">Match Status</th><th style="color:#ca8a04;">Coin Inviter (7)</th><th style="color:#ca8a04;">Coin Receiver (4)</th>
-                  <th style="background:#000; width:6px; padding:0;"></th>
-                  <th style="color:#db2777;">Inviter Name</th><th style="color:#db2777;">Inviter User ID</th><th style="color:#db2777;">Inviter Email</th><th style="color:#db2777;">Original Code</th>
-                  <th style="color:#16a34a;">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td colspan="17" style="text-align:center; padding:36px; color:#785a46; font-weight:700;">No referral login logs registered yet.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
+      document.getElementById('rg1').onclick = function() { openTable('reg-cust'); };
+      document.getElementById('rg2').onclick = function() { openTable('reg-ref'); };
+      document.getElementById('rg3').onclick = function() { openTable('reg-login-ref'); };
+      document.getElementById('rg4').onclick = function() { openTable('reg-blocked'); };
     }
 
     // -------------------------------------------------------------
-    // VISITOR, CLICKS & SECURITY
+    // VISITOR COUNT & SECURITY DESK
     // -------------------------------------------------------------
     function showVisitorHub() {
       mount.innerHTML = `
@@ -436,30 +327,8 @@
           </div>
         </div>
       `;
-      document.getElementById('v1').onclick = function() { pushView(function() { showFullTable('Guest Mode Visitors (Unregistered)', '0 guest visitors logged.'); }, 'v-1'); };
-      document.getElementById('v2').onclick = function() { pushView(function() { showFullTable('Logged In Member Visitors', '0 active members logged.'); }, 'v-2'); };
-    }
-
-    function showClickAnalytics() {
-      mount.innerHTML = `
-        <div style="width:100%; padding:10px 0;">
-          <div style="background:#ffffff; border:1px solid #dfcfbc; border-radius:10px; padding:12px 18px; margin-bottom:14px;">
-            <h3 style="font-size:16px; font-weight:800; color:#3b2219; margin:0;">PLATFORM REDIRECTION CLICK ANALYTICS</h3>
-          </div>
-          ${getFilterBar()}
-          <div style="width:100%; overflow-x:auto; background:#ffffff; border:1px solid #dfcfbc; border-radius:10px;">
-            <table class="f-table" style="width:100%; min-width:900px;">
-              <thead><tr><th>Store Platform</th><th>Today Clicks</th><th>Yesterday</th><th>Weekly</th><th>Monthly</th><th>Yearly</th><th>All Time</th></tr></thead>
-              <tbody>
-                <tr><td>Amazon Deals</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><b>0</b></td></tr>
-                <tr><td>Flipkart Deals</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><b>0</b></td></tr>
-                <tr><td>Myntra / Ajio</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><b>0</b></td></tr>
-                <tr><td>Other Affiliate Stores</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td><b>0</b></td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
+      document.getElementById('v1').onclick = function() { openTable('vis-guest'); };
+      document.getElementById('v2').onclick = function() { openTable('vis-member'); };
     }
 
     function showSecurityDesk() {
@@ -485,25 +354,7 @@
       `;
     }
 
-    function showFullTable(title, emptyText) {
-      mount.innerHTML = `
-        <div style="width:100%; padding:10px 0;">
-          <div style="background:#ffffff; border:1px solid #dfcfbc; border-radius:10px; padding:12px 18px; margin-bottom:14px;">
-            <h3 style="font-size:16px; font-weight:800; color:#3b2219; margin:0;">${title}</h3>
-          </div>
-          ${getFilterBar()}
-          <div style="width:100%; overflow-x:auto; background:#ffffff; border:1px solid #dfcfbc; border-radius:10px;">
-            <table class="f-table" style="width:100%; min-width:1100px;">
-              <thead><tr><th>S.No.</th><th>Date/Time</th><th>User ID</th><th>Name</th><th>Email</th><th>Details</th><th>Status</th></tr></thead>
-              <tbody><tr><td colspan="7" style="text-align:center; padding:36px; color:#785a46; font-weight:700;">${emptyText}</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      `;
-    }
-
-    // Initial Mount
-    viewHistory = [showLevel1];
-    showLevel1();
+    // Start
+    render(showLevel1);
   };
 })();
