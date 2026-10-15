@@ -669,9 +669,19 @@
       document.getElementById('feedbackModal').style.display = 'none';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('tableSelector').value = 'cb-5';
-      renderCurrentTable();
+  document.addEventListener('DOMContentLoaded', () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const targetTable = urlParams.get('table');
+
+  if (targetTable && TABLE_SCHEMAS[targetTable]) {
+    currentTableKey = targetTable;
+    document.getElementById('tableSelector').value = targetTable;
+  } else {
+    currentTableKey = 'cb-1';
+    document.getElementById('tableSelector').value = 'cb-1';
+  }
+  renderCurrentTable();
+});
     });
   </script>
 </body>
