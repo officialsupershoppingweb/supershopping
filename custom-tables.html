@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Tables Master Ledger - Founder Desk</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f7f3ed;
+      color: #3b2219;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .top-navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #dfcfbc;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #3b2219;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .breadcrumb {
+      font-size: 13px;
+      color: #785a46;
+    }
+    .breadcrumb span {
+      color: #3b2219;
+      font-weight: 700;
+    }
+    .selector-strip {
+      background: #ffffff;
+      border-bottom: 1px solid #dfcfbc;
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      overflow-x: auto;
+    }
+    .selector-strip label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #3b2219;
+      text-transform: uppercase;
+    }
+    .table-dropdown {
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid #dfcfbc;
+      background: #fbf8f3;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #3b2219;
+      cursor: pointer;
+      outline: none;
+    }
+    .main-viewport {
+      width: 100vw;
+      max-width: 100%;
+      padding: 20px 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-header-block {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .table-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #2b1810;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      width: 180px;
+      color: #2b1810;
+      outline: none;
+    }
+    .date-pill-btn {
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      color: #3b2219;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .date-pill-btn.active, .date-pill-btn:hover {
+      background: #3b2219;
+      color: #ffffff;
+      border-color: #3b2219;
+    }
+    .date-input {
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 12px;
+      color: #2b1810;
+    }
+    .table-container {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(59, 34, 25, 0.05);
+      overflow-x: auto;
+      flex: 1;
+    }
+    table.master-table {
+      width: 100%;
+      min-width: 1200px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    table.master-table thead tr {
+      background-color: #3b2219;
+      color: #ffffff;
+    }
+    table.master-table th {
+      padding: 12px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      border-right: 1px solid #4a2d22;
+      white-space: nowrap;
+    }
+    table.master-table th:last-child {
+      border-right: none;
+    }
+    table.master-table tbody tr {
+      border-bottom: 1px solid #e8decb;
+      transition: background 0.15s;
+    }
+    table.master-table tbody tr:nth-child(odd) {
+      background-color: #fdfbf7;
+    }
+    table.master-table tbody tr:nth-child(even) {
+      background-color: #f4ecdf;
+    }
+    table.master-table td {
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: #331f16;
+      border-right: 1px solid #e8decb;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    table.master-table td:last-child {
+      border-right: none;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #785a46;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .table-summary-bar {
+      background: #ebdcc8;
+      border-top: 1px solid #dfcfbc;
+      padding: 12px 20px;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 800;
+      color: #3b2219;
+    }
+    .btn-chip {
+      background: #3b2219;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-green {
+      background: #15803d;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-red {
+      background: #b91c1c;
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .badge-success {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+    .badge-pending {
+      background: #fef9c3;
+      color: #854d0e;
+      border: 1px solid #fef08a;
+    }
+    .badge-error {
+      background: #fee2e2;
+      color: #b91c1c;
+      border: 1px solid #fecaca;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal-card {
+      background: #ffffff;
+      border: 2px solid #3b2219;
+      border-radius: 14px;
+      padding: 18px 22px;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    .modal-card h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #3b2219;
+      margin-bottom: 8px;
+    }
+    .modal-card p {
+      font-size: 12px;
+      color: #785a46;
+      margin-bottom: 12px;
+    }
+    .modal-card textarea {
+      width: 100%;
+      height: 80px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid #dfcfbc;
+      font-size: 12px;
+      color: #2b1810;
+      outline: none;
+      resize: none;
+      margin-bottom: 14px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-navbar">
+    <div class="top-left">
+      <div class="brand-title">SuperShopping</div>
+      <div class="breadcrumb">Founder Desk &gt; <span id="viewBreadcrumb">Customer Management</span></div>
+    </div>
+  </header>
+
+  <nav class="selector-strip">
+    <label for="tableSelector">Select Table View:</label>
+    <select id="tableSelector" class="table-dropdown" onchange="switchTable(this.value)">
+      <optgroup label="1. Customer Request Claim (Cashback)">
+        <option value="cb-1">1. New Request Claim (1 to 25 Days)</option>
+        <option value="cb-2">2. Under 26 to 50 Days</option>
+        <option value="cb-3">3. Under 51 to 75 Days</option>
+        <option value="cb-4">4. Under 76 to 100 Days</option>
+        <option value="cb-5">5. 101 Send Cashback (100 Days Completed)</option>
+        <option value="cb-hist-completed">6A. History - Completed Cashback</option>
+        <option value="cb-hist-bin">6B. History - Recycling Bin</option>
+      </optgroup>
+      <optgroup label="2. Customer Request Claim (Green Coin)">
+        <option value="gc-1">7. Request For Reward (AI / Manual Audit)</option>
+        <option value="gc-2">8. Under 1 to 7 Days</option>
+        <option value="gc-3">9. Under 8 to 12 Days</option>
+        <option value="gc-4">10. Final Steps (12 Days Completed)</option>
+        <option value="gc-hist-completed">11A. History - Completed Green Coins</option>
+        <option value="gc-hist-bin-ai">11B. History - Recycling Bin (AI)</option>
+        <option value="gc-hist-bin-manual">11C. History - Recycling Bin (Manual)</option>
+      </optgroup>
+      <optgroup label="3. E-Book Purchases (Cash)">
+        <option value="eb-cash-trans">12. Customer Transfer Details</option>
+        <option value="eb-cash-sales">13. Sales Details & Bank Verification</option>
+        <option value="eb-cash-failed">14. Failed / Dropped Transactions</option>
+        <option value="eb-cash-ledger">15. Financial Ledger Account</option>
+      </optgroup>
+      <optgroup label="4. E-Book Purchases (Green Coin & Bank)">
+        <option value="eb-coin-trans">16. Sale By Green Coins</option>
+        <option value="eb-coin-sales">17. Green Coin Sales Detail 2</option>
+        <option value="eb-coin-failed">18. Wrong Transaction Desk</option>
+        <option value="eb-coin-book">19. Green Coin Transaction Book</option>
+        <option value="eb-bank-vault">20. Bank (Central Green Coin Vault)</option>
+      </optgroup>
+      <optgroup label="5. Register ID Matrix">
+        <option value="reg-cust">21. Customer Register Detail</option>
+        <option value="reg-ref">22. Customer Referral Match Ledger</option>
+        <option value="reg-login-ref">23. Login By Referral Code</option>
+        <option value="reg-blocked">24. Blocked Customer Database</option>
+      </optgroup>
+      <optgroup label="6. Traffic & Platform Analytics">
+        <option value="vis-guest">25. Guest Mode Visitors</option>
+        <option value="vis-member">26. Member Visitors</option>
+        <option value="click-analytics">27. Store Click Redirection Analytics</option>
+      </optgroup>
+    </select>
+  </nav>
+
+  <main class="main-viewport">
+    <div class="table-header-block">
+      <h2 class="table-title" id="displayTableTitle">Table View</h2>
+      <div class="filter-group">
+        <input type="text" class="search-box" placeholder="Search records..." oninput="handleSearch(this.value)">
+        <button type="button" class="date-pill-btn active" onclick="setFilter('today', this)">Today</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('tomorrow', this)">Tomorrow</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('weekly', this)">Weekly</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('monthly', this)">Monthly</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('yearly', this)">Yearly</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('all', this)">All</button>
+        <input type="date" class="date-input" id="customDateFilter" onchange="setFilter('custom', this)">
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table class="master-table">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+      <div class="table-summary-bar">
+        <span id="summaryLeft">Total Items: 0</span>
+        <span id="summaryRight">Total Amount: ₹0</span>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal-card">
+      <h4 id="modalHeading">Mandatory Feedback Required</h4>
+      <p id="modalSub">Enter reason to cancel or block this request.</p>
+      <textarea id="feedbackText" placeholder="Write feedback details here..."></textarea>
+      <div class="modal-actions">
+        <button type="button" class="btn-chip" onclick="closeFeedbackModal()">Close</button>
+        <button type="button" class="btn-red" id="btnModalConfirm">Confirm Action</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const TABLE_SCHEMAS = {
+      'cb-1': {
+        title: "New Request Claim Under 1 to 25 Days",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status"],
+        summaryL: "Total Claims: ", summaryR: "Total Requested: ₹",
+        dataKey: "cashbackClaims", filterStep: 1
+      },
+      'cb-2': {
+        title: "Under 26 to 50 Days (Verified Desk)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status", "Account"],
+        summaryL: "Verified Claims: ", summaryR: "Total Value: ₹",
+        dataKey: "cashbackClaims", filterStep: 2
+      },
+      'cb-3': {
+        title: "Under 51 to 75 Days (Income Allocation)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Income Generated", "UPI / QR Code", "Status"],
+        summaryL: "Allocated Claims: ", summaryR: "Total Allocated: ₹",
+        dataKey: "cashbackClaims", filterStep: 3
+      },
+      'cb-4': {
+        title: "Under 76 to 100 Days (Method Review & Confirm)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Status", "Request"],
+        summaryL: "Pending 100d: ", summaryR: "Payable Total: ₹",
+        dataKey: "cashbackClaims", filterStep: 4
+      },
+      'cb-5': {
+        title: "101 Send Cashback (100 Days Completed)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "Method", "Action", "Status"],
+        summaryL: "Payouts Due: ", summaryR: "Total Payout: ₹",
+        dataKey: "cashbackClaims", filterStep: 5
+      },
+      'cb-hist-completed': {
+        title: "Completed Cashback Transactions",
+        headers: ["SNo.", "Transferred Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Transfer Amount", "Method"],
+        summaryL: "Total Completed: ", summaryR: "Total Amount Transferred: ₹",
+        dataKey: "cashbackClaims", filterStep: 6
+      },
+      'cb-hist-bin': {
+        title: "Recycling Bin (Cancelled & Blocked Requests)",
+        headers: ["SNo.", "Action Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Income Generated", "Step", "Feedback"],
+        summaryL: "Total Void Items: ", summaryR: "Total Void Income: ₹",
+        dataKey: "recycleBinCashback"
+      },
+      'gc-1': {
+        title: "Request For Reward (AI & Manual Audit)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status"],
+        summaryL: "Total Coin Claims: ", summaryR: "Total Value: ₹",
+        dataKey: "greenCoinClaims", filterStep: 1
+      },
+      'gc-2': {
+        title: "Under 1 to 7 Days",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Account", "Status"],
+        summaryL: "Claims in 1-7d: ", summaryR: "Total Value: ₹",
+        dataKey: "greenCoinClaims", filterStep: 2
+      },
+      'gc-3': {
+        title: "Under 8 to 12 Days (Coins Generated)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin Generated", "Account", "Status"],
+        summaryL: "Total Claims: ", summaryR: "Total Coins Allocated: ",
+        dataKey: "greenCoinClaims", filterStep: 3
+      },
+      'gc-4': {
+        title: "Final Steps (12 Days Completed - Send 24-48h)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin", "Account", "Status"],
+        summaryL: "Final Tasks: ", summaryR: "Coins Dispatched: ",
+        dataKey: "greenCoinClaims", filterStep: 4
+      },
+      'gc-hist-completed': {
+        title: "Completed Green Coin Rewards",
+        headers: ["SNo.", "Date/Time", "User ID", "Name", "Email ID", "Product Name", "Coins Added", "Status"],
+        summaryL: "Completed: ", summaryR: "Total Coins: ",
+        dataKey: "greenCoinClaims", filterStep: 5
+      },
+      'gc-hist-bin-ai': {
+        title: "Recycling Bin 1 (AI Anomaly Rejected)",
+        headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "AI Reason", "Report View"],
+        summaryL: "AI Void Count: ", summaryR: "Status: Auto-Isolated",
+        dataKey: "recycleBinCoinsAI"
+      },
+      'gc-hist-bin-manual': {
+        title: "Recycling Bin 2 (Manual Rejected)",
+        headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "Step", "Feedback Reason"],
+        summaryL: "Manual Void Count: ", summaryR: "Status: Blocked",
+        dataKey: "recycleBinCoinsManual"
+      },
+      'eb-cash-trans': {
+        title: "E-Book Purchases & Bank Verification Log",
+        headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "E-Book Serial No.", "E-Book Price", "Amount Paid", "Bank UTR / Transaction ID", "Payment Status"],
+        summaryL: "Total Verified Purchases: ", summaryR: "Total Amount Received: ₹",
+        dataKey: "cashEbookSales"
+      },
+      'eb-cash-sales': {
+        title: "E-Book Sales Reconciliation Details",
+        headers: ["S.No.", "Order ID", "Date & Exact Time", "Name", "User ID", "Book Name", "Serial No.", "Gross Paid (₹)", "Est. Bank Credit (₹)", "Bank UTR", "Delivery Status", "Bank Match"],
+        summaryL: "Total Sales Orders: ", summaryR: "Expected Bank Payout: ₹",
+        dataKey: "cashEbookSales"
+      },
+      'eb-cash-failed': {
+        title: "Failed / Dropped Transactions Desk",
+        headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone", "Book Selected", "Price", "Failure Reason", "Bank UTR", "Quick Action", "Auto-Recheck", "Transaction State"],
+        summaryL: "Total Dropped Attempts: ", summaryR: "Lost Revenue: ₹",
+        dataKey: "failedCashOrders"
+      },
+      'eb-cash-ledger': {
+        title: "Financial Ledger Account (Daily Cash Book)",
+        headers: ["S.No.", "Date & Exact Time", "Order ID", "User ID", "Actual Price", "Platform Fee", "Tax Pay (GST)", "Received Money", "Pending Money", "Cancelled", "UTR Match"],
+        summaryL: "Ledger Entries: ", summaryR: "Net Profit Balance: ₹",
+        dataKey: "cashEbookSales"
+      },
+      'eb-coin-trans': {
+        title: "Sale By Green Coins (AI Verified)",
+        headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "Serial No.", "Price", "Amount Paid", "Transaction ID", "AI Match Check", "Payment Status"],
+        summaryL: "Coin Purchases: ", summaryR: "Total Coins Inflow: ",
+        dataKey: "coinEbookSales"
+      },
+      'eb-coin-sales': {
+        title: "Green Coin Sales Detail 2",
+        headers: ["S.No.", "Order ID", "Date & Exact Time", "Name", "User ID", "Book Title", "Serial No.", "Gross Paid (Coins)", "Transaction Ref No.", "AI Match Check", "Delivery Status"],
+        summaryL: "Total Sales: ", summaryR: "Vault Coins: ",
+        dataKey: "coinEbookSales"
+      },
+      'eb-coin-failed': {
+        title: "Wrong Transaction Desk (Insufficient Coins / Timeout)",
+        headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone", "Book", "Price", "Failure Reason", "Status", "Transaction State"],
+        summaryL: "Wrong Attempts: ", summaryR: "Alert: Low Balance Drop",
+        dataKey: "failedCoinOrders"
+      },
+      'eb-coin-book': {
+        title: "Green Coin Transaction Book",
+        headers: ["S.No.", "Date & Exact Time", "Order ID", "User ID", "Received Coin", "Pending Coin", "Cancelled", "Coin Bank Sync", "Match Status"],
+        summaryL: "Audit Entries: ", summaryR: "Redeemed Coins Total: ",
+        dataKey: "coinEbookSales"
+      },
+      'eb-bank-vault': {
+        title: "Bank (Central Green Coin Vault)",
+        headers: ["SNo.", "Date & Exact Time", "User ID", "Transaction Type", "Coins Inflow", "Generated UTR", "AI Delivery Status"],
+        summaryL: "Vault Records: ", summaryR: "Running Reserve: ",
+        dataKey: "coinBankVault"
+      },
+      'reg-cust': {
+        title: "Customer Register Detail",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Address", "User Referral Code", "Referral Count (Max 5)", "Account Status"],
+        summaryL: "Registered Users: ", summaryR: "Active Accounts: ",
+        dataKey: "registeredUsers"
+      },
+      'reg-ref': {
+        title: "Customer Referral Match Ledger",
+        headers: ["SNo.", "Date/Time", "New User ID", "New Name", "New Email", "Invite Code", "Received Code", "Match Status", "Inviter (+7)", "Receiver (+4)", "Inviter Name", "Inviter User ID", "Original Code", "Transfer Status"],
+        summaryL: "Total Referrals: ", summaryR: "Bonus Coins Issued: ",
+        dataKey: "referralLedger"
+      },
+      'reg-login-ref': {
+        title: "Customer Accounts Created via Referral Code",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Used Referral Code", "Account Status"],
+        summaryL: "Invited Users: ", summaryR: "Verification: Active",
+        dataKey: "registeredUsers"
+      },
+      'reg-blocked': {
+        title: "Blocked Customer Database",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Mandatory Feedback Reason", "Action"],
+        summaryL: "Blocked Accounts: ", summaryR: "Security Status: Suspended",
+        dataKey: "blockedUsers"
+      },
+      'vis-guest': {
+        title: "Guest Mode Visitors",
+        headers: ["Time Period", "Unique IP Count", "Pageviews", "Bounce Rate", "Status"],
+        summaryL: "Traffic Segments: ", summaryR: "Total Hits: 0",
+        dataKey: "guestTraffic"
+      },
+      'vis-member': {
+        title: "Logged In Member Visitors",
+        headers: ["Time Period", "Active Members", "Session Duration", "Actions Logged", "Status"],
+        summaryL: "Active Sessions: ", summaryR: "Retention: Normal",
+        dataKey: "loginTraffic"
+      },
+      'click-analytics': {
+        title: "Store Redirection Click Analytics",
+        headers: ["Store Platform", "Today Clicks", "Yesterday", "Weekly", "Monthly", "Yearly", "All Time Total"],
+        summaryL: "Tracked Platforms: ", summaryR: "Total Platform Clicks: 0",
+        dataKey: "linkClicks"
+      }
+    };
+
+    let currentTableKey = 'cb-5';
+
+    function getDB() {
+      try {
+        const raw = localStorage.getItem('ss_owner_cust_master_db');
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function switchTable(key) {
+      currentTableKey = key;
+      renderCurrentTable();
+    }
+
+    function renderCurrentTable() {
+      const schema = TABLE_SCHEMAS[currentTableKey];
+      if (!schema) return;
+
+      document.getElementById('displayTableTitle').textContent = schema.title;
+      document.getElementById('viewBreadcrumb').textContent = schema.title;
+
+      const tHead = document.getElementById('tableHead');
+      tHead.innerHTML = '<tr>' + schema.headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+      const tBody = document.getElementById('tableBody');
+      const db = getDB();
+      const records = db[schema.dataKey] || [];
+
+      let list = Array.isArray(records) ? records : [];
+      if (schema.filterStep) {
+        list = list.filter(item => item.currentStep === schema.filterStep);
+      }
+
+      if (list.length === 0) {
+        tBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="empty-state">No records found for this period. Live operations will appear here.</td></tr>`;
+        document.getElementById('summaryLeft').textContent = schema.summaryL + "0";
+        document.getElementById('summaryRight').textContent = schema.summaryR + "0";
+        return;
+      }
+
+      tBody.innerHTML = list.map((row, i) => {
+        return '<tr>' + schema.headers.map(h => `<td>${row[h] || 'N/A'}</td>`).join('') + '</tr>';
+      }).join('');
+
+      document.getElementById('summaryLeft').textContent = schema.summaryL + list.length;
+      document.getElementById('summaryRight').textContent = schema.summaryR + "0";
+    }
+
+    function setFilter(period, btn) {
+      document.querySelectorAll('.date-pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn && btn.classList) btn.classList.add('active');
+      renderCurrentTable();
+    }
+
+    function handleSearch(query) {
+      renderCurrentTable();
+    }
+
+    function openFeedbackModal(actionTitle, confirmCallback) {
+      document.getElementById('modalHeading').textContent = actionTitle;
+      document.getElementById('feedbackText').value = '';
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('btnModalConfirm').onclick = function () {
+        const reason = document.getElementById('feedbackText').value.trim();
+        if (!reason) {
+          alert('Mandatory: Feedback reason is required.');
+          return;
+        }
+        confirmCallback(reason);
+        closeFeedbackModal();
+      };
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('tableSelector').value = 'cb-5';
+      renderCurrentTable();
+    });
+  </script>
+</body>
+</html>
