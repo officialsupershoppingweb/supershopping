@@ -21,8 +21,9 @@
     }
 
     // Direct Table Page Redirector
-    function openTable(tableKey) {
-      window.location.href = 'customer-tables.html?table=' + tableKey;
+  function openTable(tableKey) {
+  window.location.href = './customer-tables.html?table=' + tableKey;
+}
     }
 
     // Laptop / Keyboard Back Button
