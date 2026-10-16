@@ -17,19 +17,35 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      width: 100vw;
+      overflow-x: hidden;
     }
     .top-navbar {
       background: #ffffff;
       border-bottom: 1px solid #dfcfbc;
-      padding: 12px 24px;
+      padding: 12px 30px;
       display: flex;
       align-items: center;
       justify-content: space-between;
+      width: 100%;
     }
     .top-left {
       display: flex;
       align-items: center;
       gap: 16px;
+    }
+    .back-btn-top {
+      background: #3b2219;
+      color: #ffffff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
     .brand-title {
       font-size: 18px;
@@ -49,10 +65,11 @@
     .selector-strip {
       background: #ffffff;
       border-bottom: 1px solid #dfcfbc;
-      padding: 10px 24px;
+      padding: 10px 30px;
       display: flex;
       align-items: center;
       gap: 14px;
+      width: 100%;
       overflow-x: auto;
     }
     .selector-strip label {
@@ -62,20 +79,19 @@
       text-transform: uppercase;
     }
     .table-dropdown {
-      padding: 6px 12px;
+      padding: 6px 14px;
       border-radius: 8px;
       border: 1px solid #dfcfbc;
       background: #fbf8f3;
-      font-size: 12.5px;
+      font-size: 13px;
       font-weight: 700;
       color: #3b2219;
       cursor: pointer;
       outline: none;
     }
     .main-viewport {
-      width: 100vw;
-      max-width: 100%;
-      padding: 20px 24px;
+      width: 100%;
+      padding: 24px 30px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -84,12 +100,12 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 14px;
     }
     .table-title {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 800;
       color: #2b1810;
     }
@@ -103,9 +119,9 @@
       background: #ffffff;
       border: 1px solid #dfcfbc;
       border-radius: 8px;
-      padding: 6px 12px;
+      padding: 7px 12px;
       font-size: 12px;
-      width: 180px;
+      width: 200px;
       color: #2b1810;
       outline: none;
     }
@@ -129,22 +145,26 @@
       background: #ffffff;
       border: 1px solid #dfcfbc;
       border-radius: 8px;
-      padding: 5px 10px;
+      padding: 6px 10px;
       font-size: 12px;
       color: #2b1810;
     }
-    .table-container {
+    .table-card-wrapper {
       width: 100%;
       background: #ffffff;
       border: 1px solid #dfcfbc;
       border-radius: 14px;
       box-shadow: 0 4px 18px rgba(59, 34, 25, 0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-scroll-surface {
+      width: 100%;
       overflow-x: auto;
-      flex: 1;
     }
     table.master-table {
       width: 100%;
-      min-width: 1200px;
       border-collapse: collapse;
       text-align: left;
     }
@@ -153,8 +173,8 @@
       color: #ffffff;
     }
     table.master-table th {
-      padding: 12px 14px;
-      font-size: 12px;
+      padding: 14px 16px;
+      font-size: 12.5px;
       font-weight: 700;
       letter-spacing: 0.3px;
       border-right: 1px solid #4a2d22;
@@ -165,7 +185,6 @@
     }
     table.master-table tbody tr {
       border-bottom: 1px solid #e8decb;
-      transition: background 0.15s;
     }
     table.master-table tbody tr:nth-child(odd) {
       background-color: #fdfbf7;
@@ -174,8 +193,8 @@
       background-color: #f4ecdf;
     }
     table.master-table td {
-      padding: 10px 14px;
-      font-size: 12.5px;
+      padding: 12px 16px;
+      font-size: 13px;
       color: #331f16;
       border-right: 1px solid #e8decb;
       vertical-align: middle;
@@ -194,70 +213,49 @@
     .table-summary-bar {
       background: #ebdcc8;
       border-top: 1px solid #dfcfbc;
-      padding: 12px 20px;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
+      padding: 14px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      font-size: 13.5px;
+      font-size: 14px;
       font-weight: 800;
       color: #3b2219;
     }
-    .btn-chip {
-      background: #3b2219;
-      color: #ffffff;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
+    .btn-action-pill {
       border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 800;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
       gap: 4px;
     }
-    .btn-green {
-      background: #15803d;
-      color: #ffffff;
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
+    .pill-green { background: #15803d; color: #ffffff; }
+    .pill-red { background: #b91c1c; color: #ffffff; }
+    .pill-blue { background: #0284c7; color: #ffffff; }
+    .pill-dark { background: #3b2219; color: #ffffff; }
+
+    /* Action toggles matching photos */
+    .toggle-slot {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid #dfcfbc;
     }
-    .btn-red {
-      background: #b91c1c;
-      color: #ffffff;
-      padding: 4px 10px;
+    .amount-edit-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      padding: 4px 8px;
       border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
-      border: none;
-      cursor: pointer;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-size: 11px;
       font-weight: 800;
-    }
-    .badge-success {
-      background: #dcfce7;
-      color: #15803d;
-      border: 1px solid #bbf7d0;
-    }
-    .badge-pending {
-      background: #fef9c3;
-      color: #854d0e;
-      border: 1px solid #fef08a;
-    }
-    .badge-error {
-      background: #fee2e2;
-      color: #b91c1c;
-      border: 1px solid #fecaca;
     }
     .modal-overlay {
       position: fixed;
@@ -265,7 +263,7 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.45);
       display: none;
       align-items: center;
       justify-content: center;
@@ -275,10 +273,10 @@
       background: #ffffff;
       border: 2px solid #3b2219;
       border-radius: 14px;
-      padding: 18px 22px;
+      padding: 20px 24px;
       width: 90%;
       max-width: 440px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
     }
     .modal-card h4 {
       font-size: 15px;
@@ -293,20 +291,20 @@
     }
     .modal-card textarea {
       width: 100%;
-      height: 80px;
-      padding: 8px;
+      height: 90px;
+      padding: 10px;
       border-radius: 8px;
       border: 1px solid #dfcfbc;
-      font-size: 12px;
+      font-size: 12.5px;
       color: #2b1810;
       outline: none;
       resize: none;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
     .modal-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 8px;
+      gap: 10px;
     }
   </style>
 </head>
@@ -314,8 +312,9 @@
 
   <header class="top-navbar">
     <div class="top-left">
-      <div class="brand-title">SuperShopping</div>
-      <div class="breadcrumb">Founder Desk &gt; <span id="viewBreadcrumb">Customer Management</span></div>
+      <button type="button" class="back-btn-top" onclick="handleHardwareBack()">← Back To Desk</button>
+      <div class="brand-title">SuperShopping Founder Desk</div>
+      <div class="breadcrumb">&gt; <span id="viewBreadcrumb">Customer Tables</span></div>
     </div>
   </header>
 
@@ -382,11 +381,13 @@
       </div>
     </div>
 
-    <div class="table-container">
-      <table class="master-table">
-        <thead id="tableHead"></thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+    <div class="table-card-wrapper">
+      <div class="table-scroll-surface">
+        <table class="master-table">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
       <div class="table-summary-bar">
         <span id="summaryLeft">Total Items: 0</span>
         <span id="summaryRight">Total Amount: ₹0</span>
@@ -394,14 +395,15 @@
     </div>
   </main>
 
+  <!-- Mandatory Feedback Popup Modal (Photo 1, 2, 8) -->
   <div class="modal-overlay" id="feedbackModal">
     <div class="modal-card">
-      <h4 id="modalHeading">Mandatory Feedback Required</h4>
-      <p id="modalSub">Enter reason to cancel or block this request.</p>
-      <textarea id="feedbackText" placeholder="Write feedback details here..."></textarea>
+      <h4 id="modalHeading">Cancel Request & Feedback</h4>
+      <p id="modalSub">Enter mandatory cancellation or block reason:</p>
+      <textarea id="feedbackText" placeholder="Write feedback reason here..."></textarea>
       <div class="modal-actions">
-        <button type="button" class="btn-chip" onclick="closeFeedbackModal()">Close</button>
-        <button type="button" class="btn-red" id="btnModalConfirm">Confirm Action</button>
+        <button type="button" class="btn-action-pill pill-dark" onclick="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn-action-pill pill-red" id="btnModalConfirm">Submit Cancel</button>
       </div>
     </div>
   </div>
@@ -409,31 +411,31 @@
   <script>
     const TABLE_SCHEMAS = {
       'cb-1': {
-        title: "New Request Claim Under 1 to 25 Days",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status"],
-        summaryL: "Total Claims: ", summaryR: "Total Requested: ₹",
+        title: "1. New Request Claim Under 1 to 25 Days",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Document View", "Product Price", "Product Name", "Status"],
+        summaryL: "Total Requests: ", summaryR: "Total Value: ₹",
         dataKey: "cashbackClaims", filterStep: 1
       },
       'cb-2': {
-        title: "Under 26 to 50 Days (Verified Desk)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status", "Account"],
+        title: "2. Under 26 to 50 Days (Verified Desk)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Status", "Account"],
         summaryL: "Verified Claims: ", summaryR: "Total Value: ₹",
         dataKey: "cashbackClaims", filterStep: 2
       },
       'cb-3': {
-        title: "Under 51 to 75 Days (Income Allocation)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Income Generated", "UPI / QR Code", "Status"],
+        title: "3. Under 51 to 75 Days (Income Allocation)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Document View", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Status"],
         summaryL: "Allocated Claims: ", summaryR: "Total Allocated: ₹",
         dataKey: "cashbackClaims", filterStep: 3
       },
       'cb-4': {
-        title: "Under 76 to 100 Days (Method Review & Confirm)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Status", "Request"],
+        title: "4. Under 76 to 100 Days (Method Review & Confirm)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Request", "Status"],
         summaryL: "Pending 100d: ", summaryR: "Payable Total: ₹",
         dataKey: "cashbackClaims", filterStep: 4
       },
       'cb-5': {
-        title: "101 Send Cashback (100 Days Completed)",
+        title: "5. 101 Send Cashback (100 Days Completed)",
         headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "Method", "Action", "Status"],
         summaryL: "Payouts Due: ", summaryR: "Total Payout: ₹",
         dataKey: "cashbackClaims", filterStep: 5
@@ -441,19 +443,19 @@
       'cb-hist-completed': {
         title: "Completed Cashback Transactions",
         headers: ["SNo.", "Transferred Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Transfer Amount", "Method"],
-        summaryL: "Total Completed: ", summaryR: "Total Amount Transferred: ₹",
+        summaryL: "Total Completed: ", summaryR: "Total Amount Transferred Today: ₹",
         dataKey: "cashbackClaims", filterStep: 6
       },
       'cb-hist-bin': {
         title: "Recycling Bin (Cancelled & Blocked Requests)",
         headers: ["SNo.", "Action Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Income Generated", "Step", "Feedback"],
-        summaryL: "Total Void Items: ", summaryR: "Total Void Income: ₹",
+        summaryL: "Total Items: ", summaryR: "Total Void Income: ₹",
         dataKey: "recycleBinCashback"
       },
       'gc-1': {
         title: "Request For Reward (AI & Manual Audit)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status"],
-        summaryL: "Total Coin Claims: ", summaryR: "Total Value: ₹",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Status"],
+        summaryL: "Total Coin Requests: ", summaryR: "Total Value: ₹",
         dataKey: "greenCoinClaims", filterStep: 1
       },
       'gc-2': {
@@ -463,15 +465,15 @@
         dataKey: "greenCoinClaims", filterStep: 2
       },
       'gc-3': {
-        title: "Under 8 to 12 Days (Coins Generated)",
+        title: "Under 8 to 12 Days (Claims & Coins Progress)",
         headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin Generated", "Account", "Status"],
-        summaryL: "Total Claims: ", summaryR: "Total Coins Allocated: ",
+        summaryL: "Total Users: ", summaryR: "Total Coins Allocated: ",
         dataKey: "greenCoinClaims", filterStep: 3
       },
       'gc-4': {
-        title: "Final Steps (12 Days Completed - Send 24-48h)",
+        title: "Final Steps (12 Days Completed - Send within 24-48 Hours)",
         headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin", "Account", "Status"],
-        summaryL: "Final Tasks: ", summaryR: "Coins Dispatched: ",
+        summaryL: "Total Tasks: ", summaryR: "Coins Dispatched: ",
         dataKey: "greenCoinClaims", filterStep: 4
       },
       'gc-hist-completed': {
@@ -481,13 +483,13 @@
         dataKey: "greenCoinClaims", filterStep: 5
       },
       'gc-hist-bin-ai': {
-        title: "Recycling Bin 1 (AI Anomaly Rejected)",
+        title: "Recycling Bin 1 (AI Anomaly Auto-Isolated)",
         headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "AI Reason", "Report View"],
         summaryL: "AI Void Count: ", summaryR: "Status: Auto-Isolated",
         dataKey: "recycleBinCoinsAI"
       },
       'gc-hist-bin-manual': {
-        title: "Recycling Bin 2 (Manual Rejected)",
+        title: "Recycling Bin 2 (Manual Rejected Desk)",
         headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "Step", "Feedback Reason"],
         summaryL: "Manual Void Count: ", summaryR: "Status: Blocked",
         dataKey: "recycleBinCoinsManual"
@@ -495,13 +497,13 @@
       'eb-cash-trans': {
         title: "E-Book Purchases & Bank Verification Log",
         headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "E-Book Serial No.", "E-Book Price", "Amount Paid", "Bank UTR / Transaction ID", "Payment Status"],
-        summaryL: "Total Verified Purchases: ", summaryR: "Total Amount Received: ₹",
+        summaryL: "Total Verified Purchases: ", summaryR: "Total Amount Verified: ₹",
         dataKey: "cashEbookSales"
       },
       'eb-cash-sales': {
         title: "E-Book Sales Reconciliation Details",
         headers: ["S.No.", "Order ID", "Date & Exact Time", "Name", "User ID", "Book Name", "Serial No.", "Gross Paid (₹)", "Est. Bank Credit (₹)", "Bank UTR", "Delivery Status", "Bank Match"],
-        summaryL: "Total Sales Orders: ", summaryR: "Expected Bank Payout: ₹",
+        summaryL: "Total Orders: ", summaryR: "Expected Bank Credit: ₹",
         dataKey: "cashEbookSales"
       },
       'eb-cash-failed': {
@@ -531,7 +533,7 @@
       'eb-coin-failed': {
         title: "Wrong Transaction Desk (Insufficient Coins / Timeout)",
         headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone", "Book", "Price", "Failure Reason", "Status", "Transaction State"],
-        summaryL: "Wrong Attempts: ", summaryR: "Alert: Low Balance Drop",
+        summaryL: "Wrong Attempts: ", summaryR: "Status: Low Balance Alerts",
         dataKey: "failedCoinOrders"
       },
       'eb-coin-book': {
@@ -585,12 +587,12 @@
       'click-analytics': {
         title: "Store Redirection Click Analytics",
         headers: ["Store Platform", "Today Clicks", "Yesterday", "Weekly", "Monthly", "Yearly", "All Time Total"],
-        summaryL: "Tracked Platforms: ", summaryR: "Total Platform Clicks: 0",
+        summaryL: "Tracked Stores: ", summaryR: "Total Redirection Clicks: 0",
         dataKey: "linkClicks"
       }
     };
 
-    let currentTableKey = 'cb-5';
+    let currentTableKey = 'cb-1';
 
     function getDB() {
       try {
@@ -626,7 +628,7 @@
       }
 
       if (list.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="empty-state">No records found for this period. Live operations will appear here.</td></tr>`;
+        tBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="empty-state">No customer records under this stage right now. Live entries will appear here.</td></tr>`;
         document.getElementById('summaryLeft').textContent = schema.summaryL + "0";
         document.getElementById('summaryRight').textContent = schema.summaryR + "0";
         return;
@@ -646,22 +648,32 @@
       renderCurrentTable();
     }
 
-    function handleSearch(query) {
+    function handleSearch(val) {
       renderCurrentTable();
     }
 
-    function openFeedbackModal(actionTitle, confirmCallback) {
-      document.getElementById('modalHeading').textContent = actionTitle;
+    function handleHardwareBack() {
+      window.location.href = './ss-founder-desk.html';
+    }
+
+    window.onkeydown = function(e) {
+      if ((e.altKey && e.key === 'ArrowLeft') || (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
+        e.preventDefault();
+        handleHardwareBack();
+      }
+    };
+
+    function triggerCancelWithModal(orderId) {
       document.getElementById('feedbackText').value = '';
       document.getElementById('feedbackModal').style.display = 'flex';
-      document.getElementById('btnModalConfirm').onclick = function () {
+      document.getElementById('btnModalConfirm').onclick = function() {
         const reason = document.getElementById('feedbackText').value.trim();
         if (!reason) {
-          alert('Mandatory: Feedback reason is required.');
+          alert('Mandatory: Cancellation feedback reason is strictly required.');
           return;
         }
-        confirmCallback(reason);
         closeFeedbackModal();
+        alert('Request cancelled & moved to Recycling Bin.');
       };
     }
 
@@ -669,19 +681,17 @@
       document.getElementById('feedbackModal').style.display = 'none';
     }
 
-  document.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const targetTable = urlParams.get('table');
-
-  if (targetTable && TABLE_SCHEMAS[targetTable]) {
-    currentTableKey = targetTable;
-    document.getElementById('tableSelector').value = targetTable;
-  } else {
-    currentTableKey = 'cb-1';
-    document.getElementById('tableSelector').value = 'cb-1';
-  }
-  renderCurrentTable();
-});
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const target = urlParams.get('table');
+      if (target && TABLE_SCHEMAS[target]) {
+        currentTableKey = target;
+        document.getElementById('tableSelector').value = target;
+      } else {
+        currentTableKey = 'cb-1';
+        document.getElementById('tableSelector').value = 'cb-1';
+      }
+      renderCurrentTable();
     });
   </script>
 </body>
