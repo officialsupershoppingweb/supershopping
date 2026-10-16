@@ -23,7 +23,7 @@
     .top-navbar {
       background: #ffffff;
       border-bottom: 1px solid #dfcfbc;
-      padding: 12px 30px;
+      padding: 12px 28px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -38,15 +38,17 @@
       background: #3b2219;
       color: #ffffff;
       border: none;
-      padding: 6px 14px;
+      padding: 7px 16px;
       border-radius: 8px;
-      font-size: 12px;
+      font-size: 12.5px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
+      transition: opacity 0.2s;
     }
+    .back-btn-top:hover { opacity: 0.9; }
     .brand-title {
       font-size: 18px;
       font-weight: 800;
@@ -65,7 +67,7 @@
     .selector-strip {
       background: #ffffff;
       border-bottom: 1px solid #dfcfbc;
-      padding: 10px 30px;
+      padding: 10px 28px;
       display: flex;
       align-items: center;
       gap: 14px;
@@ -77,6 +79,7 @@
       font-weight: 800;
       color: #3b2219;
       text-transform: uppercase;
+      white-space: nowrap;
     }
     .table-dropdown {
       padding: 6px 14px;
@@ -91,7 +94,7 @@
     }
     .main-viewport {
       width: 100%;
-      padding: 24px 30px;
+      padding: 20px 28px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -105,7 +108,7 @@
       gap: 14px;
     }
     .table-title {
-      font-size: 24px;
+      font-size: 23px;
       font-weight: 800;
       color: #2b1810;
     }
@@ -121,7 +124,7 @@
       border-radius: 8px;
       padding: 7px 12px;
       font-size: 12px;
-      width: 200px;
+      width: 180px;
       color: #2b1810;
       outline: none;
     }
@@ -165,6 +168,7 @@
     }
     table.master-table {
       width: 100%;
+      min-width: 1200px;
       border-collapse: collapse;
       text-align: left;
     }
@@ -205,10 +209,11 @@
     }
     .empty-state {
       text-align: center;
-      padding: 60px 20px;
+      padding: 70px 20px;
       color: #785a46;
       font-weight: 700;
       font-size: 14px;
+      background: #fdfbf7;
     }
     .table-summary-bar {
       background: #ebdcc8;
@@ -237,26 +242,7 @@
     .pill-blue { background: #0284c7; color: #ffffff; }
     .pill-dark { background: #3b2219; color: #ffffff; }
 
-    /* Action toggles matching photos */
-    .toggle-slot {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #ffffff;
-      padding: 4px 8px;
-      border-radius: 8px;
-      border: 1px solid #dfcfbc;
-    }
-    .amount-edit-box {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #ffffff;
-      border: 1px solid #dfcfbc;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-weight: 800;
-    }
+    /* Mandatory Feedback Modal */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -267,7 +253,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 999;
+      z-index: 99999;
     }
     .modal-card {
       background: #ffffff;
@@ -300,6 +286,7 @@
       outline: none;
       resize: none;
       margin-bottom: 16px;
+      box-sizing: border-box;
     }
     .modal-actions {
       display: flex;
@@ -395,14 +382,14 @@
     </div>
   </main>
 
-  <!-- Mandatory Feedback Popup Modal (Photo 1, 2, 8) -->
+  <!-- Mandatory Feedback Popup Modal (Photo 2, 4, 8) -->
   <div class="modal-overlay" id="feedbackModal">
     <div class="modal-card">
       <h4 id="modalHeading">Cancel Request & Feedback</h4>
-      <p id="modalSub">Enter mandatory cancellation or block reason:</p>
+      <p id="modalSub">Enter mandatory feedback reason:</p>
       <textarea id="feedbackText" placeholder="Write feedback reason here..."></textarea>
       <div class="modal-actions">
-        <button type="button" class="btn-action-pill pill-dark" onclick="closeFeedbackModal()">Cancel</button>
+        <button type="button" class="btn-action-pill pill-dark" onclick="closeFeedbackModal()">Close</button>
         <button type="button" class="btn-action-pill pill-red" id="btnModalConfirm">Submit Cancel</button>
       </div>
     </div>
@@ -410,185 +397,166 @@
 
   <script>
     const TABLE_SCHEMAS = {
+      // 1. CASHBACK
       'cb-1': {
         title: "1. New Request Claim Under 1 to 25 Days",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Document View", "Product Price", "Product Name", "Status"],
-        summaryL: "Total Requests: ", summaryR: "Total Value: ₹",
-        dataKey: "cashbackClaims", filterStep: 1
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Document View", "Product Price", "Product Name", "Progress", "Status (Accept / Reject)"],
+        sumL: "Total Requests: ", sumR: "Total Value: ₹", key: "cashbackClaims", step: 1
       },
       'cb-2': {
         title: "2. Under 26 to 50 Days (Verified Desk)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Status", "Account"],
-        summaryL: "Verified Claims: ", summaryR: "Total Value: ₹",
-        dataKey: "cashbackClaims", filterStep: 2
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status", "Account (Active / Block)"],
+        sumL: "Verified Claims: ", sumR: "Total Value: ₹", key: "cashbackClaims", step: 2
       },
       'cb-3': {
         title: "3. Under 51 to 75 Days (Income Allocation)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Document View", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Status"],
-        summaryL: "Allocated Claims: ", summaryR: "Total Allocated: ₹",
-        dataKey: "cashbackClaims", filterStep: 3
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Document View", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Progress", "Status"],
+        sumL: "Allocated Claims: ", sumR: "Total Allocated: ₹", key: "cashbackClaims", step: 3
       },
       'cb-4': {
         title: "4. Under 76 to 100 Days (Method Review & Confirm)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "UPI ID / QR Code", "Request", "Status"],
-        summaryL: "Pending 100d: ", summaryR: "Payable Total: ₹",
-        dataKey: "cashbackClaims", filterStep: 4
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Income Generated", "Product Price", "Product Name", "Method (QR/UPI)", "Progress", "Request (Confirm/Cancel)", "Status"],
+        sumL: "Pending 100d: ", sumR: "Payable Total: ₹", key: "cashbackClaims", step: 4
       },
       'cb-5': {
         title: "5. 101 Send Cashback (100 Days Completed)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Income Generated", "Method", "Action", "Status"],
-        summaryL: "Payouts Due: ", summaryR: "Total Payout: ₹",
-        dataKey: "cashbackClaims", filterStep: 5
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Phone Number", "Income Generated", "Method", "Action (Correct/Cancel)", "Status (Completed/Pending)"],
+        sumL: "Payouts Due: ", sumR: "Total Payout: ₹", key: "cashbackClaims", step: 5
       },
       'cb-hist-completed': {
-        title: "Completed Cashback Transactions",
+        title: "Completed Cashback Transactions (1-Year Archive)",
         headers: ["SNo.", "Transferred Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Transfer Amount", "Method"],
-        summaryL: "Total Completed: ", summaryR: "Total Amount Transferred Today: ₹",
-        dataKey: "cashbackClaims", filterStep: 6
+        sumL: "Total Completed: ", sumR: "Total Amount Transferred Today: ₹", key: "cashbackClaims", step: 6
       },
       'cb-hist-bin': {
         title: "Recycling Bin (Cancelled & Blocked Requests)",
-        headers: ["SNo.", "Action Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Income Generated", "Step", "Feedback"],
-        summaryL: "Total Items: ", summaryR: "Total Void Income: ₹",
-        dataKey: "recycleBinCashback"
+        headers: ["SNo.", "Action Date/Day/Time", "User ID", "Name", "Email ID", "Product Price", "Product Name", "Income Generated", "Step", "Feedback Reason"],
+        sumL: "Total Items: ", sumR: "Total Void Income: ₹", key: "recycleBinCashback"
       },
+
+      // 2. GREEN COIN
       'gc-1': {
-        title: "Request For Reward (AI & Manual Audit)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Status"],
-        summaryL: "Total Coin Requests: ", summaryR: "Total Value: ₹",
-        dataKey: "greenCoinClaims", filterStep: 1
+        title: "1. Request For Reward (AI & Manual Audit)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Status (Accept / Reject)"],
+        sumL: "Total Requests: ", sumR: "Total Value: ₹", key: "greenCoinClaims", step: 1
       },
       'gc-2': {
-        title: "Under 1 to 7 Days",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Account", "Status"],
-        summaryL: "Claims in 1-7d: ", summaryR: "Total Value: ₹",
-        dataKey: "greenCoinClaims", filterStep: 2
+        title: "2. Under 1 to 7 Days (Verified Desk)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Progress", "Account (Active / Block)", "Status"],
+        sumL: "Claims in 1-7d: ", sumR: "Total Value: ₹", key: "greenCoinClaims", step: 2
       },
       'gc-3': {
-        title: "Under 8 to 12 Days (Claims & Coins Progress)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin Generated", "Account", "Status"],
-        summaryL: "Total Users: ", summaryR: "Total Coins Allocated: ",
-        dataKey: "greenCoinClaims", filterStep: 3
+        title: "3. Under 8 to 12 Days (Claims & Coins Progress)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin Generated", "Progress", "Account", "Status"],
+        sumL: "Total Users: ", sumR: "Total Coins Allocated: ", key: "greenCoinClaims", step: 3
       },
       'gc-4': {
-        title: "Final Steps (12 Days Completed - Send within 24-48 Hours)",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin", "Account", "Status"],
-        summaryL: "Total Tasks: ", summaryR: "Coins Dispatched: ",
-        dataKey: "greenCoinClaims", filterStep: 4
+        title: "4. Final Steps (12 Days Completed - Send within 24-48 Hours)",
+        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Product Price", "Product Name", "Document View", "Green Coin", "Progress", "Account", "Status"],
+        sumL: "Total Tasks: ", sumR: "Coins Dispatched: ", key: "greenCoinClaims", step: 4
       },
       'gc-hist-completed': {
         title: "Completed Green Coin Rewards",
         headers: ["SNo.", "Date/Time", "User ID", "Name", "Email ID", "Product Name", "Coins Added", "Status"],
-        summaryL: "Completed: ", summaryR: "Total Coins: ",
-        dataKey: "greenCoinClaims", filterStep: 5
+        sumL: "Completed: ", sumR: "Total Coins: ", key: "greenCoinClaims", step: 5
       },
       'gc-hist-bin-ai': {
         title: "Recycling Bin 1 (AI Anomaly Auto-Isolated)",
-        headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "AI Reason", "Report View"],
-        summaryL: "AI Void Count: ", summaryR: "Status: Auto-Isolated",
-        dataKey: "recycleBinCoinsAI"
+        headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "Step", "Feedback Reason", "View Report"],
+        sumL: "AI Void Count: ", sumR: "Status: Auto-Isolated", key: "recycleBinCoinsAI"
       },
       'gc-hist-bin-manual': {
         title: "Recycling Bin 2 (Manual Rejected Desk)",
         headers: ["SNo.", "Date/Time", "User ID", "Name", "Product Name", "Step", "Feedback Reason"],
-        summaryL: "Manual Void Count: ", summaryR: "Status: Blocked",
-        dataKey: "recycleBinCoinsManual"
+        sumL: "Manual Void Count: ", sumR: "Status: Blocked", key: "recycleBinCoinsManual"
       },
+
+      // 3. E-BOOK PURCHASES (CASH)
       'eb-cash-trans': {
-        title: "E-Book Purchases & Bank Verification Log",
-        headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "E-Book Serial No.", "E-Book Price", "Amount Paid", "Bank UTR / Transaction ID", "Payment Status"],
-        summaryL: "Total Verified Purchases: ", summaryR: "Total Amount Verified: ₹",
-        dataKey: "cashEbookSales"
+        title: "1. Customer Transfer Details (AI 2-Second Dispatch Log)",
+        headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "E-Book Serial No. (10-Digit)", "E-Book Price", "Amount Paid", "Bank UTR / Transaction ID", "Payment Status"],
+        sumL: "Total Purchases: ", sumR: "Total Amount Received: ₹", key: "cashEbookSales"
       },
       'eb-cash-sales': {
-        title: "E-Book Sales Reconciliation Details",
-        headers: ["S.No.", "Order ID", "Date & Exact Time", "Name", "User ID", "Book Name", "Serial No.", "Gross Paid (₹)", "Est. Bank Credit (₹)", "Bank UTR", "Delivery Status", "Bank Match"],
-        summaryL: "Total Orders: ", summaryR: "Expected Bank Credit: ₹",
-        dataKey: "cashEbookSales"
+        title: "2. E-Book Sales Reconciliation Details",
+        headers: ["S.No.", "Order ID", "Date & Exact Time", "Name", "User ID", "Book Title", "Serial No.", "Gross Paid (₹)", "Est. Bank Credit (₹)", "Bank UTR / Ref No.", "Delivery Status", "Bank Match Check"],
+        sumL: "Total Orders: ", sumR: "Expected Credit: ₹", key: "cashEbookSales"
       },
       'eb-cash-failed': {
-        title: "Failed / Dropped Transactions Desk",
-        headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone", "Book Selected", "Price", "Failure Reason", "Bank UTR", "Quick Action", "Auto-Recheck", "Transaction State"],
-        summaryL: "Total Dropped Attempts: ", summaryR: "Lost Revenue: ₹",
-        dataKey: "failedCashOrders"
+        title: "3. Failed / Dropped Transactions Desk",
+        headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone Number", "E-Book Selected", "Price", "Failure Reason (AI Tag)", "Bank UTR", "Quick Action Buttons", "Auto-Recheck Gateway Status", "Transaction State"],
+        sumL: "Dropped Orders: ", sumR: "Lost Value: ₹", key: "failedCashOrders"
       },
       'eb-cash-ledger': {
-        title: "Financial Ledger Account (Daily Cash Book)",
-        headers: ["S.No.", "Date & Exact Time", "Order ID", "User ID", "Actual Price", "Platform Fee", "Tax Pay (GST)", "Received Money", "Pending Money", "Cancelled", "UTR Match"],
-        summaryL: "Ledger Entries: ", summaryR: "Net Profit Balance: ₹",
-        dataKey: "cashEbookSales"
+        title: "4. Financial Ledger Account (Daily Cash Book)",
+        headers: ["S.No.", "Date & Exact Time", "Order ID", "User ID", "Actual Price", "Platform Fee", "Tax Pay (GST)", "Received Money", "Pending Money", "Transaction Cancel", "UTR Match Check"],
+        sumL: "Ledger Entries: ", sumR: "Net Profit Balance: ₹", key: "cashEbookSales"
       },
+
+      // 4. E-BOOK PURCHASES (GREEN COIN & BANK)
       'eb-coin-trans': {
-        title: "Sale By Green Coins (AI Verified)",
-        headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "Serial No.", "Price", "Amount Paid", "Transaction ID", "AI Match Check", "Payment Status"],
-        summaryL: "Coin Purchases: ", summaryR: "Total Coins Inflow: ",
-        dataKey: "coinEbookSales"
+        title: "1. Customer By Green Coin (AI Verified)",
+        headers: ["SNo.", "Date & Exact Time", "Order Id", "User Name", "User ID", "Email ID", "E-Book Name", "E-Book Serial No.", "E-Book Price", "Amount Paid (Coins)", "Transaction ID", "AI Match Check", "Payment Status"],
+        sumL: "Coin Purchases: ", sumR: "Total Coins Inflow: ", key: "coinEbookSales"
       },
       'eb-coin-sales': {
-        title: "Green Coin Sales Detail 2",
+        title: "2. Green Coin Sales Detail 2",
         headers: ["S.No.", "Order ID", "Date & Exact Time", "Name", "User ID", "Book Title", "Serial No.", "Gross Paid (Coins)", "Transaction Ref No.", "AI Match Check", "Delivery Status"],
-        summaryL: "Total Sales: ", summaryR: "Vault Coins: ",
-        dataKey: "coinEbookSales"
+        sumL: "Total Sales: ", sumR: "Vault Coins: ", key: "coinEbookSales"
       },
       'eb-coin-failed': {
-        title: "Wrong Transaction Desk (Insufficient Coins / Timeout)",
-        headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone", "Book", "Price", "Failure Reason", "Status", "Transaction State"],
-        summaryL: "Wrong Attempts: ", summaryR: "Status: Low Balance Alerts",
-        dataKey: "failedCoinOrders"
+        title: "3. Wrong Transaction Desk (Insufficient Coins / Timeout)",
+        headers: ["Attempt ID", "Date / Day / Time", "Name", "User ID", "Email", "Phone Number", "E-Book Selected", "Price", "Failure Reason (AI Tag)", "Status", "Transaction State"],
+        sumL: "Wrong Attempts: ", sumR: "Status: Low Balance Alerts", key: "failedCoinOrders"
       },
       'eb-coin-book': {
-        title: "Green Coin Transaction Book",
-        headers: ["S.No.", "Date & Exact Time", "Order ID", "User ID", "Received Coin", "Pending Coin", "Cancelled", "Coin Bank Sync", "Match Status"],
-        summaryL: "Audit Entries: ", summaryR: "Redeemed Coins Total: ",
-        dataKey: "coinEbookSales"
+        title: "4. Green Coin Transaction Book",
+        headers: ["S.No.", "Date & Exact Time", "Order ID", "User ID", "Received Coin", "Pending Coin", "Transaction Cancel", "Coin Bank Sync", "Match Status"],
+        sumL: "Audit Entries: ", sumR: "Redeemed Coins Total: ", key: "coinEbookSales"
       },
       'eb-bank-vault': {
-        title: "Bank (Central Green Coin Vault)",
+        title: "Bank (Central Green Coin Vault Ledger)",
         headers: ["SNo.", "Date & Exact Time", "User ID", "Transaction Type", "Coins Inflow", "Generated UTR", "AI Delivery Status"],
-        summaryL: "Vault Records: ", summaryR: "Running Reserve: ",
-        dataKey: "coinBankVault"
+        sumL: "Vault Records: ", sumR: "Running Reserve: ", key: "coinBankVault"
       },
+
+      // 5. REGISTER ID MATRIX
       'reg-cust': {
-        title: "Customer Register Detail",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Address", "User Referral Code", "Referral Count (Max 5)", "Account Status"],
-        summaryL: "Registered Users: ", summaryR: "Active Accounts: ",
-        dataKey: "registeredUsers"
+        title: "1. Customer Register Detail",
+        headers: ["SNo.", "Date / Day / Time", "Username ID", "Name", "Email ID", "Phone Number", "Address", "User Referral Code", "Referral Count (Max 5)", "Status (Active/Block)"],
+        sumL: "Registered Users: ", sumR: "Active Accounts: ", key: "registeredUsers"
       },
       'reg-ref': {
-        title: "Customer Referral Match Ledger",
-        headers: ["SNo.", "Date/Time", "New User ID", "New Name", "New Email", "Invite Code", "Received Code", "Match Status", "Inviter (+7)", "Receiver (+4)", "Inviter Name", "Inviter User ID", "Original Code", "Transfer Status"],
-        summaryL: "Total Referrals: ", summaryR: "Bonus Coins Issued: ",
-        dataKey: "referralLedger"
+        title: "2. Customer Referral Match Ledger (Multi-Color Desk)",
+        headers: ["SNo.", "Date / Day / Time", "New User ID", "New Name", "New Email ID", "Friend Referral Code", "Invite Code", "Received Code", "Match Status", "Coin Inviter (+7)", "Coin Receiver (+5)", "Inviter Name", "Inviter User ID", "Inviter Email ID", "Original Code", "Transfer Status"],
+        sumL: "Total Referrals: ", sumR: "Bonus Coins Issued: ", key: "referralLedger"
       },
       'reg-login-ref': {
-        title: "Customer Accounts Created via Referral Code",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Used Referral Code", "Account Status"],
-        summaryL: "Invited Users: ", summaryR: "Verification: Active",
-        dataKey: "registeredUsers"
+        title: "3. Customer Login By Referral Code",
+        headers: ["SNo.", "Date / Day / Time", "Username ID", "Name", "Email ID", "Phone Number", "Address", "User Referral Code", "Referral Count", "Status (Active/Block)"],
+        sumL: "Invited Users: ", sumR: "Verification: Active", key: "registeredUsers"
       },
       'reg-blocked': {
-        title: "Blocked Customer Database",
-        headers: ["SNo.", "Date / Day / Time", "User ID", "Name", "Email ID", "Phone Number", "Mandatory Feedback Reason", "Action"],
-        summaryL: "Blocked Accounts: ", summaryR: "Security Status: Suspended",
-        dataKey: "blockedUsers"
+        title: "4. Blocked Customer Database",
+        headers: ["SNo.", "Date / Day / Time", "Username ID", "Name", "Email ID", "Phone Number", "Address", "Mandatory Feedback Reason", "Status (Active/Block)"],
+        sumL: "Blocked Accounts: ", sumR: "Security Status: Suspended", key: "blockedUsers"
       },
+
+      // 6. TRAFFIC & ANALYTICS
       'vis-guest': {
-        title: "Guest Mode Visitors",
-        headers: ["Time Period", "Unique IP Count", "Pageviews", "Bounce Rate", "Status"],
-        summaryL: "Traffic Segments: ", summaryR: "Total Hits: 0",
-        dataKey: "guestTraffic"
+        title: "Visitor Count: Guest Mode",
+        headers: ["Time Period", "Unique IP Count", "Pageviews", "Bounce Rate", "Platform Hits", "Status"],
+        sumL: "Traffic Segments: ", sumR: "Total Hits: 0", key: "guestTraffic"
       },
       'vis-member': {
-        title: "Logged In Member Visitors",
-        headers: ["Time Period", "Active Members", "Session Duration", "Actions Logged", "Status"],
-        summaryL: "Active Sessions: ", summaryR: "Retention: Normal",
-        dataKey: "loginTraffic"
+        title: "Visitor Count: Login Member Visitors",
+        headers: ["Time Period", "Active Members", "Session Duration", "Actions Logged", "Wallet Views", "Status"],
+        sumL: "Active Sessions: ", sumR: "Retention: Normal", key: "loginTraffic"
       },
       'click-analytics': {
         title: "Store Redirection Click Analytics",
-        headers: ["Store Platform", "Today Clicks", "Yesterday", "Weekly", "Monthly", "Yearly", "All Time Total"],
-        summaryL: "Tracked Stores: ", summaryR: "Total Redirection Clicks: 0",
-        dataKey: "linkClicks"
+        headers: ["Store Platform", "Today Clicks", "Tomorrow", "Weekly", "Monthly", "Yearly", "All Time Total"],
+        sumL: "Tracked Platforms: ", sumR: "Total Platform Clicks: 0", key: "linkClicks"
       }
     };
 
@@ -620,26 +588,26 @@
 
       const tBody = document.getElementById('tableBody');
       const db = getDB();
-      const records = db[schema.dataKey] || [];
+      const records = db[schema.key] || [];
 
       let list = Array.isArray(records) ? records : [];
-      if (schema.filterStep) {
-        list = list.filter(item => item.currentStep === schema.filterStep);
+      if (schema.step) {
+        list = list.filter(item => item.currentStep === schema.step);
       }
 
       if (list.length === 0) {
-        tBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="empty-state">No customer records under this stage right now. Live entries will appear here.</td></tr>`;
-        document.getElementById('summaryLeft').textContent = schema.summaryL + "0";
-        document.getElementById('summaryRight').textContent = schema.summaryR + "0";
+        tBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="empty-state">No customer records under this stage right now. Live operational entries will appear here.</td></tr>`;
+        document.getElementById('summaryLeft').textContent = schema.sumL + "0";
+        document.getElementById('summaryRight').textContent = schema.sumR + "0";
         return;
       }
 
-      tBody.innerHTML = list.map((row, i) => {
+      tBody.innerHTML = list.map((row) => {
         return '<tr>' + schema.headers.map(h => `<td>${row[h] || 'N/A'}</td>`).join('') + '</tr>';
       }).join('');
 
-      document.getElementById('summaryLeft').textContent = schema.summaryL + list.length;
-      document.getElementById('summaryRight').textContent = schema.summaryR + "0";
+      document.getElementById('summaryLeft').textContent = schema.sumL + list.length;
+      document.getElementById('summaryRight').textContent = schema.sumR + "0";
     }
 
     function setFilter(period, btn) {
@@ -663,17 +631,18 @@
       }
     };
 
-    function triggerCancelWithModal(orderId) {
+    function triggerModal(title, callback) {
+      document.getElementById('modalHeading').textContent = title;
       document.getElementById('feedbackText').value = '';
       document.getElementById('feedbackModal').style.display = 'flex';
       document.getElementById('btnModalConfirm').onclick = function() {
         const reason = document.getElementById('feedbackText').value.trim();
         if (!reason) {
-          alert('Mandatory: Cancellation feedback reason is strictly required.');
+          alert('Mandatory: Feedback reason is required.');
           return;
         }
+        callback(reason);
         closeFeedbackModal();
-        alert('Request cancelled & moved to Recycling Bin.');
       };
     }
 
