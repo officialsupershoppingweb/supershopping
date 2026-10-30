@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Staff Master Tables - Founder Desk</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    body {
+      background-color: #f7f3ed;
+      color: #3b2219;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      width: 100vw;
+      overflow-x: hidden;
+    }
+    .top-navbar {
+      background: #ffffff;
+      border-bottom: 1px solid #dfcfbc;
+      padding: 12px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .back-btn-top {
+      background: #3b2219;
+      color: #ffffff;
+      border: none;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .brand-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #3b2219;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .breadcrumb {
+      font-size: 13px;
+      color: #785a46;
+    }
+    .breadcrumb span {
+      color: #3b2219;
+      font-weight: 700;
+    }
+    .selector-strip {
+      background: #ffffff;
+      border-bottom: 1px solid #dfcfbc;
+      padding: 10px 28px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      overflow-x: auto;
+    }
+    .selector-strip label {
+      font-size: 12px;
+      font-weight: 800;
+      color: #3b2219;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    .table-dropdown {
+      padding: 6px 14px;
+      border-radius: 8px;
+      border: 1px solid #dfcfbc;
+      background: #fbf8f3;
+      font-size: 13px;
+      font-weight: 700;
+      color: #3b2219;
+      cursor: pointer;
+      outline: none;
+    }
+    .main-viewport {
+      width: 100%;
+      padding: 20px 28px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-header-block {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .table-title {
+      font-size: 23px;
+      font-weight: 800;
+      color: #2b1810;
+    }
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .search-box {
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 12px;
+      width: 180px;
+      color: #2b1810;
+      outline: none;
+    }
+    .date-pill-btn {
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      color: #3b2219;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .date-pill-btn.active, .date-pill-btn:hover {
+      background: #3b2219;
+      color: #ffffff;
+      border-color: #3b2219;
+    }
+    .date-input {
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      color: #2b1810;
+    }
+    .table-card-wrapper {
+      width: 100%;
+      background: #ffffff;
+      border: 1px solid #dfcfbc;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(59, 34, 25, 0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .table-scroll-surface {
+      width: 100%;
+      overflow-x: auto;
+    }
+    table.master-table {
+      width: 100%;
+      min-width: 1250px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    table.master-table thead tr {
+      background-color: #3b2219;
+      color: #ffffff;
+    }
+    table.master-table th {
+      padding: 14px 16px;
+      font-size: 12.5px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      border-right: 1px solid #4a2d22;
+      white-space: nowrap;
+    }
+    table.master-table th:last-child {
+      border-right: none;
+    }
+    table.master-table tbody tr {
+      border-bottom: 1px solid #e8decb;
+    }
+    table.master-table tbody tr:nth-child(odd) {
+      background-color: #fdfbf7;
+    }
+    table.master-table tbody tr:nth-child(even) {
+      background-color: #f4ecdf;
+    }
+    table.master-table td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #331f16;
+      border-right: 1px solid #e8decb;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    table.master-table td:last-child {
+      border-right: none;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 70px 20px;
+      color: #785a46;
+      font-weight: 700;
+      font-size: 14px;
+      background: #fdfbf7;
+    }
+    .table-summary-bar {
+      background: #ebdcc8;
+      border-top: 1px solid #dfcfbc;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      font-weight: 800;
+      color: #3b2219;
+    }
+    .btn-action-pill {
+      border: none;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pill-green { background: #15803d; color: #ffffff; }
+    .pill-red { background: #b91c1c; color: #ffffff; }
+    .pill-blue { background: #0284c7; color: #ffffff; }
+    .pill-dark { background: #3b2219; color: #ffffff; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+    .modal-card {
+      background: #ffffff;
+      border: 2px solid #3b2219;
+      border-radius: 14px;
+      padding: 20px 24px;
+      width: 90%;
+      max-width: 440px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+    .modal-card h4 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #3b2219;
+      margin-bottom: 8px;
+    }
+    .modal-card p {
+      font-size: 12px;
+      color: #785a46;
+      margin-bottom: 12px;
+    }
+    .modal-card textarea {
+      width: 100%;
+      height: 90px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #dfcfbc;
+      font-size: 12.5px;
+      color: #2b1810;
+      outline: none;
+      resize: none;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="top-navbar">
+    <div class="top-left">
+      <button type="button" class="back-btn-top" onclick="handleHardwareBack()">← Back To Desk</button>
+      <div class="brand-title">SuperShopping Founder Desk</div>
+      <div class="breadcrumb">&gt; <span id="viewBreadcrumb">Staff Management</span></div>
+    </div>
+  </header>
+
+  <nav class="selector-strip">
+    <label for="tableSelector">Select Staff Table:</label>
+    <select id="tableSelector" class="table-dropdown" onchange="switchTable(this.value)">
+      <optgroup label="1. Details Staff">
+        <option value="stf-join-req">1A. Joining For Request</option>
+        <option value="stf-enroll">1B. Enroll (Staff Registration Details)</option>
+      </optgroup>
+      <optgroup label="2. Register Staff">
+        <option value="stf-reg-add">2A. Add Staff (Credentials Setup)</option>
+        <option value="stf-reg-remove">2B. Remove Staff & Access Status</option>
+        <option value="stf-reg-id">2C. Staff Register ID (Credentials Sync)</option>
+      </optgroup>
+      <optgroup label="3. Staff Attendance">
+        <option value="stf-att-daily">3A. Staff Daily Present (45-Min Activity)</option>
+        <option value="stf-att-monthly">3B. Staff Attendance Monthly (30-Day Cycle)</option>
+        <option value="stf-att-graph">3C. Graph Of All Staff (24-Hour Logs)</option>
+      </optgroup>
+      <optgroup label="4. Work & Done By Staff">
+        <option value="stf-work-give">4A. Work For Staff (Given Tasks)</option>
+        <option value="stf-work-get">4B. Get Work (Assigned Tasks Overview)</option>
+        <option value="stf-work-done">4C. Work Done By Staff (Completed Status)</option>
+      </optgroup>
+      <optgroup label="5. Other Desk Options">
+        <option value="stf-salary">5. Staff Salary Ledger</option>
+        <option value="stf-custom">6. Custom Desk</option>
+        <option value="stf-partner">7. Partner Desk</option>
+      </optgroup>
+    </select>
+  </nav>
+
+  <main class="main-viewport">
+    <div class="table-header-block">
+      <h2 class="table-title" id="displayTableTitle">Staff Table View</h2>
+      <div class="filter-group">
+        <input type="text" class="search-box" placeholder="Search staff records..." oninput="handleSearch(this.value)">
+        <button type="button" class="date-pill-btn active" onclick="setFilter('today', this)">Today</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('tomorrow', this)">Tomorrow</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('weekly', this)">Weekly</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('monthly', this)">Monthly</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('yearly', this)">Yearly</button>
+        <button type="button" class="date-pill-btn" onclick="setFilter('all', this)">All</button>
+        <input type="date" class="date-input" id="customDateFilter" onchange="setFilter('custom', this)">
+      </div>
+    </div>
+
+    <div class="table-card-wrapper">
+      <div class="table-scroll-surface">
+        <table class="master-table">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div class="table-summary-bar">
+        <span id="summaryLeft">Total Staff: 0</span>
+        <span id="summaryRight">Status: Active Engine</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mandatory Feedback Popup Modal -->
+  <div class="modal-overlay" id="feedbackModal">
+    <div class="modal-card">
+      <h4 id="modalHeading">Mandatory Staff Feedback Required</h4>
+      <p id="modalSub">Enter reason to reject or remove staff account:</p>
+      <textarea id="feedbackText" placeholder="Write reason here..."></textarea>
+      <div class="modal-actions">
+        <button type="button" class="btn-action-pill pill-dark" onclick="closeFeedbackModal()">Close</button>
+        <button type="button" class="btn-action-pill pill-red" id="btnModalConfirm">Confirm Action</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const STAFF_SCHEMAS = {
+      // 1. Details Staff
+      'stf-join-req': {
+        title: "1A. Joining For Request Desk",
+        headers: ["SNo.", "Date / Day / Time", "View PDF", "Auto Fill No.", "Action (Accept / Reject)"],
+        sumL: "Total Requests: ", key: "staffJoinRequests"
+      },
+      'stf-enroll': {
+        title: "Enroll (Staff Registration Details)",
+        headers: ["SNo.", "Date / Day / Time", "Auto Fill No.", "Name", "Father Name", "Date of Birth", "Gender", "Phone Number", "Email ID", "Address", "Identity Proof", "Photo", "Signature", "Document View"],
+        sumL: "Total Enrolled: ", key: "staffEnrolled"
+      },
+
+      // 2. Register Staff
+      'stf-reg-add': {
+        title: "2A. Add Staff (Credentials Setup Desk)",
+        headers: ["SNo.", "Date / Day / Time", "Auto Fill No.", "Name", "Email ID", "Phone No.", "User ID", "Password", "Access ID", "Action (Save)"],
+        sumL: "Added Staff: ", key: "staffAccounts"
+      },
+      'stf-reg-remove': {
+        title: "2B. Remove Staff & Access Status Desk",
+        headers: ["SNo.", "Date / Day / Time", "Name", "Email ID", "User ID", "Password", "Access ID", "Status (Active / Block)", "Remove (Delete with Feedback)", "Save"],
+        sumL: "Staff Accounts: ", key: "staffAccounts"
+      },
+      'stf-reg-id': {
+        title: "2C. Staff Register ID (Credentials Sync)",
+        headers: ["SNo.", "Name", "Email", "User ID (Editable)", "Password (Editable)", "Access ID (Editable)", "Action (Save & Sync)"],
+        sumL: "Active Credential Records: ", key: "staffAccounts"
+      },
+
+      // 3. Staff Attendance
+      'stf-att-daily': {
+        title: "3A. Staff Daily Present (45-Min Activity Check)",
+        headers: ["SNo.", "Profile Image", "Auto Fill No.", "Name", "User ID", "Access ID", "Status (Present / Absent)"],
+        sumL: "Daily Logged Staff: ", key: "staffDailyAtt"
+      },
+      'stf-att-monthly': {
+        title: "3B. Staff Attendance Monthly (30-Day Cycle)",
+        headers: ["SNo.", "Profile Image", "Date / Day", "Access ID", "Name", "User ID", "Present (Days Out of 30)", "Absent (Days)"],
+        sumL: "Monthly Tracked Staff: ", key: "staffMonthlyAtt"
+      },
+      'stf-att-graph': {
+        title: "3C. Graph Of All Staff (24-Hour Logs & Activity)",
+        headers: ["SNo.", "Profile Image", "User ID", "Access ID", "Login Time", "Exit Time", "Stay (Calculated Hours & Minutes)"],
+        sumL: "Live Session Count: ", key: "staffSessionLogs"
+      },
+
+      // 4. Work & Done By Staff
+      'stf-work-give': {
+        title: "4A. Work For Staff (Given Tasks & Target Allocation)",
+        headers: ["SNo.", "Staff Profile", "Name", "User ID", "Access ID", "Email", "Phone", "Task Action (Open Modal & Assign Task)"],
+        sumL: "Staff Queued for Work: ", key: "staffWorkQueue"
+      },
+      'stf-work-get': {
+        title: "4B. Get Work (Assigned Tasks Overview)",
+        headers: ["SNo.", "Staff Profile", "Name", "User ID", "Assigned Work Details", "Action (Edit Work)", "Action (Remove Task)"],
+        sumL: "Active Task Assignees: ", key: "staffAssignedTasks"
+      },
+      'stf-work-done': {
+        title: "4C. Work Done By Staff (Live Output Desk)",
+        headers: ["S.No.", "Work Given", "Work Done (Completed / Pending / Incomplete)", "View Output (Added Products / Ebooks)"],
+        sumL: "Completed Tasks Tracked: ", key: "staffWorkDone"
+      },
+
+      // 5. Placeholders
+      'stf-salary': {
+        title: "5. Staff Salary Ledger",
+        headers: ["SNo.", "Profile Image", "Name", "User ID", "Access ID", "Phone Number", "Attendance", "Target Completed", "Net Salary", "Status"],
+        sumL: "Salary Records: ", key: "staffSalary"
+      },
+      'stf-custom': {
+        title: "6. Custom Desk (Reserved Space)",
+        headers: ["SNo.", "Module Name", "Assigned Staff", "Activity Log", "System Status"],
+        sumL: "Custom Modules: ", key: "staffCustom"
+      },
+      'stf-partner': {
+        title: "7. Partner Desk (Reserved Workspace)",
+        headers: ["SNo.", "Partner ID", "Organization Name", "Contact Person", "Active Deals", "Status"],
+        sumL: "Partners: ", key: "staffPartner"
+      }
+    };
+
+    let currentTableKey = 'stf-enroll';
+
+    function getDB() {
+      try {
+        const raw = localStorage.getItem('ss_owner_staff_master_db');
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function switchTable(key) {
+      currentTableKey = key;
+      renderCurrentTable();
+    }
+
+    function renderCurrentTable() {
+      const schema = STAFF_SCHEMAS[currentTableKey];
+      if (!schema) return;
+
+      document.getElementById('displayTableTitle').textContent = schema.title;
+      document.getElementById('viewBreadcrumb').textContent = schema.title;
+
+      const tHead = document.getElementById('tableHead');
+      tHead.innerHTML = '<tr>' + schema.headers.map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+      const tBody = document.getElementById('tableBody');
+      const db = getDB();
+      const records = db[schema.key] || [];
+
+      let list = Array.isArray(records) ? records : [];
+
+      if (list.length === 0) {
+        tBody.innerHTML = `<tr><td colspan="${schema.headers.length}" class="empty-state">No staff operational records logged right now. Live entries will appear here.</td></tr>`;
+        document.getElementById('summaryLeft').textContent = schema.sumL + "0";
+        return;
+      }
+
+      tBody.innerHTML = list.map((row) => {
+        return '<tr>' + schema.headers.map(h => `<td>${row[h] || 'N/A'}</td>`).join('') + '</tr>';
+      }).join('');
+
+      document.getElementById('summaryLeft').textContent = schema.sumL + list.length;
+    }
+
+    function setFilter(period, btn) {
+      document.querySelectorAll('.date-pill-btn').forEach(b => b.classList.remove('active'));
+      if (btn && btn.classList) btn.classList.add('active');
+      renderCurrentTable();
+    }
+
+    function handleSearch(val) {
+      renderCurrentTable();
+    }
+
+    function handleHardwareBack() {
+      window.location.href = './ss-founder-desk.html';
+    }
+
+    window.onkeydown = function(e) {
+      if ((e.altKey && e.key === 'ArrowLeft') || (e.key === 'Backspace' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA')) {
+        e.preventDefault();
+        handleHardwareBack();
+      }
+    };
+
+    function triggerModal(title, callback) {
+      document.getElementById('modalHeading').textContent = title;
+      document.getElementById('feedbackText').value = '';
+      document.getElementById('feedbackModal').style.display = 'flex';
+      document.getElementById('btnModalConfirm').onclick = function() {
+        const reason = document.getElementById('feedbackText').value.trim();
+        if (!reason) {
+          alert('Mandatory: Reason is strictly required.');
+          return;
+        }
+        callback(reason);
+        closeFeedbackModal();
+      };
+    }
+
+    function closeFeedbackModal() {
+      document.getElementById('feedbackModal').style.display = 'none';
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const target = urlParams.get('table');
+      if (target && STAFF_SCHEMAS[target]) {
+        currentTableKey = target;
+        document.getElementById('tableSelector').value = target;
+      } else {
+        currentTableKey = 'stf-enroll';
+        document.getElementById('tableSelector').value = 'stf-enroll';
+      }
+      renderCurrentTable();
+    });
+  </script>
+</body>
+</html>
