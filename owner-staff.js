@@ -1,307 +1,241 @@
 /* ==========================================================================
-   SUPER SHOPPING - FOUNDER DESK: STAFF MODULE (ZERO DUMMY DATA)
+   SUPER SHOPPING - FOUNDER DESK: STAFF MANAGEMENT HUB (FULL BLUEPRINT ENGINE)
    ========================================================================== */
 
 (function () {
   'use strict';
 
-  function getStaffStore() {
-    try {
-      const raw = localStorage.getItem('ss_owner_staff_store');
-      return raw ? JSON.parse(raw) : {
-        joiningRequests: [],
-        enrolledStaff: [],
-        activeRoster: [],
-        assignedWork: []
-      };
-    } catch (e) {
-      return { joiningRequests: [], enrolledStaff: [], activeRoster: [], assignedWork: [] };
-    }
-  }
-
-  function saveStaffStore(store) {
-    try {
-      localStorage.setItem('ss_owner_staff_store', JSON.stringify(store));
-    } catch (e) {}
-  }
-
   window.initOwnerStaff = function () {
-    const container = document.getElementById('view-staff');
-    if (!container) return;
+    var mount = document.getElementById('view-staff');
+    if (!mount) return;
 
-    function renderStaffHub() {
-      container.innerHTML = `
-        <div style="margin-bottom: 16px;">
-          <h2 style="font-size: 19px; font-weight: 800; color: #3b2219; margin-bottom: 4px;">Staff & Operations Control</h2>
-          <p style="font-size: 12.5px; color: #785a46;">Manage real applications, real enrolled members, and live attendance.</p>
-        </div>
-
-        <div style="display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap;">
-          <button type="button" class="btn-action-sm btn-blue staff-main-pill active" data-sub="joining">1. Joining Requests</button>
-          <button type="button" class="btn-action-sm btn-blue staff-main-pill" data-sub="enroll" style="opacity: 0.6;">2. Enrolled Staff</button>
-          <button type="button" class="btn-action-sm btn-blue staff-main-pill" data-sub="roster" style="opacity: 0.6;">3. Register & Roster</button>
-          <button type="button" class="btn-action-sm btn-blue staff-main-pill" data-sub="attendance" style="opacity: 0.6;">4. Attendance & 24h Graph</button>
-          <button type="button" class="btn-action-sm btn-blue staff-main-pill" data-sub="work" style="opacity: 0.6;">5. Work & Output</button>
-        </div>
-
-        <div id="staffDynamicMount"></div>
-      `;
-
-      container.querySelectorAll('.staff-main-pill').forEach(pill => {
-        pill.onclick = function () {
-          container.querySelectorAll('.staff-main-pill').forEach(p => p.style.opacity = '0.6');
-          this.style.opacity = '1';
-          const sub = this.getAttribute('data-sub');
-          if (sub === 'joining') openJoiningView();
-          if (sub === 'enroll') openEnrollView();
-          if (sub === 'roster') openRosterView();
-          if (sub === 'attendance') openAttendanceView();
-          if (sub === 'work') openWorkView();
-        };
-      });
-
-      openJoiningView();
+    // DIRECT ROUTE RUNNER: STAFF-TABLES.HTML LINK
+    function openStaffTable(key) {
+      window.location.href = './staff-tables.html?table=' + key;
     }
 
-    // 1. REAL JOINING (ZERO DUMMY)
-    function openJoiningView() {
-      const mount = document.getElementById('staffDynamicMount');
-      const store = getStaffStore();
+    // Isolate staff view display
+    document.querySelectorAll('.f-view').forEach(function(el) {
+      if (el.id !== 'view-staff') {
+        el.classList.remove('active');
+        el.style.display = 'none';
+      }
+    });
+    mount.classList.add('active');
+    mount.style.display = 'block';
+
+    var viewHistory = [];
+
+    function pushView(fn) {
+      viewHistory.push(fn);
+      fn();
+    }
+
+    window.onpopstate = function () {
+      if (viewHistory.length > 1) {
+        viewHistory.pop();
+        var prevScreen = viewHistory[viewHistory.length - 1];
+        if (prevScreen) prevScreen();
+      } else {
+        showLevel1();
+      }
+    };
+
+    // -------------------------------------------------------------
+    // LEVEL 1: STAFF & PARTNER SELECTION (2 OPTIONS)
+    // -------------------------------------------------------------
+    function showLevel1() {
       mount.innerHTML = `
-        <div class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 12px;">New Staff Joining Applications</h4>
-          <div class="table-responsive-box">
-            <table class="f-table">
-              <thead>
-                <tr>
-                  <th>S.No.</th>
-                  <th>Date / Time</th>
-                  <th>Candidate Name</th>
-                  <th>Category</th>
-                  <th>Application Form</th>
-                  <th>Auto Fill No.</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${store.joiningRequests.length === 0
-                  ? '<tr><td colspan="7" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No new staff applications right now.</td></tr>'
-                  : store.joiningRequests.map((r, i) => `
-                    <tr>
-                      <td>${i + 1}</td>
-                      <td>${r.dateTime}</td>
-                      <td><b>${r.name}</b></td>
-                      <td>${r.category}</td>
-                      <td><button type="button" class="btn-action-sm btn-blue">📄 View Form</button></td>
-                      <td><b style="color:#6b3e26;">${r.autoNo}</b></td>
-                      <td>
-                        <button type="button" class="btn-action-sm btn-green">Accept ✓</button>
-                        <button type="button" class="btn-action-sm btn-red">Reject ✕</button>
-                      </td>
-                    </tr>
-                  `).join('')}
-              </tbody>
-            </table>
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#ffffff; border:2px solid #3b2219; border-radius:12px; padding:10px 28px; margin-bottom:28px; box-shadow:0 4px 12px rgba(59,34,25,0.08);">
+            <h3 style="font-size:18px; font-weight:900; color:#3b2219; letter-spacing:1px; margin:0; text-transform:uppercase;">STAFF & PARTNER DESK</h3>
+          </div>
+
+          <div style="display:flex; gap:26px; justify-content:center; flex-wrap:wrap;">
+            <button type="button" id="btnDeskStaff" class="stock-square-card" style="width:185px; height:185px; background:#0284c7; border:none; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; cursor:pointer; box-shadow:0 12px 28px rgba(2,132,199,0.25);">
+              <span style="font-size:44px;">👔</span>
+              <span style="font-size:16px; font-weight:900; color:#ffffff; text-align:center; line-height:1.2;">1. STAFF<br/>MANAGEMENT</span>
+            </button>
+            <button type="button" id="btnDeskPartner" class="stock-square-card" style="width:185px; height:185px; background:#0284c7; border:none; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; cursor:pointer; box-shadow:0 12px 28px rgba(2,132,199,0.25);">
+              <span style="font-size:44px;">🤝</span>
+              <span style="font-size:16px; font-weight:900; color:#ffffff; text-align:center; line-height:1.2;">2. PARTNER<br/>DESK</span>
+            </button>
           </div>
         </div>
       `;
+
+      document.getElementById('btnDeskStaff').onclick = function() { pushView(showStaff6Modules); };
+      document.getElementById('btnDeskPartner').onclick = function() { openStaffTable('stf-partner'); };
     }
 
-    // 2. REAL ENROLLED (ZERO DUMMY)
-    function openEnrollView() {
-      const mount = document.getElementById('staffDynamicMount');
-      const store = getStaffStore();
+    // -------------------------------------------------------------
+    // LEVEL 2: 6 STAFF MODULES
+    // -------------------------------------------------------------
+    function showStaff6Modules() {
       mount.innerHTML = `
-        <div class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 12px;">Enrolled Staff Database</h4>
-          <div class="table-responsive-box">
-            <table class="f-table">
-              <thead>
-                <tr>
-                  <th>S.No.</th>
-                  <th>Enroll Date</th>
-                  <th>Auto Fill No.</th>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th>ID Document</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${store.enrolledStaff.length === 0
-                  ? '<tr><td colspan="8" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No enrolled staff members yet.</td></tr>'
-                  : store.enrolledStaff.map((e, i) => `
-                    <tr>
-                      <td>${i + 1}</td>
-                      <td>${e.acceptDate}</td>
-                      <td><b>${e.autoNo}</b></td>
-                      <td><b>${e.name}</b></td>
-                      <td>${e.phone}</td>
-                      <td>${e.email}</td>
-                      <td>✓ ${e.idDoc}</td>
-                      <td>ENROLLED</td>
-                    </tr>
-                  `).join('')}
-              </tbody>
-            </table>
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#ffffff; border:2px solid #3b2219; border-radius:12px; padding:10px 26px; margin-bottom:28px; box-shadow:0 4px 12px rgba(59,34,25,0.08);">
+            <h3 style="font-size:17px; font-weight:900; color:#3b2219; margin:0; text-transform:uppercase;">STAFF OPERATIONS</h3>
+          </div>
+
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 170px)); gap:18px; justify-content:center; width:100%; max-width:580px;">
+            <button type="button" id="stfM1" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 10px 24px rgba(2,132,199,0.2);">
+              <span style="font-size:34px;">📋</span>
+              <span style="font-size:13px; font-weight:800; color:#ffffff; text-align:center; line-height:1.2;">1. Details<br/>Staff</span>
+            </button>
+            <button type="button" id="stfM2" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 10px 24px rgba(2,132,199,0.2);">
+              <span style="font-size:34px;">📇</span>
+              <span style="font-size:13px; font-weight:800; color:#ffffff; text-align:center; line-height:1.2;">2. Register<br/>Staff</span>
+            </button>
+            <button type="button" id="stfM3" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 10px 24px rgba(2,132,199,0.2);">
+              <span style="font-size:34px;">📅</span>
+              <span style="font-size:13px; font-weight:800; color:#ffffff; text-align:center; line-height:1.2;">3. Staff<br/>Attendance</span>
+            </button>
+            <button type="button" id="stfM4" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 10px 24px rgba(2,132,199,0.2);">
+              <span style="font-size:34px;">⚡</span>
+              <span style="font-size:13px; font-weight:800; color:#ffffff; text-align:center; line-height:1.2;">4. Work &<br/>Done</span>
+            </button>
+            <button type="button" id="stfM5" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 10px 24px rgba(2,132,199,0.2);">
+              <span style="font-size:34px;">💵</span>
+              <span style="font-size:13px; font-weight:800; color:#ffffff; text-align:center; line-height:1.2;">5. Staff<br/>Salary</span>
+            </button>
+            <button type="button" id="stfM6" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; box-shadow:0 10px 24px rgba(2,132,199,0.2);">
+              <span style="font-size:34px;">⚙️</span>
+              <span style="font-size:13px; font-weight:800; color:#ffffff; text-align:center; line-height:1.2;">6. Custom<br/>Desk</span>
+            </button>
           </div>
         </div>
       `;
+
+      document.getElementById('stfM1').onclick = function() { pushView(showDetailsStaffSub); };
+      document.getElementById('stfM2').onclick = function() { pushView(showRegisterStaffSub); };
+      document.getElementById('stfM3').onclick = function() { pushView(showAttendanceSub); };
+      document.getElementById('stfM4').onclick = function() { pushView(showWorkSub); };
+      document.getElementById('stfM5').onclick = function() { openStaffTable('stf-salary'); };
+      document.getElementById('stfM6').onclick = function() { openStaffTable('stf-custom'); };
     }
 
-    // 3. REAL ROSTER (ZERO DUMMY)
-    function openRosterView() {
-      const mount = document.getElementById('staffDynamicMount');
-      const store = getStaffStore();
+    // -------------------------------------------------------------
+    // SUB-MODULE 1: DETAILS STAFF
+    // -------------------------------------------------------------
+    function showDetailsStaffSub() {
       mount.innerHTML = `
-        <div class="f-card" style="margin-bottom: 16px;">
-          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 10px;">Issue Member Credentials (Add Staff)</h4>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin-bottom: 10px;">
-            <input type="text" id="inpRosterAutoNo" placeholder="Auto Fill No." style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; color:#2b1810; font-size:12px;" />
-            <input type="text" id="inpRosterName" placeholder="Staff Name" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; color:#2b1810; font-size:12px;" />
-            <input type="text" id="inpRosterUserId" placeholder="User ID" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; color:#2b1810; font-size:12px;" />
-            <input type="password" id="inpRosterPass" placeholder="Login Password" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; color:#2b1810; font-size:12px;" />
-            <input type="password" id="inpRosterAccessId" placeholder="Access ID Key" style="background:#ffffff; border:1px solid #dfcfbc; padding:8px; border-radius:6px; color:#2b1810; font-size:12px;" />
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#ffffff; border:2px solid #3b2219; border-radius:12px; padding:10px 26px; margin-bottom:28px;">
+            <h3 style="font-size:17px; font-weight:900; color:#3b2219; margin:0; text-transform:uppercase;">1. DETAILS STAFF</h3>
           </div>
-          <button type="button" class="btn-action-sm btn-green" id="btnCreateCredentials" style="padding:10px 16px; font-size:13px;">Save & Issue Credentials ✓</button>
-        </div>
-
-        <div class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 12px;">Active Operations Roster</h4>
-          <div class="table-responsive-box">
-            <table class="f-table">
-              <thead>
-                <tr>
-                  <th>S.No.</th>
-                  <th>Name</th>
-                  <th>User ID</th>
-                  <th>Access ID</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${store.activeRoster.length === 0
-                  ? '<tr><td colspan="5" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No active staff accounts issued yet.</td></tr>'
-                  : store.activeRoster.map((r, i) => `
-                    <tr>
-                      <td>${i + 1}</td>
-                      <td><b>${r.name}</b></td>
-                      <td><b>${r.userId}</b></td>
-                      <td><code>${r.accessId}</code></td>
-                      <td>${r.status}</td>
-                    </tr>
-                  `).join('')}
-              </tbody>
-            </table>
+          <div style="display:flex; gap:24px; justify-content:center; flex-wrap:wrap;">
+            <button type="button" id="subD1" class="stock-square-card" style="width:180px; height:180px; background:#ffffff; border:2px solid #dfcfbc; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; box-shadow:0 12px 28px rgba(59,34,25,0.08);">
+              <span style="font-size:40px;">📩</span>
+              <span style="font-size:14px; font-weight:900; color:#0284c7; text-align:center; line-height:1.2;">i. JOINING FOR<br/>REQUEST</span>
+            </button>
+            <button type="button" id="subD2" class="stock-square-card" style="width:180px; height:180px; background:#ffffff; border:2px solid #dfcfbc; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; box-shadow:0 12px 28px rgba(59,34,25,0.08);">
+              <span style="font-size:40px;">📜</span>
+              <span style="font-size:14px; font-weight:900; color:#0284c7; text-align:center; line-height:1.2;">ii. ENROLL<br/>STAFF</span>
+            </button>
           </div>
         </div>
       `;
 
-      document.getElementById('btnCreateCredentials').onclick = () => {
-        const name = document.getElementById('inpRosterName').value.trim();
-        const uid = document.getElementById('inpRosterUserId').value.trim();
-        const pass = document.getElementById('inpRosterPass').value.trim();
-        const acc = document.getElementById('inpRosterAccessId').value.trim();
-
-        if (!name || !uid || !pass || !acc) {
-          alert('Please enter all credential fields.');
-          return;
-        }
-
-        store.activeRoster.push({
-          sno: store.activeRoster.length + 1,
-          name,
-          userId: uid,
-          password: pass,
-          accessId: acc,
-          status: 'active'
-        });
-
-        saveStaffStore(store);
-        alert(`Account created for ${name}!`);
-        openRosterView();
-      };
+      document.getElementById('subD1').onclick = function() { openStaffTable('stf-join-req'); };
+      document.getElementById('subD2').onclick = function() { openStaffTable('stf-enroll'); };
     }
 
-    // 4. REAL ATTENDANCE (CLEAN TIMELINE)
-    function openAttendanceView() {
-      const mount = document.getElementById('staffDynamicMount');
-      const store = getStaffStore();
+    // -------------------------------------------------------------
+    // SUB-MODULE 2: REGISTER STAFF
+    // -------------------------------------------------------------
+    function showRegisterStaffSub() {
       mount.innerHTML = `
-        <div class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 6px;">24-Hour Live Duty Activity Graph</h4>
-          <p style="font-size: 12px; color: #785a46; margin-bottom: 12px;">Real-time active work pulse (Min 45m required).</p>
-
-          <div class="table-responsive-box">
-            <table class="f-table">
-              <thead>
-                <tr>
-                  <th>Staff Name</th>
-                  <th>User ID</th>
-                  <th>Login Time</th>
-                  <th>Exit Time</th>
-                  <th>Total Stay</th>
-                  <th>Daily Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${store.activeRoster.length === 0
-                  ? '<tr><td colspan="6" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No staff on duty today.</td></tr>'
-                  : store.activeRoster.map(r => `
-                    <tr>
-                      <td><b>${r.name}</b></td>
-                      <td>${r.userId}</td>
-                      <td>--:--</td>
-                      <td>--:--</td>
-                      <td>0h 00m</td>
-                      <td>ABSENT</td>
-                    </tr>
-                  `).join('')}
-              </tbody>
-            </table>
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#ffffff; border:2px solid #3b2219; border-radius:12px; padding:10px 26px; margin-bottom:28px;">
+            <h3 style="font-size:17px; font-weight:900; color:#3b2219; margin:0; text-transform:uppercase;">2. REGISTER STAFF</h3>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 170px)); gap:18px; justify-content:center; width:100%; max-width:580px;">
+            <button type="button" id="subR1" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; line-height:1.2;">A. ADD<br/>STAFF</button>
+            <button type="button" id="subR2" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; line-height:1.2;">B. REMOVE<br/>STAFF</button>
+            <button type="button" id="subR3" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; line-height:1.2;">C. REGISTER<br/>ID</button>
           </div>
         </div>
       `;
+
+      document.getElementById('subR1').onclick = function() { openStaffTable('stf-reg-add'); };
+      document.getElementById('subR2').onclick = function() { openStaffTable('stf-reg-remove'); };
+      document.getElementById('subR3').onclick = function() { openStaffTable('stf-reg-id'); };
     }
 
-    // 5. REAL WORK (ZERO DUMMY)
-    function openWorkView() {
-      const mount = document.getElementById('staffDynamicMount');
-      const store = getStaffStore();
+    // -------------------------------------------------------------
+    // SUB-MODULE 3: STAFF ATTENDANCE
+    // -------------------------------------------------------------
+    function showAttendanceSub() {
       mount.innerHTML = `
-        <div class="f-card">
-          <h4 style="font-size: 14px; font-weight: 700; color: #3b2219; margin-bottom: 12px;">Daily Tasks & Performance Audit</h4>
-          <div class="table-responsive-box">
-            <table class="f-table">
-              <thead>
-                <tr>
-                  <th>Staff Name</th>
-                  <th>Access ID</th>
-                  <th>Assigned Task</th>
-                  <th>Status</th>
-                  <th>Products Added</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${store.assignedWork.length === 0
-                  ? '<tr><td colspan="5" style="text-align:center; padding:24px; color:#785a46; font-weight:600;">No tasks assigned yet.</td></tr>'
-                  : store.assignedWork.map(w => `
-                    <tr>
-                      <td><b>${w.staffName}</b></td>
-                      <td><code>${w.accessId}</code></td>
-                      <td>${w.task}</td>
-                      <td>${w.status}</td>
-                      <td>0 Deals</td>
-                    </tr>
-                  `).join('')}
-              </tbody>
-            </table>
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#ffffff; border:2px solid #3b2219; border-radius:12px; padding:10px 26px; margin-bottom:28px;">
+            <h3 style="font-size:17px; font-weight:900; color:#3b2219; margin:0; text-transform:uppercase;">3. STAFF ATTENDANCE</h3>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 170px)); gap:18px; justify-content:center; width:100%; max-width:580px;">
+            <button type="button" id="subA1" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; line-height:1.2;">1. DAILY<br/>PRESENT</button>
+            <button type="button" id="subA2" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; line-height:1.2;">2. MONTHLY<br/>COUNT</button>
+            <button type="button" id="subA3" class="stock-square-card" style="height:145px; background:#0284c7; border:none; border-radius:20px; color:#fff; font-weight:900; font-size:13px; cursor:pointer; line-height:1.2;">3. GRAPH OF<br/>ALL STAFF</button>
           </div>
         </div>
       `;
+
+      document.getElementById('subA1').onclick = function() { openStaffTable('stf-att-daily'); };
+      document.getElementById('subA2').onclick = function() { openStaffTable('stf-att-monthly'); };
+      document.getElementById('subA3').onclick = function() { openStaffTable('stf-att-graph'); };
     }
 
-    renderStaffHub();
+    // -------------------------------------------------------------
+    // SUB-MODULE 4: WORK & DONE BY STAFF
+    // -------------------------------------------------------------
+    function showWorkSub() {
+      mount.innerHTML = `
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#ffffff; border:2px solid #3b2219; border-radius:12px; padding:10px 26px; margin-bottom:28px;">
+            <h3 style="font-size:17px; font-weight:900; color:#3b2219; margin:0; text-transform:uppercase;">4. WORK & DONE BY STAFF</h3>
+          </div>
+          <div style="display:flex; gap:24px; justify-content:center; flex-wrap:wrap;">
+            <button type="button" id="subW1" class="stock-square-card" style="width:180px; height:180px; background:#ffffff; border:2px solid #dfcfbc; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; box-shadow:0 12px 28px rgba(59,34,25,0.08);">
+              <span style="font-size:40px;">📤</span>
+              <span style="font-size:14px; font-weight:900; color:#0284c7; text-align:center; line-height:1.2;">a) WORK FOR<br/>STAFF</span>
+            </button>
+            <button type="button" id="subW2" class="stock-square-card" style="width:180px; height:180px; background:#ffffff; border:2px solid #dfcfbc; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer; box-shadow:0 12px 28px rgba(59,34,25,0.08);">
+              <span style="font-size:40px;">📥</span>
+              <span style="font-size:14px; font-weight:900; color:#0284c7; text-align:center; line-height:1.2;">b) WORK DONE<br/>BY STAFF</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('subW1').onclick = function() { pushView(showWorkForStaffSub); };
+      document.getElementById('subW2').onclick = function() { openStaffTable('stf-work-done'); };
+    }
+
+    function showWorkForStaffSub() {
+      mount.innerHTML = `
+        <div style="padding:20px 10px; min-height:75vh; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+          <div style="background:#0284c7; border:2px solid #0369a1; border-radius:12px; padding:10px 26px; margin-bottom:28px;">
+            <h3 style="font-size:17px; font-weight:900; color:#ffffff; margin:0; text-transform:uppercase;">Work For Staff Desk</h3>
+          </div>
+          <div style="display:flex; gap:24px; justify-content:center; flex-wrap:wrap;">
+            <button type="button" id="subWG1" class="stock-square-card" style="width:180px; height:180px; background:#ffffff; border:2px solid #dfcfbc; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer;">
+              <span style="font-size:40px;">✍️</span>
+              <span style="font-size:14px; font-weight:900; color:#0284c7; text-align:center; line-height:1.2;">i. GIVEN BY<br/>STAFF (ASSIGN)</span>
+            </button>
+            <button type="button" id="subWG2" class="stock-square-card" style="width:180px; height:180px; background:#ffffff; border:2px solid #dfcfbc; border-radius:22px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; cursor:pointer;">
+              <span style="font-size:40px;">📋</span>
+              <span style="font-size:14px; font-weight:900; color:#0284c7; text-align:center; line-height:1.2;">ii. GET WORK<br/>OVERVIEW</span>
+            </button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('subWG1').onclick = function() { openStaffTable('stf-work-give'); };
+      document.getElementById('subWG2').onclick = function() { openStaffTable('stf-work-get'); };
+    }
+
+    // Launch Level 1
+    viewHistory = [showLevel1];
+    showLevel1();
   };
 })();
