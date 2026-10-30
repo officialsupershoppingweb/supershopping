@@ -395,6 +395,38 @@
     </div>
   </div>
 
+  <!-- ================= FIREBASE CLOUD DATA CENTRE ================= -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // 1. Firebase Cloud Setup (Screen Keys Embedded)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwn4pJz2Ay9dDGJoSxwn___lQJu86qjsM",
+      authDomain: "supershopping-core.firebaseapp.com",
+      projectId: "supershopping-core",
+      storageBucket: "supershopping-core.firebasestorage.app",
+      messagingSenderId: "418018835419",
+      appId: "1:418018835419:web:3844d9ee37ba79e13885fe",
+      measurementId: "G-P1TB3QDE1N"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // 2. Part B: Live Cloud Reader Function
+    function listenLiveTableData(collectionName, callback) {
+      db.collection(collectionName).onSnapshot((snapshot) => {
+        const liveRecords = [];
+        snapshot.forEach((doc) => {
+          liveRecords.push({ id: doc.id, ...doc.data() });
+        });
+        callback(liveRecords);
+      }, (error) => {
+        console.error("Cloud DB Error:", error);
+      });
+    }
+  </script>
   <script>
     const TABLE_SCHEMAS = {
       // 1. CASHBACK
