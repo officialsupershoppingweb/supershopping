@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Shopping - Staff Career & Onboarding Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-cream: #FFF9E6;
+      --bg-light: #FBF6E9;
+      --chocolate: #36221A;
+      --chocolate-soft: #4A3328;
+      --card-bg: #FFFFFF;
+      --accent-brown: #795548;
+      --accent-gold: #D4A373;
+      --border-color: #E6D5C3;
+      --text-dark: #2B1810;
+      --text-muted: #6C584C;
+      --badge-bg: #EEDCC8;
+      --radius: 14px;
+      --shadow: 0 10px 25px rgba(54, 34, 26, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      line-height: 1.6;
+      padding: 0 16px 40px 16px;
+    }
+
+    .container {
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* SECTION 1: HERO SECTION */
+    .hero-section {
+      background: radial-gradient(circle at center, #FFFDF8 0%, #FFF3D6 100%);
+      border: 2px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 40px 20px;
+      text-align: center;
+      margin-top: 20px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--chocolate);
+      color: #FFF;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 6px 16px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .brand-title {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--chocolate);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      line-height: 1.1;
+      margin-bottom: 8px;
+    }
+
+    .brand-title span {
+      display: inline-block;
+      background: #E65100;
+      color: #FFF;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 8px;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    .hero-tagline {
+      font-size: 15px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+      font-weight: 500;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      background: var(--chocolate);
+      color: #FFF;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 28px;
+      border-radius: 50px;
+      box-shadow: 0 4px 12px rgba(54, 34, 26, 0.25);
+      transition: transform 0.2s;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+    }
+
+    .trust-badges {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+      flex-wrap: wrap;
+    }
+
+    .trust-pill {
+      background: rgba(121, 85, 72, 0.08);
+      border: 1px solid var(--border-color);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--chocolate-soft);
+    }
+
+    /* SECTION 2: HIRING & OVERVIEW */
+    .overview-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .section-heading {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--chocolate);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .intro-box {
+      background: var(--bg-light);
+      border-left: 4px solid var(--chocolate);
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: var(--text-dark);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .info-box {
+      background: #FDFBF7;
+      border: 1px solid var(--border-color);
+      padding: 16px;
+      border-radius: 10px;
+    }
+
+    .info-box h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--chocolate);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .info-box ul {
+      list-style-type: none;
+    }
+
+    .info-box ul li {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      position: relative;
+      padding-left: 16px;
+    }
+
+    .info-box ul li::before {
+      content: "•";
+      color: var(--accent-gold);
+      position: absolute;
+      left: 0;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .contact-block {
+      background: var(--chocolate);
+      color: #FFF;
+      padding: 16px;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 13px;
+    }
+
+    .contact-block a {
+      color: #FFD59E;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* SECTION 3: FORM */
+    .form-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 2px solid var(--chocolate-soft);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+
+    .form-header-banner {
+      background: var(--chocolate);
+      color: #FFF;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .form-header-banner h2 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .instructions-list {
+      background: #FFFDF8;
+      border: 1px dashed var(--border-color);
+      padding: 14px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--chocolate);
+      margin-bottom: 6px;
+    }
+
+    .form-group label span {
+      color: #D32F2F;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      background: #FFF;
+    }
+
+    .form-control:focus {
+      border-color: var(--chocolate);
+    }
+
+    .upload-section {
+      background: #FDF9F3;
+      border: 1px solid var(--border-color);
+      padding: 18px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .upload-section h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--chocolate);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .file-input-wrapper {
+      margin-bottom: 12px;
+    }
+
+    .file-input-wrapper label {
+      font-size: 12px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 4px;
+      color: var(--text-dark);
+    }
+
+    .file-input-wrapper input[type="file"] {
+      font-size: 12px;
+    }
+
+    /* SECTION 4: TERMS & POLICY */
+    .terms-box {
+      background: #FFF;
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .terms-box h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--chocolate);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--chocolate);
+    }
+
+    .checkbox-group input {
+      margin-top: 3px;
+      cursor: pointer;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: var(--chocolate);
+      color: #FFF;
+      border: none;
+      padding: 16px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .submit-btn:hover {
+      background: var(--chocolate-soft);
+    }
+
+    .submit-btn:disabled {
+      background: #A89F91;
+      cursor: not-allowed;
+    }
+
+    /* SUCCESS MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 9999;
+    }
+
+    .modal-box {
+      background: #FFF;
+      border-radius: 16px;
+      padding: 30px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    }
+
+    .modal-ref-id {
+      display: block;
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--chocolate);
+      background: var(--bg-light);
+      border: 1px dashed var(--border-color);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      letter-spacing: 1px;
+    }
+
+    .modal-btn {
+      background: var(--chocolate);
+      color: #FFF;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- 1. HERO SECTION -->
+    <section class="hero-section">
+      <div class="hero-badge">Official Onboarding Portal</div>
+      <h1 class="brand-title"><span>Free Entry</span>Super Shopping</h1>
+      <p class="hero-tagline">Join India's verified digital commerce & catalog operations workflow.</p>
+      <a href="#application-form" class="hero-cta">Apply For Staff Position ↓</a>
+      
+      <div class="trust-badges">
+        <div class="trust-pill">✓ 100% Verified Registration</div>
+        <div class="trust-pill">✓ Direct Founder Desk Audit</div>
+        <div class="trust-pill">✓ Instant Cloud Sync</div>
+      </div>
+    </section>
+
+    <!-- 2. WORK OVERVIEW & HIRING INFO -->
+    <section class="overview-card">
+      <h3 class="section-heading">We Are Hiring</h3>
+      
+      <div class="intro-box">
+        I am RV, the manager of Super Shopping. I warmly welcome you to our platform. My vision is to build a growing business with a dedicated team, where trust, teamwork, and commitment are our priorities. I believe every great achievement begins with the right people and shared goals.
+      </div>
+
+      <div class="grid-2">
+        <div class="info-box">
+          <h4>Skills Required</h4>
+          <ul>
+            <li>E-commerce Specialist</li>
+            <li>Data Management</li>
+            <li>Social Media Optimization</li>
+            <li>Communication skills</li>
+            <li>Product Listing Executive</li>
+          </ul>
+        </div>
+        
+        <div class="info-box">
+          <h4>Work Overview</h4>
+          <ul>
+            <li>Online work-from-home & operation workflow</li>
+            <li>Manage inventory & verify user claims</li>
+            <li>Social media & customer feedback monitoring</li>
+            <li>Daily targets and performance compliance</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="info-box">
+          <h4>Education Required</h4>
+          <ul>
+            <li>Minimum Qualification: 10th Pass</li>
+            <li>Graduates and College Students welcome to apply</li>
+          </ul>
+        </div>
+
+        <div class="contact-block">
+          <div><strong>Direct Help Desk:</strong></div>
+          <div>📞 Contact: <a href="tel:9454748368">+91 9454748368</a></div>
+          <div>✉ Email: <a href="mailto:rvm7695@gmail.com">rvm7695@gmail.com</a></div>
+          <div>📍 Office: Sector 72 Delhi</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. APPLICATION FORM -->
+    <section class="form-card" id="application-form">
+      <div class="form-header-banner">
+        <h2>SUPER SHOPPING</h2>
+      </div>
+
+      <div class="instructions-list">
+        <strong>Instructions:</strong>
+        <p>1. Complete your personal information and identity details below accurately.</p>
+        <p>2. We will contact you with portal instructions for the next steps.</p>
+        <p>3. Once your documents are verified by Founder Desk, you will receive the joining letter & portal access.</p>
+      </div>
+
+      <form id="staffJoinForm">
+        <div class="form-group">
+          <label>Full Name <span>*</span></label>
+          <input type="text" id="fullName" class="form-control" placeholder="Enter candidate full name" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Gender <span>*</span></label>
+            <select id="gender" class="form-control" required>
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Date of Birth <span>*</span></label>
+            <input type="date" id="dob" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Father's Name <span>*</span></label>
+          <input type="text" id="fatherName" class="form-control" placeholder="Enter father's name" required>
+        </div>
+
+        <div class="form-group">
+          <label>Complete Address <span>*</span></label>
+          <textarea id="address" class="form-control" rows="2" placeholder="House no, Street, Landmark, District, State, Pincode" required></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Contact Number (Call) <span>*</span></label>
+            <input type="tel" id="contactNumber" class="form-control" maxlength="10" placeholder="10-digit mobile number" pattern="[0-9]{10}" required>
+          </div>
+
+          <div class="form-group">
+            <label>WhatsApp Number <span>*</span></label>
+            <input type="tel" id="whatsappNumber" class="form-control" maxlength="10" placeholder="10-digit WhatsApp number" pattern="[0-9]{10}" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address <span>*</span></label>
+          <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Identity Proof Number (Aadhaar / Class X-XII / PAN) <span>*</span></label>
+          <input type="text" id="idProofNumber" class="form-control" placeholder="Enter identity document number" required>
+        </div>
+
+        <!-- UPLOAD SECTION -->
+        <div class="upload-section">
+          <h4>Document Upload (Max: 2MB each)</h4>
+          
+          <div class="file-input-wrapper">
+            <label>Class X/XII Marksheet, Aadhaar Card, or PAN Card (PDF/Image) <span>*</span></label>
+            <input type="file" id="docFile" accept="image/*,.pdf" required>
+          </div>
+
+          <div class="file-input-wrapper">
+            <label>Passport Size Photo (Recent photo) <span>*</span></label>
+            <input type="file" id="photoFile" accept="image/*" required>
+          </div>
+
+          <div class="file-input-wrapper">
+            <label>Signature (Clear sign on white paper) <span>*</span></label>
+            <input type="file" id="signFile" accept="image/*" required>
+          </div>
+        </div>
+
+        <!-- 4. TERMS & POLICIES -->
+        <div class="terms-box" style="margin-top: 24px;">
+          <h4>Terms & Policies</h4>
+          <p>Staff must provide accurate and genuine information during registration. All assigned tasks must be completed responsibly within the given deadlines. Daily targets and performance standards must be followed. Any fraudulent activity, false claims or misuse of company resources is strictly prohibited. Staff must maintain the confidentiality of company and customer information. Positions and responsibilities may vary according to individual skills and performance. All staff members must follow company guidelines and maintain professional conduct.</p>
+        </div>
+
+        <div class="checkbox-group">
+          <input type="checkbox" id="termsCheck" required>
+          <label for="termsCheck">I have read and agree to the Terms & Conditions and Privacy Policy. <span>*</span></label>
+        </div>
+
+        <button type="submit" id="submitBtn" class="submit-btn">Submit Application</button>
+      </form>
+    </section>
+
+  </div>
+
+  <!-- SUCCESS POPUP MODAL -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-box">
+      <h3 style="color: #2E7D32; font-size: 22px; margin-bottom: 8px;">✓ Application Submitted!</h3>
+      <p style="font-size: 13px; color: var(--text-muted);">Your application is synced with the Founder Desk Data Centre.</p>
+      
+      <span class="modal-ref-id" id="displayRefId">AUTO-XXXX-ST</span>
+      
+      <p style="font-size: 12px; margin-bottom: 20px; color: var(--text-dark);">
+        Please save this Reference Number. We will contact you once verification is complete.
+      </p>
+      
+      <button class="modal-btn" onclick="closeModal()">Close & Return</button>
+    </div>
+  </div>
+
+  <!-- FIREBASE DATA CENTRE SCRIPTS -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    // 1. Firebase Live Cloud Connection
+    const firebaseConfig = {
+      apiKey: "AIzaSyBwn4pJz2Ay9dDGJoSxwn___lQJu86qjsM",
+      authDomain: "supershopping-core.firebaseapp.com",
+      projectId: "supershopping-core",
+      storageBucket: "supershopping-core.firebasestorage.app",
+      messagingSenderId: "418018835419",
+      appId: "1:418018835419:web:3844d9ee37ba79e13885fe",
+      measurementId: "G-P1TB3QDE1N"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // Helper: Convert file to Base64 (Max 2MB)
+    function readFileAsBase64(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve(null);
+        if (file.size > 2 * 1024 * 1024) {
+          return reject(new Error(`File "${file.name}" exceeds the 2MB limit.`));
+        }
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (err) => reject(err);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // 2. Submit Event Handler
+    const form = document.getElementById('staffJoinForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!document.getElementById('termsCheck').checked) {
+        alert("Please accept the Terms & Conditions.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Syncing with Data Centre...";
+
+      try {
+        const docFile = document.getElementById('docFile').files[0];
+        const photoFile = document.getElementById('photoFile').files[0];
+        const signFile = document.getElementById('signFile').files[0];
+
+        const [docBase64, photoBase64, signBase64] = await Promise.all([
+          readFileAsBase64(docFile),
+          readFileAsBase64(photoFile),
+          readFileAsBase64(signFile)
+        ]);
+
+        // Generate AUTO Reference (e.g., AUTO-9821-ST)
+        const randomNum = Math.floor(1000 + Math.random() * 9000);
+        const autoRefId = `AUTO-${randomNum}-ST`;
+        const currentTimestamp = new Date().toISOString();
+
+        // 3. Save to Firestore "staffJoinRequests" Collection
+        await db.collection("staffJoinRequests").add({
+          autoRefId: autoRefId,
+          fullName: document.getElementById('fullName').value.trim(),
+          gender: document.getElementById('gender').value,
+          dob: document.getElementById('dob').value,
+          fatherName: document.getElementById('fatherName').value.trim(),
+          address: document.getElementById('address').value.trim(),
+          contactNumber: document.getElementById('contactNumber').value.trim(),
+          whatsappNumber: document.getElementById('whatsappNumber').value.trim(),
+          email: document.getElementById('email').value.trim(),
+          idProofNumber: document.getElementById('idProofNumber').value.trim(),
+          documents: {
+            idProofDoc: docBase64 ? docFile.name : null,
+            photoDoc: photoBase64 ? photoFile.name : null,
+            signDoc: signBase64 ? signFile.name : null
+          },
+          status: "Pending",
+          submissionDate: currentTimestamp,
+          tableModule: "1A_JOINING_REQUEST"
+        });
+
+        // 4. Show Success Modal
+        document.getElementById('displayRefId').innerText = autoRefId;
+        document.getElementById('successModal').style.display = 'flex';
+        form.reset();
+
+      } catch (error) {
+        console.error("Submission failed:", error);
+        alert("Submission Error: " + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Submit Application";
+      }
+    });
+
+    function closeModal() {
+      document.getElementById('successModal').style.display = 'none';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
