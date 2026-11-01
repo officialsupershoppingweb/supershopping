@@ -150,9 +150,6 @@
       color: var(--chocolate);
       text-transform: uppercase;
       margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .intro-box {
@@ -298,6 +295,11 @@
       border-color: var(--chocolate);
     }
 
+    .form-control:disabled {
+      background-color: #F5EFEB;
+      cursor: not-allowed;
+    }
+
     .upload-section {
       background: #FDF9F3;
       border: 1px solid var(--border-color);
@@ -315,7 +317,7 @@
     }
 
     .file-input-wrapper {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
 
     .file-input-wrapper label {
@@ -324,6 +326,10 @@
       display: block;
       margin-bottom: 4px;
       color: var(--text-dark);
+    }
+
+    .file-input-wrapper label span {
+      color: #D32F2F;
     }
 
     .file-input-wrapper input[type="file"] {
@@ -363,6 +369,8 @@
     .checkbox-group input {
       margin-top: 3px;
       cursor: pointer;
+      width: 18px;
+      height: 18px;
     }
 
     .submit-btn {
@@ -377,16 +385,13 @@
       cursor: pointer;
       text-transform: uppercase;
       letter-spacing: 1px;
-      transition: background 0.2s, transform 0.1s;
-    }
-
-    .submit-btn:hover {
-      background: var(--chocolate-soft);
+      transition: all 0.2s;
     }
 
     .submit-btn:disabled {
-      background: #A89F91;
-      cursor: not-allowed;
+      background: #A89F91 !important;
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
     }
 
     /* SUCCESS MODAL */
@@ -568,9 +573,24 @@
           <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
         </div>
 
-        <div class="form-group">
-          <label>Identity Proof Number (Aadhaar / Class X-XII / PAN) <span>*</span></label>
-          <input type="text" id="idProofNumber" class="form-control" placeholder="Enter identity document number" required>
+        <!-- NEW IDENTITY PROOF DROPDOWN & NUMBER -->
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Select Identity Proof Type <span>*</span></label>
+            <select id="idProofType" class="form-control" required onchange="handleIdTypeChange()">
+              <option value="">-- Choose Identity Document --</option>
+              <option value="Aadhaar Card">Aadhaar Card</option>
+              <option value="PAN Card">PAN Card</option>
+              <option value="Driving Licence">Driving Licence</option>
+              <option value="Ration Card">Ration Card</option>
+              <option value="Class 10th Roll Number">Class 10th Roll Number</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label id="idNumberLabel">Identity Document / Roll Number <span>*</span></label>
+            <input type="text" id="idProofNumber" class="form-control" placeholder="Select document type first" required disabled>
+          </div>
         </div>
 
         <!-- UPLOAD SECTION -->
@@ -578,7 +598,7 @@
           <h4>Document Upload (Max: 2MB each)</h4>
           
           <div class="file-input-wrapper">
-            <label>Class X/XII Marksheet, Aadhaar Card, or PAN Card (PDF/Image) <span>*</span></label>
+            <label id="uploadDocLabel">Selected Identity Proof Photo / PDF (Mandatory) <span>*</span></label>
             <input type="file" id="docFile" accept="image/*,.pdf" required>
           </div>
 
@@ -604,7 +624,7 @@
           <label for="termsCheck">I have read and agree to the Terms & Conditions and Privacy Policy. <span>*</span></label>
         </div>
 
-        <button type="submit" id="submitBtn" class="submit-btn">Submit Application</button>
+        <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Application</button>
       </form>
     </section>
 
@@ -631,7 +651,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
   <script>
-    // 1. Firebase Live Cloud Connection
     const firebaseConfig = {
       apiKey: "AIzaSyBwn4pJz2Ay9dDGJoSxwn___lQJu86qjsM",
       authDomain: "supershopping-core.firebaseapp.com",
@@ -645,7 +664,51 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    // Helper: Convert file to Base64 (Max 2MB)
+    // ID Type change handler
+    function handleIdTypeChange() {
+      const typeSelect = document.getElementById('idProofType');
+      const numberInput = document.getElementById('idProofNumber');
+      const uploadLabel = document.getElementById('uploadDocLabel');
+
+      if (typeSelect.value) {
+        numberInput.disabled = false;
+        numberInput.placeholder = `Enter valid ${typeSelect.value} number`;
+        uploadLabel.innerText = `Upload ${typeSelect.value} Photo / PDF (Mandatory) *`;
+      } else {
+        numberInput.disabled = true;
+        numberInput.value = "";
+        numberInput.placeholder = "Select document type first";
+        uploadLabel.innerText = "Selected Identity Proof Photo / PDF (Mandatory) *";
+      }
+      checkFormCompleteness();
+    }
+
+    // Strict Validation: Button lock/unlock
+    const form = document.getElementById('staffJoinForm');
+    const terms = document.getElementById('termsCheck');
+    const submitBtn = document.getElementById('submitBtn');
+
+    function checkFormCompleteness() {
+      const isFormValid = form.checkValidity();
+      const isTermsChecked = terms.checked;
+      const isIdSelected = document.getElementById('idProofType').value !== "";
+
+      const docFile = document.getElementById('docFile').files.length > 0;
+      const photoFile = document.getElementById('photoFile').files.length > 0;
+      const signFile = document.getElementById('signFile').files.length > 0;
+
+      if (isFormValid && isTermsChecked && isIdSelected && docFile && photoFile && signFile) {
+        submitBtn.disabled = false;
+      } else {
+        submitBtn.disabled = true;
+      }
+    }
+
+    // Attach real-time checkers
+    form.addEventListener('input', checkFormCompleteness);
+    form.addEventListener('change', checkFormCompleteness);
+
+    // Helper: File to Base64 (Max 2MB)
     function readFileAsBase64(file) {
       return new Promise((resolve, reject) => {
         if (!file) return resolve(null);
@@ -659,17 +722,9 @@
       });
     }
 
-    // 2. Submit Event Handler
-    const form = document.getElementById('staffJoinForm');
-    const submitBtn = document.getElementById('submitBtn');
-
+    // Form Submit Event
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-
-      if (!document.getElementById('termsCheck').checked) {
-        alert("Please accept the Terms & Conditions.");
-        return;
-      }
 
       submitBtn.disabled = true;
       submitBtn.innerText = "Syncing with Data Centre...";
@@ -685,12 +740,10 @@
           readFileAsBase64(signFile)
         ]);
 
-        // Generate AUTO Reference (e.g., AUTO-9821-ST)
         const randomNum = Math.floor(1000 + Math.random() * 9000);
         const autoRefId = `AUTO-${randomNum}-ST`;
         const currentTimestamp = new Date().toISOString();
 
-        // 3. Save to Firestore "staffJoinRequests" Collection
         await db.collection("staffJoinRequests").add({
           autoRefId: autoRefId,
           fullName: document.getElementById('fullName').value.trim(),
@@ -701,6 +754,7 @@
           contactNumber: document.getElementById('contactNumber').value.trim(),
           whatsappNumber: document.getElementById('whatsappNumber').value.trim(),
           email: document.getElementById('email').value.trim(),
+          idProofType: document.getElementById('idProofType').value,
           idProofNumber: document.getElementById('idProofNumber').value.trim(),
           documents: {
             idProofDoc: docBase64 ? docFile.name : null,
@@ -712,16 +766,16 @@
           tableModule: "1A_JOINING_REQUEST"
         });
 
-        // 4. Show Success Modal
         document.getElementById('displayRefId').innerText = autoRefId;
         document.getElementById('successModal').style.display = 'flex';
         form.reset();
+        checkFormCompleteness();
 
       } catch (error) {
         console.error("Submission failed:", error);
         alert("Submission Error: " + error.message);
       } finally {
-        submitBtn.disabled = false;
+        submitBtn.disabled = true;
         submitBtn.innerText = "Submit Application";
       }
     });
